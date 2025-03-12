@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../category_based_service_listing/service_listing_screen.dart';
+// <-- Make sure this path is correct for your project
 
 class CategoriesWidget extends StatelessWidget {
   const CategoriesWidget({super.key});
@@ -25,7 +27,7 @@ class CategoriesWidget extends StatelessWidget {
               'Categories',
               style: TextStyle(
                 fontFamily: 'Roboto',
-                fontWeight: FontWeight.w600, // SemiBold
+                fontWeight: FontWeight.w600,
                 fontSize: 24,
                 color: Color(0xFF027335),
               ),
@@ -43,47 +45,60 @@ class CategoriesWidget extends StatelessWidget {
         ),
         const SizedBox(height: 16),
 
-        /// **Fixed Grid to Avoid Overflow**
+        /// Grid with category items
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4, // 4 items per row
-            crossAxisSpacing: 16, // Horizontal spacing
-            mainAxisSpacing: 30,  // Increased vertical spacing
-            childAspectRatio: 0.8, // **Ensure enough height for image + text**
+            crossAxisCount: 4,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 30,
+            childAspectRatio: 0.8,
           ),
           itemCount: categories.length,
           itemBuilder: (context, index) {
             final category = categories[index];
 
-            return Column(
-              mainAxisSize: MainAxisSize.min, // Prevents overflow issues
-              children: [
-                Container(
-                  width: 70,
-                  height: 62,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: AssetImage(category['image']!),
-                      fit: BoxFit.cover,
+            return InkWell(
+              onTap: () {
+                // Navigate to the new screen, passing category name
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ServiceListingScreen(
+                      categoryName: category['name']!,
                     ),
                   ),
-                ),
-                const SizedBox(height: 6), // Extra spacing for text
-                Text(
-                  category['name']!,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
+                );
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 70,
+                    height: 62,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: AssetImage(category['image']!),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis, // Prevents multi-line overflow
-                ),
-              ],
+                  const SizedBox(height: 6),
+                  Text(
+                    category['name']!,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontFamily: 'Roboto',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             );
           },
         ),
