@@ -63,6 +63,7 @@ flutter:
      - assets/images/categories/
      - assets/images/jobs/
      - assets/images/other/
+     - assets/images/cover_image/
      - assets/images/cover_image/cleaning_cover_image.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
