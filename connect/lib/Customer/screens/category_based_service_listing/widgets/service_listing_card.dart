@@ -25,10 +25,9 @@ class ServiceListingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // 10% rounded edges, color: F6FAF8, with drop shadow
       decoration: BoxDecoration(
         color: const Color(0xFFF6FAF8),
-        borderRadius: BorderRadius.circular(16), // ~10% of typical card size
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
@@ -107,12 +106,12 @@ class ServiceListingCard extends StatelessWidget {
                   children: [
                     const Icon(
                       Icons.star,
-                      color: Color(0xFFFFD700), // #FFD700
+                      color: Color(0xFFFFD700),
                       size: 18,
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      rating.toStringAsFixed(1), // e.g. "4.9"
+                      rating.toStringAsFixed(1),
                       style: const TextStyle(
                         fontFamily: 'Roboto',
                         fontSize: 13,
@@ -151,7 +150,7 @@ class ServiceListingCard extends StatelessWidget {
                         fontFamily: 'Roboto',
                         fontWeight: FontWeight.w600,
                         fontSize: 18,
-                        color: Colors.grey[600], // #898A8D approx
+                        color: Colors.grey[600],
                       ),
                     ),
                   ],

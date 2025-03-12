@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-// Reuse your existing custom AppBar and NavBar
 import '../../widgets/connect_app_bar.dart';
 import '../../widgets/connect_nav_bar.dart';
 
-// Reuse your search bar from home, or create a new search bar if preferred
 import '../home/widgets/search_bar_widget.dart';
 
-// The widget for each service card
 import 'widgets/service_listing_card.dart';
 
 class ServiceListingScreen extends StatefulWidget {
@@ -28,8 +25,6 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
   bool _hideNavBar = false;
   double _lastOffset = 0;
 
-  // Example service data for demonstration.
-  // In a real app, you'd fetch from an API or local data source.
   final List<Map<String, dynamic>> allServices = [
     {
       'category': 'Fitness',
@@ -119,8 +114,6 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
       'price': 800.00,
       'image': 'assets/images/cover_image/gardening1.jpg',
     },
-
-    // ... more services ...
   ];
 
   List<Map<String, dynamic>> filteredServices = [];
@@ -130,7 +123,6 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
     super.initState();
     _scrollController.addListener(_onScroll);
 
-    // Filter services based on the passed category name
     filteredServices = allServices.where((service) {
       return service['category'] == widget.categoryName;
     }).toList();
@@ -163,13 +155,11 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Same gradient app bar
       appBar: const ConnectAppBar(),
       body: Stack(
         children: [
           SingleChildScrollView(
             controller: _scrollController,
-            // 25px padding around all content
             padding: const EdgeInsets.all(25),
             child: Column(
               children: [
@@ -192,7 +182,6 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
                         ),
                       ),
                     ),
-                    // Spacer so we can place the category name center
                     const Spacer(),
 
                     // Category name (center)
@@ -205,18 +194,15 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
                         color: Color(0xFF027335),
                       ),
                     ),
-                    // Spacer so that text remains centered
                     const Spacer(),
 
                     // Invisible box matching arrow size to keep text centered
-                    // If you want no empty space on the right, you can skip this
                     SizedBox(width: 28) // ~ the width of arrow+padding
                   ],
                 ),
 
                 const SizedBox(height: 30),
 
-                // Reuse the same search bar
                 SearchBarWidget(
                   onTap: () {
                     Navigator.pushNamed(context, '/search');
