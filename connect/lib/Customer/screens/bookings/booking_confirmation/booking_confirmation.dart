@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../../widgets/connect_app_bar.dart';
 
-class BookingConfirmationScreen extends StatelessWidget {
-  const BookingConfirmationScreen({super.key});
+class BookingConfirmation extends StatelessWidget {
+  const BookingConfirmation({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const ConnectAppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(25),
-        child: Center(
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
                 'Successful!',
@@ -23,7 +23,7 @@ class BookingConfirmationScreen extends StatelessWidget {
                   color: Color(0xFF027335),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               const Text(
                 'Booking ID - 565332',
                 style: TextStyle(
@@ -33,7 +33,7 @@ class BookingConfirmationScreen extends StatelessWidget {
                   color: Colors.black,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               const Text(
                 'Your booking request has been sent!',
                 style: TextStyle(
@@ -42,48 +42,36 @@ class BookingConfirmationScreen extends StatelessWidget {
                   fontSize: 18,
                   color: Colors.black,
                 ),
-                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               const Text(
                 'The provider has up to 2 days to respond',
                 style: TextStyle(
                   fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w400,
                   fontSize: 18,
                   color: Colors.black,
                 ),
-                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 32),
-
-              // Big check icon inside a circle
+              const SizedBox(height: 24),
               Container(
-                width: 120,
-                height: 120,
+                width: 150,
+                height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xFF027335),
-                    width: 2,
-                  ),
-                  color: const Color(0xFFE8F5E8), // light greenish
+                  border: Border.all(color: Color(0xFF027335), width: 2),
+                  color: const Color(0xFFEFF8F3),
                 ),
-                child: const Center(
-                  child: Icon(
-                    Icons.check,
-                    color: Color(0xFF027335),
-                    size: 60,
-                  ),
+                child: const Icon(
+                  Icons.check,
+                  size: 100,
+                  color: Color(0xFF027335),
                 ),
               ),
-              const SizedBox(height: 32),
-
-              // "View upcoming bookings" button
+              const SizedBox(height: 35),
               ElevatedButton(
                 onPressed: () {
-                  // Navigate to upcoming bookings screen (placeholder)
-                  // For now, just pop to home or show a placeholder
-                  Navigator.popUntil(context, (route) => route.isFirst);
+                  Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF027335),
@@ -100,7 +88,7 @@ class BookingConfirmationScreen extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: 'Roboto',
                     fontWeight: FontWeight.bold,
-                    fontSize: 22,
+                    fontSize: 20,
                     color: Colors.white,
                   ),
                 ),

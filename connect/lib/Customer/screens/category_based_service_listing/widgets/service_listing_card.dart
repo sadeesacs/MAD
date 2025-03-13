@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../bookings/booking/booking_screen.dart'; // Import Booking Screen
+import '../../bookings/booking/booking_screen.dart';
+import '../../bookings/booking_form_data.dart'; // Import Booking Screen
 
 class ServiceListingCard extends StatelessWidget {
   final String imagePath;
@@ -10,6 +11,7 @@ class ServiceListingCard extends StatelessWidget {
   final double rating;
   final int reviewsCount;
   final double price;
+  final String category;
 
   const ServiceListingCard({
     super.key,
@@ -21,6 +23,7 @@ class ServiceListingCard extends StatelessWidget {
     required this.rating,
     required this.reviewsCount,
     required this.price,
+    required this.category,
   });
 
   @override
@@ -32,11 +35,13 @@ class ServiceListingCard extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (_) => BookingScreen(
-              serviceTitle: title,
-              providerName: provider,
-              categoryName: 'Cleaning', // Update dynamically if needed
-              pricePerHour: price,
-              coverImagePath: imagePath,
+              formData: BookingFormData(
+                serviceTitle: title,
+                providerName: provider,
+                pricePerHour: price,
+                imageUrl: imagePath,
+                category: category,
+              ),
             ),
           ),
         );
