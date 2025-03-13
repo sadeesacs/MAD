@@ -7,11 +7,11 @@ class DateInput extends StatefulWidget {
   final ValueChanged<String> onDateSelected;
 
   const DateInput({
-    Key? key,
+    super.key,
     this.initialDate,
     required this.isError,
     required this.onDateSelected,
-  }) : super(key: key);
+  });
 
   @override
   State<DateInput> createState() => _DateInputState();

@@ -10,7 +10,7 @@ import '../booking_summary/booking_summary.dart';
 class BookingScreen extends StatefulWidget {
   final BookingFormData formData;
 
-  const BookingScreen({Key? key, required this.formData}) : super(key: key);
+  const BookingScreen({super.key, required this.formData});
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();

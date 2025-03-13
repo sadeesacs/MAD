@@ -8,12 +8,12 @@ class TimeInput extends StatefulWidget {
   final Function(String fromTime, String toTime) onTimeSelected;
 
   const TimeInput({
-    Key? key,
+    super.key,
     this.initialFromTime,
     this.initialToTime,
     required this.isError,
     required this.onTimeSelected,
-  }) : super(key: key);
+  });
 
   @override
   State<TimeInput> createState() => _TimeInputState();
