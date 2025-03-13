@@ -12,9 +12,9 @@ class ServiceListingScreen extends StatefulWidget {
   final String categoryName;
 
   const ServiceListingScreen({
-    Key? key,
+    super.key,
     required this.categoryName,
-  }) : super(key: key);
+  });
 
   @override
   State<ServiceListingScreen> createState() => _ServiceListingScreenState();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../bookings/booking/booking_screen.dart'; // Import Booking Screen
 
 class ServiceListingCard extends StatelessWidget {
   final String imagePath;
@@ -24,141 +25,158 @@ class ServiceListingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF6FAF8),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            offset: const Offset(0, 2),
-            blurRadius: 4,
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        children: [
-          // Cover image
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
-              imagePath,
-              width: 110,
-              height: 120,
-              fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () {
+        // Navigate to BookingScreen and pass service details
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BookingScreen(
+              serviceTitle: title,
+              providerName: provider,
+              categoryName: 'Cleaning', // Update dynamically if needed
+              pricePerHour: price,
+              coverImagePath: imagePath,
             ),
           ),
-          const SizedBox(width: 12),
-          // Service details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Window Cleaning
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500, // "Medium"
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                // By Mr. Richard Perera
-                Text(
-                  'By $provider',
-                  style: const TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                // Location:
-                Row(
-                  children: [
-                    const Text(
-                      'Location: ',
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500, // "Medium"
-                        color: Colors.black,
-                      ),
-                    ),
-                    Text(
-                      '$city, $province',
-                      style: const TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                // Rating & Reviews
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.star,
-                      color: Color(0xFFFFD700),
-                      size: 18,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      rating.toStringAsFixed(1),
-                      style: const TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600, // "Semibold"
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(width: 30),
-                    Text(
-                      '$reviewsCount Reviews',
-                      style: const TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                // LKR 500.00/h
-                Row(
-                  children: [
-                    Text(
-                      'LKR ${price.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Text(
-                      '/h',
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFFF6FAF8),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              offset: const Offset(0, 2),
+              blurRadius: 4,
             ),
-          ),
-        ],
+          ],
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            // Cover image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                imagePath,
+                width: 110,
+                height: 120,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 12),
+            // Service details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Service Title
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontFamily: 'Roboto',
+                      fontSize: 17,
+                      fontWeight: FontWeight.w500, // Medium
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  // Provider Name
+                  Text(
+                    'By $provider',
+                    style: const TextStyle(
+                      fontFamily: 'Roboto',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  // Location
+                  Row(
+                    children: [
+                      const Text(
+                        'Location: ',
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500, // Medium
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        '$city, $province',
+                        style: const TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  // Rating & Reviews
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.star,
+                        color: Color(0xFFFFD700),
+                        size: 18,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        rating.toStringAsFixed(1),
+                        style: const TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600, // Semibold
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(width: 30),
+                      Text(
+                        '$reviewsCount Reviews',
+                        style: const TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  // Price Per Hour
+                  Row(
+                    children: [
+                      Text(
+                        'LKR ${price.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        '/h',
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
