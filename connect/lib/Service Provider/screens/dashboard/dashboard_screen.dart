@@ -7,7 +7,7 @@ import 'widgets/manage_my_services.dart';
 import 'widgets/customer_reviews_sp_widget.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();

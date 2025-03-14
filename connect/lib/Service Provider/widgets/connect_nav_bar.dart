@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ConnectNavBarSP extends StatelessWidget {
   final bool isHomeSelected;
-  const ConnectNavBarSP({Key? key, this.isHomeSelected = false}) : super(key: key);
+  const ConnectNavBarSP({super.key, this.isHomeSelected = false});
 
   @override
   Widget build(BuildContext context) {
