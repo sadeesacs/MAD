@@ -79,6 +79,7 @@ class _BookingSummaryState extends State<BookingSummary> {
     final form = widget.formData;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: const ConnectAppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(25),
