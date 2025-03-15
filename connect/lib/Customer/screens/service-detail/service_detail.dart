@@ -1,4 +1,7 @@
 import 'package:connect/Customer/screens/service-detail/widgets/bottom_buttons.dart';
+import 'package:connect/Customer/screens/service-detail/widgets/job_description.dart';
+import 'package:connect/Customer/screens/service-detail/widgets/recent_jobs.dart';
+import 'package:connect/Customer/screens/service-detail/widgets/reviews.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/connect_app_bar.dart';
@@ -18,9 +21,12 @@ class ConnectApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ServiceDetailScreen(),
+      theme: ThemeData(
+        fontFamily: 'Roboto', // Apply Roboto font to the entire app
+      ),
+      home: const ServiceDetailScreen(),
     );
   }
 }
@@ -40,18 +46,43 @@ class ServiceDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Cleaning Text
-                Center(
-                  child: Text(
-                    'Cleaning',
-                    style: TextStyle(
-                      color: darkGreen,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                // Row for Back Button and Cleaning Text
+                Row(
+                  children: [
+                    // Back Button
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDFE9E3),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: Color(0xFF027335),
+                          size: 20,
+                        ),
+                      ),
                     ),
-                  ),
+                    const Spacer(), // Spacer to push the title to the center
+
+                    // Cleaning Text
+                    Text(
+                      'Cleaning',
+                      style: TextStyle(
+                        color: darkGreen,
+                        fontSize: 29,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Spacer(), // Spacer to balance the row
+
+                    // Invisible placeholder to match the back button's width
+                    const SizedBox(width: 40), // Adjust width to match back button size
+                  ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 18),
 
                 // Cover Image
                 ClipRRect(
@@ -61,21 +92,25 @@ class ServiceDetailScreen extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
 
                 // Kitchen Cleaning Section
-                const Text(
+                Text(
                   'Kitchen Cleaning',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    fontFamily: 'Roboto', // Apply Roboto font
                   ),
                 ),
-                const Text(
+                Text(
                   'By Leo Perera',
-                  style: TextStyle(color: greyText),
+                  style: TextStyle(
+                    color: greyText,
+                    fontFamily: 'Roboto', // Apply Roboto font
+                  ),
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 7),
 
                 // Stars and Price Row
                 Row(
@@ -90,11 +125,12 @@ class ServiceDetailScreen extends StatelessWidget {
                         Icon(Icons.star_border, color: Colors.orange),
                       ],
                     ),
-                    const Text(
+                    Text(
                       'LKR 500.00/h',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        fontFamily: 'Roboto', // Apply Roboto font
                       ),
                     ),
                   ],
@@ -135,11 +171,14 @@ class ServiceDetailScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         border: Border.all(color: darkGreen),
-        borderRadius: BorderRadius.circular(0),
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         label,
-        style: TextStyle(color: darkGreen),
+        style: TextStyle(
+          color: black,
+          fontFamily: 'Roboto', // Apply Roboto font
+        ),
       ),
     );
   }
@@ -164,11 +203,11 @@ class ServiceDetailScreen extends StatelessWidget {
             child: TabBarView(
               children: [
                 // Job Description Content
-
+                const JobDescription(),
                 // Recent Jobs Content
-
+                RecentJobs(),
                 // Reviews Content
-
+                Reviews(),
               ],
             ),
           ),
