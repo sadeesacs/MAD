@@ -12,9 +12,9 @@ class ServiceListingScreen extends StatefulWidget {
   final String categoryName;
 
   const ServiceListingScreen({
-    Key? key,
+    super.key,
     required this.categoryName,
-  }) : super(key: key);
+  });
 
   @override
   State<ServiceListingScreen> createState() => _ServiceListingScreenState();
@@ -45,7 +45,7 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
       'province': 'Western',
       'rating': 4.7,
       'reviews': 110,
-      'price': 800.00,
+      'price': 1000.00,
       'image': 'assets/images/cover_image/gardening1.jpg',
     },
     {
@@ -56,7 +56,7 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
       'province': 'Gampaha',
       'rating': 4.9,
       'reviews': 150,
-      'price': 500.00,
+      'price': 1200.00,
       'image': 'assets/images/cover_image/cleaning1.png',
     },
     {
@@ -225,6 +225,7 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
                         rating: service['rating'],
                         reviewsCount: service['reviews'],
                         price: service['price'],
+                        category: service['category'],
                       ),
                     );
                   }).toList(),
