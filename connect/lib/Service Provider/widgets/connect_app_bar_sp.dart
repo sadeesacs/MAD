@@ -9,7 +9,7 @@ class ConnectAppBarSP extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFEDF9EB), // #EDF9EB
+      color: const Color(0xFFEDF9EB),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),

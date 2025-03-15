@@ -7,6 +7,7 @@ class BookingConfirmation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: const ConnectAppBar(),
       body: Center(
         child: SingleChildScrollView(
