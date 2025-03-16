@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'Customer/screens/home/home_screen.dart';
+import 'Customer/screens/category_based_service_listing/service_listing_screen.dart'; // Import ServiceListingScreen
+import 'Customer/screens/Signup/register_screen.dart';
+import 'Customer/screens/Signup/email_verification_screen.dart'; // Import OTP Screen
+import 'Customer/screens/Notifications/Notifications.dart'; // Import NotificationsScreen
 
 void main() {
   runApp(const MyApp());
@@ -16,24 +19,26 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: const HomeScreen(),
+      home: const NotificationsScreen(), // Start from NotificationsScreen
       routes: {
-        // Placeholder route for your search function
-        '/search': (context) => const SearchFunctionScreen(),
+        '/home': (context) => const HomeScreen(), // HomeScreen route
+        '/register': (context) => const RegisterScreen(), // RegisterScreen route
+        '/otp': (context) => const EmailVerificationScreen(), // OTP Screen route
+        '/category': (context) => const ServiceListingScreen(categoryName: 'Cleaning'), // Set the route for the ServiceListingScreen
+        '/notifications': (context) => const NotificationsScreen(), // Add the NotificationsScreen route
       },
     );
   }
 }
 
-/// Simple placeholder for your Search screen
-class SearchFunctionScreen extends StatelessWidget {
-  const SearchFunctionScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Search Screen Placeholder')),
-      body: const Center(child: Text('Search Screen Placeholder')),
+      appBar: AppBar(title: const Text('Home Screen')),
+      body: const Center(child: Text('Welcome to Home Screen')),
     );
   }
 }
