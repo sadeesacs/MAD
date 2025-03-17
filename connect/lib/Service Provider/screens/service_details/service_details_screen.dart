@@ -11,6 +11,9 @@ import 'widgets/recent_jobs_widget.dart';
 import 'popups/status_confirmation_popup.dart';
 import 'popups/edit_job_description_popup.dart';
 
+// Import the EditServiceDetailsScreen (adjust path as needed)
+import 'edit_service_details_screen.dart';
+
 class ServiceDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> service;
 
@@ -88,7 +91,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Back button + Service Title + Status Indicator Row
+                // Row for the back button + Service Title + Status Indicator Row
                 Row(
                   children: [
                     // Back button: navigates back to previous screen
@@ -155,7 +158,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                     service['coverImage'] ??
                         'assets/images/cover_image/cleaning2.png',
                     width: double.infinity,
-                    height: 150,
+                    height: 250,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -165,7 +168,19 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                 ServiceDetailCard(
                   service: service,
                   onEdit: () {
-                    // Placeholder: Implement editing for service details if needed
+                    // Navigate to EditServiceDetailsScreen and update service on return.
+                    Navigator.push<Map<String, dynamic>>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EditServiceDetailsScreen(service: service),
+                      ),
+                    ).then((updatedService) {
+                      if (updatedService != null) {
+                        setState(() {
+                          service = updatedService;
+                        });
+                      }
+                    });
                   },
                 ),
                 const SizedBox(height: 30),
@@ -207,7 +222,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                         },
                       ],
                   onAdd: () {
-                    // Placeholder for navigation to add a new job
+                    // Placeholder for adding a new job
                   },
                 ),
                 const SizedBox(height: 30),
