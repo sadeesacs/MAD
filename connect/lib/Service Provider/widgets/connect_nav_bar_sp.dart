@@ -1,3 +1,4 @@
+import 'package:connect/Service%20Provider/screens/scheduled_jobs/scheduled_job.dart';
 import 'package:flutter/material.dart';
 import '../screens/dashboard/dashboard_screen.dart';
 import '../screens/service_listing/service_listing_screen.dart';
@@ -7,10 +8,13 @@ class ConnectNavBarSP extends StatelessWidget {
 
   final bool isToolsSelected;
 
+  final bool isCalenderSelected;
+
   const ConnectNavBarSP({
     super.key,
     this.isHomeSelected = false,
     this.isToolsSelected = false,
+    this.isCalenderSelected = false,
   });
 
   @override
@@ -62,11 +66,22 @@ class ConnectNavBarSP extends StatelessWidget {
                 ),
               ),
 
-              // Calendar icon
-              _NavIcon(
-                icon: Icons.calendar_today_outlined,
-                isActive: false,
+              GestureDetector(
+                onTap: () {
+                  // Navigate to Service Listing
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ScheduledJobsScreen(),
+                    ),
+                  );
+                },
+                child: _NavIcon(
+                  icon: Icons.calendar_today_outlined,
+                  isActive: isCalenderSelected,
+                ),
               ),
+
 
               // Messages icon
               _NavIcon(
