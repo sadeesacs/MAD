@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class StatusIndicator extends StatelessWidget {
   final bool isActive;
 
-  const StatusIndicator({Key? key, required this.isActive}) : super(key: key);
+  const StatusIndicator({super.key, required this.isActive});
 
   @override
   Widget build(BuildContext context) {

@@ -4,7 +4,7 @@ import 'package:flutter/rendering.dart';
 
 import '../../widgets/connect_app_bar_sp.dart' show ConnectAppBarSP;
 import '../../widgets/connect_nav_bar_sp.dart' show ConnectNavBarSP;
-import 'widgets/customer_reviews_sp_widget.dart'; // from your snippet
+import 'widgets/customer_reviews_sp_widget.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

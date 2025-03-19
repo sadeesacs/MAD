@@ -5,14 +5,13 @@ class ServiceDetailCard extends StatelessWidget {
   final VoidCallback onEdit;
 
   const ServiceDetailCard({
-    Key? key,
+    super.key,
     required this.service,
     required this.onEdit,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Example fields assumed:
     final name = service['name'] ?? 'Service Name';
     final category = service['category'] ?? 'Cleaning';
     final hourlyRate = service['hourlyRate'] ?? 0.0;
