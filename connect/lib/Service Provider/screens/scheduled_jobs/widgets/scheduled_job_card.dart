@@ -1,6 +1,8 @@
 // widgets/scheduled_job_card.dart
 import 'package:flutter/material.dart';
 
+import '../../booking_details-scheduled_jobs/bookings_details_jobs.dart';
+
 const Color darkGreen = Color(0xFF027335);
 const Color white = Colors.white;
 
@@ -90,6 +92,12 @@ class ScheduledJobCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 OutlinedButton(
                   onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BookingDetailsScreen(),
+                      ),
+                    );
 
                   },
                   style: OutlinedButton.styleFrom(
