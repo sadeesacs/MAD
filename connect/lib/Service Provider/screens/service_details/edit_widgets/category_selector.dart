@@ -6,11 +6,11 @@ class CategorySelector extends StatefulWidget {
   final ValueChanged<String> onCategorySelected;
 
   const CategorySelector({
-    Key? key,
+    super.key,
     this.selectedCategory,
     required this.isError,
     required this.onCategorySelected,
-  }) : super(key: key);
+  });
 
   @override
   State<CategorySelector> createState() => _CategorySelectorState();

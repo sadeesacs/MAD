@@ -18,9 +18,9 @@ class ServiceDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> service;
 
   const ServiceDetailsScreen({
-    Key? key,
+    super.key,
     required this.service,
-  }) : super(key: key);
+  });
 
   @override
   State<ServiceDetailsScreen> createState() => _ServiceDetailsScreenState();

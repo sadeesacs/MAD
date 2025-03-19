@@ -5,10 +5,10 @@ class JobDescriptionCard extends StatelessWidget {
   final VoidCallback onEdit;
 
   const JobDescriptionCard({
-    Key? key,
+    super.key,
     required this.description,
     required this.onEdit,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

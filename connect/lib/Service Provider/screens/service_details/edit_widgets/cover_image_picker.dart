@@ -8,11 +8,11 @@ class CoverImagePicker extends StatefulWidget {
   final ValueChanged<String> onImagePicked;
 
   const CoverImagePicker({
-    Key? key,
+    super.key,
     required this.imagePath,
     required this.isError,
     required this.onImagePicked,
-  }) : super(key: key);
+  });
 
   @override
   State<CoverImagePicker> createState() => _CoverImagePickerState();

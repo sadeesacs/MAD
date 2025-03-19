@@ -6,11 +6,11 @@ class LocationSelector extends StatefulWidget {
   final ValueChanged<List<String>> onLocationsChanged;
 
   const LocationSelector({
-    Key? key,
+    super.key,
     required this.selectedLocations,
     required this.isError,
     required this.onLocationsChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<LocationSelector> createState() => _LocationSelectorState();
@@ -65,7 +65,7 @@ class _LocationSelectorState extends State<LocationSelector> {
               spacing: 8,
               runSpacing: 8,
               children: [
-                ...selected.map((loc) => _buildChip(loc)).toList(),
+                ...selected.map((loc) => _buildChip(loc)),
                 if (selected.isEmpty)
                   const Text(
                     'Select Locations',

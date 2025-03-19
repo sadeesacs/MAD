@@ -6,11 +6,11 @@ class AvailableDatesPicker extends StatefulWidget {
   final ValueChanged<String> onDayToggled;
 
   const AvailableDatesPicker({
-    Key? key,
+    super.key,
     required this.selectedDays,
     required this.isError,
     required this.onDayToggled,
-  }) : super(key: key);
+  });
 
   @override
   State<AvailableDatesPicker> createState() => _AvailableDatesPickerState();

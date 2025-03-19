@@ -5,10 +5,10 @@ class EditJobDescriptionPopup extends StatefulWidget {
   final ValueChanged<String> onSubmit;
 
   const EditJobDescriptionPopup({
-    Key? key,
+    super.key,
     required this.initialValue,
     required this.onSubmit,
-  }) : super(key: key);
+  });
 
   @override
   State<EditJobDescriptionPopup> createState() => _EditJobDescriptionPopupState();

@@ -5,10 +5,10 @@ class ServiceDetailCard extends StatelessWidget {
   final VoidCallback onEdit;
 
   const ServiceDetailCard({
-    Key? key,
+    super.key,
     required this.service,
     required this.onEdit,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

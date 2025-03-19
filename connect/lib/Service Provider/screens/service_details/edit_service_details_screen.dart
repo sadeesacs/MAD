@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import '../../widgets/connect_app_bar_sp.dart';
 
@@ -16,9 +15,9 @@ class EditServiceDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> service;
 
   const EditServiceDetailsScreen({
-    Key? key,
+    super.key,
     required this.service,
-  }) : super(key: key);
+  });
 
   @override
   State<EditServiceDetailsScreen> createState() =>
