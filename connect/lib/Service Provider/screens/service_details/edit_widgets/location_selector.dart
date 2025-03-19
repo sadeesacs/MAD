@@ -19,7 +19,6 @@ class LocationSelector extends StatefulWidget {
 class _LocationSelectorState extends State<LocationSelector> {
   final TextEditingController _controller = TextEditingController();
 
-  // Example location list
   List<String> allLocations = [
     'Colombo',
     'Gampaha',
@@ -52,7 +51,7 @@ class _LocationSelectorState extends State<LocationSelector> {
     return GestureDetector(
       onTap: _showLocationPicker,
       child: SizedBox(
-        height: 80, // Fixed height so it always fits with parent's 25 padding
+        height: 80,
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.all(8),
@@ -158,7 +157,6 @@ class _LocationSelectorState extends State<LocationSelector> {
                               ? const Icon(Icons.check, color: Colors.green)
                               : null,
                           onTap: () {
-                            // Use setModalState to update bottom sheet UI seamlessly
                             setModalState(() {
                               if (selectedFlag) {
                                 selected.remove(loc);

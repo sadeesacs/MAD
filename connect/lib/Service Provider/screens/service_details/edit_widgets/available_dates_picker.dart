@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AvailableDatesPicker extends StatefulWidget {
-  final Set<String> selectedDays; // e.g. {'M','T','W','T2','F','S','S2'}
+  final Set<String> selectedDays;
   final bool isError;
   final ValueChanged<String> onDayToggled;
 
@@ -21,8 +21,6 @@ class _AvailableDatesPickerState extends State<AvailableDatesPicker> {
   Widget build(BuildContext context) {
     final borderColor = widget.isError ? Colors.red : Colors.transparent;
 
-    // Define the 7 items in order: M, T, W, T2, F, S, S2.
-    // For display, T2 and S2 show as "T" and "S" respectively.
     final items = [
       {'key': 'M', 'label': 'M'},
       {'key': 'T', 'label': 'T'},
@@ -46,7 +44,7 @@ class _AvailableDatesPickerState extends State<AvailableDatesPicker> {
         children: items.map((item) {
           final bool selected = widget.selectedDays.contains(item['key']);
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2.0), // little space between dates
+            padding: const EdgeInsets.symmetric(horizontal: 2.0),
             child: GestureDetector(
               onTap: () {
                 widget.onDayToggled(item['key'] as String);

@@ -5,8 +5,6 @@ import '../../widgets/connect_app_bar_sp.dart' show ConnectAppBarSP;
 import '../../widgets/connect_nav_bar_sp.dart' show ConnectNavBarSP;
 import 'widgets/service_card.dart';
 
-// Example "details" screen import (adjust path/name if different)
-// This is where the user ends up after tapping the arrow
 import '../service_details/service_details_screen.dart';
 
 class ServiceListingScreen extends StatefulWidget {
@@ -21,7 +19,6 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
   bool _hideNavBar = false;
   double _lastOffset = 0;
 
-  // Updated services list with new entity fields
   final List<Map<String, dynamic>> _services = [
     {
       'serviceName': 'Window Cleaning',
@@ -77,7 +74,6 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
       ],
       'status': 'Inactive',
     },
-    // Add more services as needed...
   ];
 
   @override
@@ -138,7 +134,6 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
                     ),
                     InkWell(
                       onTap: () {
-                        // "Add" service placeholder
                       },
                       child: Container(
                         padding: const EdgeInsets.all(8),

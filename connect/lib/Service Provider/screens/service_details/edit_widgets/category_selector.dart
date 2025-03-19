@@ -29,7 +29,6 @@ class _CategorySelectorState extends State<CategorySelector> {
   @override
   void initState() {
     super.initState();
-    // if we have an existing category
     _controller.text = widget.selectedCategory ?? '';
     filtered = categories;
   }

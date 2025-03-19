@@ -3,7 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class CoverImagePicker extends StatefulWidget {
-  final String imagePath; // initial path
+  final String imagePath;
   final bool isError;
   final ValueChanged<String> onImagePicked;
 
@@ -57,8 +57,6 @@ class _CoverImagePickerState extends State<CoverImagePicker> {
   }
 
   Widget _buildImagePreview(String path) {
-    // If it's a local file path, or possibly a network url, handle accordingly.
-    // We'll assume local file path for now.
     if (path.startsWith('http')) {
       // If you have a network URL
       return Image.network(

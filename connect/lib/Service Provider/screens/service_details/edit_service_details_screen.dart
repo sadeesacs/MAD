@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../widgets/connect_app_bar_sp.dart';
 
-// Our separate widgets:
 import 'edit_widgets/category_selector.dart';
 import 'edit_widgets/location_selector.dart';
 import 'edit_widgets/time_input.dart';
 import 'edit_widgets/available_dates_picker.dart';
 import 'edit_widgets/cover_image_picker.dart';
 
-/// A screen that edits the details of an existing service.
-/// We'll assume we pass an existing service map in the constructor.
 class EditServiceDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> service;
 

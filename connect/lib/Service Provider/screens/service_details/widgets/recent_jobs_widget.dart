@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'add_recent_job_screen.dart'; // Adjust import based on actual project structure
 
 class RecentJobsWidget extends StatelessWidget {
-  final List<Map<String, dynamic>> jobs; // Each job has 'images':[], 'description':''
+  final List<Map<String, dynamic>> jobs;
+  final VoidCallback onAdd;
 
   const RecentJobsWidget({
     super.key,
     required this.jobs,
+    required this.onAdd,
   });
 
   @override
@@ -28,16 +29,7 @@ class RecentJobsWidget extends StatelessWidget {
             ),
             const Spacer(),
             InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AddRecentJobScreen(),
-                  ),
-                ).then((value) {
-                  // Handle any updates to jobs list if needed
-                });
-              },
+              onTap: onAdd,
               child: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
