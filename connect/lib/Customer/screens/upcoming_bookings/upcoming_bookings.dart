@@ -111,7 +111,7 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
                 // The booking cards
                 ...bookings.map((booking) {
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
+                    padding: const EdgeInsets.only(bottom: 5),
                     child: UpcomingBookingCard(
                       bookingData: booking,
                       onCancel: () {

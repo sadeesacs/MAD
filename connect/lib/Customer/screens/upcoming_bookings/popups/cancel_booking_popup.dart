@@ -15,13 +15,14 @@ class CancelBookingPopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      insetPadding: const EdgeInsets.all(25), // 25 pixels margin from screen edges
       content: const Text(
         'Are you sure you want to cancel this booking?',
         textAlign: TextAlign.center,
         style: TextStyle(
           fontFamily: 'Roboto',
           fontWeight: FontWeight.w500, // Medium
-          fontSize: 20,
+          fontSize: 18,
           color: Colors.black,
         ),
       ),
@@ -34,7 +35,7 @@ class CancelBookingPopup extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
           child: const Text(
             'Cancel',
@@ -53,7 +54,7 @@ class CancelBookingPopup extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
           child: const Text(
             'Confirm',
