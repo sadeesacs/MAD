@@ -1,5 +1,3 @@
-// lib/Customer/screens/upcoming_bookings/widgets/upcoming_booking_card.dart
-
 import 'package:flutter/material.dart';
 
 class UpcomingBookingCard extends StatelessWidget {
@@ -7,14 +5,13 @@ class UpcomingBookingCard extends StatelessWidget {
   final VoidCallback onCancel;
 
   const UpcomingBookingCard({
-    Key? key,
+    super.key,
     required this.bookingData,
     required this.onCancel,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    // bookingData might have keys like 'bookingId', 'serviceType', 'serviceProvider', etc.
     final String bookingId       = bookingData['bookingId']       ?? '';
     final String serviceType     = bookingData['serviceType']     ?? '';
     final String serviceProvider = bookingData['serviceProvider'] ?? '';
@@ -93,8 +90,6 @@ class UpcomingBookingCard extends StatelessWidget {
   }
 
   Widget _buildLabelValueRow(String label, String value) {
-    // label => style: Roboto Medium, 16, black
-    // value => style: Roboto Regular, 16, black
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

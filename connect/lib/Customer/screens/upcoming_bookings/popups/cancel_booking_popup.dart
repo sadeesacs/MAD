@@ -1,5 +1,3 @@
-// lib/Customer/screens/upcoming_bookings/popups/cancel_booking_popup.dart
-
 import 'package:flutter/material.dart';
 
 class CancelBookingPopup extends StatelessWidget {
@@ -8,11 +6,11 @@ class CancelBookingPopup extends StatelessWidget {
   final VoidCallback onCancel;
 
   const CancelBookingPopup({
-    Key? key,
+    super.key,
     required this.bookingInfo,
     required this.onConfirm,
     required this.onCancel,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

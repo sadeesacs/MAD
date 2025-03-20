@@ -1,16 +1,13 @@
-// lib/Customer/screens/upcoming_bookings/widgets/upcoming_history_toggle.dart
-
 import 'package:flutter/material.dart';
-// Adjust these paths to your actual screen files:
-import '../upcoming_bookings.dart';           // For "Upcoming Bookings"
+import '../upcoming_bookings.dart';
 
 class UpcomingHistoryToggle extends StatelessWidget {
   final bool isUpcomingSelected;
 
   const UpcomingHistoryToggle({
-    Key? key,
-    required this.isUpcomingSelected, required Null Function() onUpcomingPressed, required Null Function() onHistoryPressed,
-  }) : super(key: key);
+    super.key,
+    required this.isUpcomingSelected,
+  });
 
   @override
   Widget build(BuildContext context) {

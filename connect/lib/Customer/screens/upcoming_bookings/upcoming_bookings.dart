@@ -1,13 +1,12 @@
 // lib/Customer/screens/upcoming_bookings/upcoming_bookings.dart
 
-import 'package:connect/Customer/screens/upcoming_bookings/popups/cancel_booking_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import '../../widgets/connect_app_bar.dart';
 import '../../widgets/connect_nav_bar.dart';
-import '../../widgets/connect_nav_bar.dart';
 import 'widgets/upcoming_history_toggle.dart';
 import 'widgets/upcoming_booking_card.dart';
+import 'package:connect/Customer/screens/upcoming_bookings/popups/cancel_booking_popup.dart';
 
 // A list of booking items that we'll display in this screen
 // Each booking is a map with booking info.
@@ -34,7 +33,7 @@ final List<Map<String, dynamic>> sampleBookings = [
 ];
 
 class UpcomingBookingsScreen extends StatefulWidget {
-  const UpcomingBookingsScreen({Key? key}) : super(key: key);
+  const UpcomingBookingsScreen({super.key});
 
   @override
   State<UpcomingBookingsScreen> createState() => _UpcomingBookingsScreenState();
@@ -74,10 +73,9 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
     super.dispose();
   }
 
-  // This method is called when the user confirms cancellation in the popup
+  // This method is called when the user confirms cancellation in the popup.
   void _onCancelBookingConfirmed(Map<String, dynamic> booking) {
     setState(() {
-      // Remove the booking from the list
       bookings.remove(booking);
     });
   }
@@ -105,53 +103,43 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
                     color: Color(0xFF027335),
                   ),
                 ),
-                const SizedBox(height: 20),
-
+                const SizedBox(height: 25),
                 // The toggle row: "Upcoming Bookings" & "Booking History"
-                UpcomingHistoryToggle(
-                  isUpcomingSelected: true, // We are on "Upcoming Bookings"
-                  onUpcomingPressed: () {
-                    // Already here, do nothing or reload
-                  },
-                  onHistoryPressed: () {
-                    // Navigate to booking_history.dart
-                    // e.g., Navigator.push(context, MaterialPageRoute(...));
-                  },
-                ),
-                const SizedBox(height: 20),
-
+                // (Upcoming Bookings is highlighted on this screen)
+                const UpcomingHistoryToggle(isUpcomingSelected: true),
+                const SizedBox(height: 25),
                 // The booking cards
                 ...bookings.map((booking) {
-                  return UpcomingBookingCard(
-                    bookingData: booking,
-                    onCancel: () {
-                      // Show popup for cancellation
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (_) {
-                          return CancelBookingPopup(
-                            bookingInfo: booking,
-                            onConfirm: () {
-                              Navigator.pop(context); // close popup
-                              _onCancelBookingConfirmed(booking);
-                            },
-                            onCancel: () {
-                              Navigator.pop(context); // close popup
-                            },
-                          );
-                        },
-                      );
-                    },
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 15),
+                    child: UpcomingBookingCard(
+                      bookingData: booking,
+                      onCancel: () {
+                        // Show popup for cancellation
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (_) {
+                            return CancelBookingPopup(
+                              bookingInfo: booking,
+                              onConfirm: () {
+                                Navigator.pop(context); // Close popup
+                                _onCancelBookingConfirmed(booking);
+                              },
+                              onCancel: () {
+                                Navigator.pop(context); // Close popup
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
                   );
-                }).toList(),
-
-                const SizedBox(height: 80),
+                }),
               ],
             ),
           ),
-
-          // Floating nav bar
+          // Floating nav bar with the calendar icon highlighted (Upcoming)
           Positioned(
             left: 0,
             right: 0,
@@ -160,7 +148,8 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
               duration: const Duration(milliseconds: 500),
               offset: _hideNavBar ? const Offset(0, 1.5) : const Offset(0, 0),
               child: const ConnectNavBar(
-                isHomeSelected: true,
+                isHomeSelected: false,
+                isUpcomingSelected: true,
               ),
             ),
           ),

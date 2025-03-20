@@ -3,7 +3,7 @@ import '../../widgets/connect_app_bar_sp.dart';
 import 'job_widgets/dual_image_picker.dart';
 
 class AddRecentJobScreen extends StatefulWidget {
-  const AddRecentJobScreen({Key? key}) : super(key: key);
+  const AddRecentJobScreen({super.key});
 
   @override
   State<AddRecentJobScreen> createState() => _AddRecentJobScreenState();
