@@ -1,0 +1,2 @@
+C:/Users/Pinee/Desktop/23.2 Software Engineering/Second Year/Connect - Git/MAD/connect/android/app/.cxx/Debug/1f3p1m72/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/Pinee/Desktop/23.2 Software Engineering/Second Year/Connect - Git/MAD/connect/android/app/.cxx/Debug/1f3p1m72/x86_64/CMakeFiles/rebuild_cache.dir
