@@ -12,18 +12,18 @@ class DualImagePicker extends StatelessWidget {
   final ValueChanged<String> onImage2Picked;
 
   const DualImagePicker({
-    Key? key,
+    super.key,
     this.image1Path,
     this.image2Path,
     required this.image1Error,
     required this.image2Error,
     required this.onImage1Picked,
     required this.onImage2Picked,
-  }) : super(key: key);
+  });
 
   Future<void> _pickImage(BuildContext context, bool isImage1) async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       if (isImage1) {
         onImage1Picked(pickedFile.path);
