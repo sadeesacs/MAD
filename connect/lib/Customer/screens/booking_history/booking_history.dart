@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import '../../widgets/connect_app_bar.dart';
 import '../../widgets/connect_nav_bar.dart';
-import '../booking_history/booking_history.dart';
-import 'widgets/upcoming_history_toggle.dart';
-import 'widgets/upcoming_booking_card.dart';
-import 'package:connect/Customer/screens/upcoming_bookings/popups/cancel_booking_popup.dart';
+import '../upcoming_bookings/upcoming_bookings.dart';
+import '../upcoming_bookings/widgets/upcoming_history_toggle.dart';
+import 'widgets/booking_history_card.dart';
 
-final List<Map<String, dynamic>> sampleBookings = [
+final List<Map<String, dynamic>> sampleHistoryBookings = [
   {
     'bookingId': '#6489303',
     'serviceType': 'Cleaning',
@@ -15,37 +14,37 @@ final List<Map<String, dynamic>> sampleBookings = [
     'serviceName': 'Kitchen Cleaning',
     'date': '2005-02-28',
     'time': '3 PM To 6 PM',
-    'estimatedTotal': 'LKR 6000.00',
+    'total': 'LKR 6000.00',
   },
   {
-    'bookingId': '#9012874',
+    'bookingId': '#1112223',
     'serviceType': 'Gardening',
-    'serviceProvider': 'Nimal Fernando',
-    'serviceName': 'Full Garden Maintenance',
-    'date': '2005-03-01',
-    'time': '9 AM To 11 AM',
-    'estimatedTotal': 'LKR 4000.00',
+    'serviceProvider': 'Nimal Perera',
+    'serviceName': 'Full Garden Trim',
+    'date': '2005-02-15',
+    'time': '1 PM To 3 PM',
+    'total': 'LKR 2000.00',
   },
 ];
 
-class UpcomingBookingsScreen extends StatefulWidget {
-  const UpcomingBookingsScreen({super.key});
+class BookingHistoryScreen extends StatefulWidget {
+  const BookingHistoryScreen({Key? key}) : super(key: key);
 
   @override
-  State<UpcomingBookingsScreen> createState() => _UpcomingBookingsScreenState();
+  State<BookingHistoryScreen> createState() => _BookingHistoryScreenState();
 }
 
-class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
+class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
   final ScrollController _scrollController = ScrollController();
   bool _hideNavBar = false;
   double _lastOffset = 0;
 
-  late List<Map<String, dynamic>> bookings;
+  late List<Map<String, dynamic>> historyBookings;
 
   @override
   void initState() {
     super.initState();
-    bookings = List<Map<String, dynamic>>.from(sampleBookings);
+    historyBookings = List<Map<String, dynamic>>.from(sampleHistoryBookings);
     _scrollController.addListener(_onScroll);
   }
 
@@ -67,12 +66,6 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
     super.dispose();
   }
 
-  void _onCancelBookingConfirmed(Map<String, dynamic> booking) {
-    setState(() {
-      bookings.remove(booking);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,7 +79,7 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Screen title
+                // Screen Title
                 const Text(
                   'Bookings',
                   style: TextStyle(
@@ -96,52 +89,39 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
                     color: Color(0xFF027335),
                   ),
                 ),
-                const SizedBox(height: 25),
+                const SizedBox(height: 20),
+
                 UpcomingHistoryToggle(
-                  isUpcomingSelected: true,
+                  isUpcomingSelected: false,
                   onUpcomingPressed: () {
-                  },
-                  onHistoryPressed: () {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const BookingHistoryScreen(),
+                        builder: (_) => const UpcomingBookingsScreen(),
                       ),
                     );
                   },
+                  onHistoryPressed: () {
+                  },
                 ),
-                const SizedBox(height: 25),
-                // The booking cards
-                ...bookings.map((booking) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 5),
-                    child: UpcomingBookingCard(
-                      bookingData: booking,
-                      onCancel: () {
-                        // Show popup for cancellation
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (_) {
-                            return CancelBookingPopup(
-                              bookingInfo: booking,
-                              onConfirm: () {
-                                Navigator.pop(context); // Close popup
-                                _onCancelBookingConfirmed(booking);
-                              },
-                              onCancel: () {
-                                Navigator.pop(context); // Close popup
-                              },
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  );
-                }),
+                const SizedBox(height: 20),
+
+                // Display booking history cards
+                Column(
+                  children: historyBookings.map((booking) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: BookingHistoryCard(
+                        bookingData: booking,
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 80),
               ],
             ),
           ),
+
           Positioned(
             left: 0,
             right: 0,
