@@ -19,15 +19,25 @@ class BottomButtons extends StatelessWidget {
   }
 
   Widget _buildButton(String text) {
-    return ElevatedButton(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF027335),
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(color: Colors.white),
+    return SizedBox(
+      width: 150,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF027335),
+          padding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,  
+          ),
+        ),
       ),
     );
   }

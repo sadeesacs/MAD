@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 
 class ConnectNavBar extends StatelessWidget {
   final bool isHomeSelected;
-  const ConnectNavBar({super.key, this.isHomeSelected = false});
+  final bool isConstructionSelected;
+  const ConnectNavBar({super.key,
+    this.isHomeSelected = false,
+    this.isConstructionSelected = false
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +23,7 @@ class ConnectNavBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _NavIcon(icon: Icons.construction, isActive: false),
+              _NavIcon(icon: Icons.construction, isActive: isConstructionSelected),
               _NavIcon(icon: Icons.message_outlined, isActive: false),
               _NavIcon(icon: Icons.home_filled, isActive: isHomeSelected),
               _NavIcon(icon: Icons.calendar_today_outlined, isActive: false),
