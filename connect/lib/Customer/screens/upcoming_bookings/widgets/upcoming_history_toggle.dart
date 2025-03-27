@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
-import '../upcoming_bookings.dart';
 
 class UpcomingHistoryToggle extends StatelessWidget {
   final bool isUpcomingSelected;
+  final VoidCallback onUpcomingPressed;
+  final VoidCallback onHistoryPressed;
 
   const UpcomingHistoryToggle({
-    super.key,
+    Key? key,
     required this.isUpcomingSelected,
-  });
+    required this.onUpcomingPressed,
+    required this.onHistoryPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // If upcoming is selected, fill color => #DFE9E3, else #F3F5F7
-    final upcomingFill = isUpcomingSelected
+    final Color upcomingFill = isUpcomingSelected
         ? const Color(0xFFDFE9E3)
         : const Color(0xFFF3F5F7);
-    final historyFill = isUpcomingSelected
+    final Color historyFill = isUpcomingSelected
         ? const Color(0xFFF3F5F7)
         : const Color(0xFFDFE9E3);
 
@@ -24,17 +26,7 @@ class UpcomingHistoryToggle extends StatelessWidget {
         // Upcoming Bookings Button
         Expanded(
           child: GestureDetector(
-            onTap: () {
-              // If not on upcoming, navigate to UpcomingBookingsScreen
-              if (!isUpcomingSelected) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const UpcomingBookingsScreen(),
-                  ),
-                );
-              }
-            },
+            onTap: onUpcomingPressed,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
@@ -59,6 +51,7 @@ class UpcomingHistoryToggle extends StatelessWidget {
         // Booking History Button
         Expanded(
           child: GestureDetector(
+            onTap: onHistoryPressed,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
