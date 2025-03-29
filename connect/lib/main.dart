@@ -1,19 +1,7 @@
-import 'package:connect/Customer/screens/category_based_service_listing/category_screen.dart/category_screen.dart';
 import 'package:flutter/material.dart';
-///////////////////////Customer Screens /////////////////////////////////////
-import 'Customer/screens/category_based_service_listing/service_listing_screen.dart'; // Import ServiceListingScreen
-import 'Customer/screens/Signup/register_screen.dart';
-import 'Customer/screens/Signup/email_verification_screen.dart'; // Import OTP Screen
-import 'Customer/screens/Notifications/Notifications.dart'; //
-import 'Customer/screens/category_based_service_listing/service_listing_screen.dart';
-import 'Customer/screens/category_based_service_listing/category_screen.dart/Widgets/hamburger_menu.dart';
-import '/Customer/screens/Signup/profile_view.dart';
-/////////////////Service Provider //////////////////////
-import 'ServiceProvider/Screens/Profile_View/ServiceProfileView.dart'; // Import NotificationsScreen
-import 'ServiceProvider/Screens/Notifications/Service_notificationscreen.dart'; // Import NotificationsScreen
-import 'ServiceProvider/Screens/Hamburger Menu/Service_Hamburgermenu.dart';
-
-
+import 'role_selection/role_selection.dart'; // Import Role Selection Screen
+import 'Customer/screens/home/home_screen.dart'; // Import Customer Home Screen
+import 'Service Provider/screens/dashboard/dashboard_screen.dart'; // Import SP Dashboard
 
 void main() {
   runApp(const MyApp());
@@ -29,32 +17,27 @@ class MyApp extends StatelessWidget {
       title: 'Connect App',
       theme: ThemeData(
         primarySwatch: Colors.green,
+        fontFamily: 'Roboto',
       ),
-      home: const EmailVerificationScreen(), // Start from NotificationsScreen
+      home: const RoleSelectionScreen(), // Set Role Selection as the entry screen
       routes: {
-        '/home': (context) => const HomeScreen(), // HomeScreen route
-        '/register': (context) => const RegisterScreen(), // RegisterScreen route
-        '/otp': (context) => const EmailVerificationScreen(), // OTP Screen route
-        '/category': (context) => const ServiceListingScreen(categoryName: 'Cleaning'), // Set the route for the ServiceListingScreen
-        '/notifications': (context) => const NotificationsScreen(), // Add the NotificationsScreen route
-        '/notifications': (context) => const ServiceProfileViewScreen(), // Add the NotificationsScreen route
-
-
+        '/home': (context) => const HomeScreen(), // Customer Home Screen
+        '/dashboard': (context) => const DashboardScreen(), // Service Provider Dashboard
+        '/search': (context) => const SearchFunctionScreen(), // Search Screen Placeholder
       },
     );
   }
 }
 
-
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+/// Simple placeholder for your Search screen
+class SearchFunctionScreen extends StatelessWidget {
+  const SearchFunctionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home Screen')),
-      body: const Center(child: Text('Welcome to Home Screen')),
+      appBar: AppBar(title: const Text('Search Screen Placeholder')),
+      body: const Center(child: Text('Search Screen Placeholder')),
     );
   }
 }
