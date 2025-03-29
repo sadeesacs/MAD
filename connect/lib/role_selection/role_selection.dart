@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../Customer/screens/home/home_screen.dart';
-import '../Service Provider/screens/dashboard/dashboard_screen.dart';
+import '../auth/login_screen.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
@@ -37,7 +36,7 @@ class RoleSelectionScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const HomeScreen(),
+                          builder: (_) => const LoginScreen(isServiceProvider: false),
                         ),
                       );
                     },
@@ -53,7 +52,7 @@ class RoleSelectionScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const DashboardScreen(),
+                          builder: (_) => const LoginScreen(isServiceProvider: true),
                         ),
                       );
                     },
