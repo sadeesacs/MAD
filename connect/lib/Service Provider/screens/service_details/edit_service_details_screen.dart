@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../widgets/connect_app_bar_sp.dart';
 
+import '../../widgets/sp_hamburger_menu.dart';
 import 'edit_widgets/category_selector.dart';
 import 'edit_widgets/location_selector.dart';
 import 'edit_widgets/time_input.dart';
@@ -175,6 +176,7 @@ class _EditServiceDetailsScreenState extends State<EditServiceDetailsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const ConnectAppBarSP(),
+      endDrawer: const SPHamburgerMenu(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(25),
         child: Column(

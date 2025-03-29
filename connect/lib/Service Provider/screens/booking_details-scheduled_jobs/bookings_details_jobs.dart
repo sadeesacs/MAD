@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../widgets/connect_app_bar_sp.dart';
+import '../../widgets/sp_hamburger_menu.dart';
 import '../scheduled_jobs/scheduled_job.dart';
 
 const Color darkGreen = Color(0xFF027335);
@@ -46,7 +47,8 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: white,
-      appBar: const ConnectAppBarSP(), // Use the ConnectAppBar widget
+      appBar: const ConnectAppBarSP(),
+      endDrawer: const SPHamburgerMenu(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(25.0), // Add 25 padding to the entire page
         child: Column(

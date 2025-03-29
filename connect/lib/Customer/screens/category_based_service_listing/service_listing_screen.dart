@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
 import '../../widgets/connect_app_bar.dart';
 import '../../widgets/connect_nav_bar.dart';
-
 import '../home/widgets/search_bar_widget.dart';
-
 import 'widgets/service_listing_card.dart';
 
 class ServiceListingScreen extends StatefulWidget {

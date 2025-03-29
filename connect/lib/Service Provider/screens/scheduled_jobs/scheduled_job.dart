@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 
 import '../../widgets/connect_app_bar_sp.dart' show ConnectAppBarSP;
 import '../../widgets/connect_nav_bar_sp.dart' show ConnectNavBarSP;
+import '../../widgets/sp_hamburger_menu.dart';
 
 const Color darkGreen = Color(0xFF027335);
 const Color appBarColor = Color(0xFFF1FAF1);
@@ -56,6 +57,7 @@ class _ScheduledJobsScreenState extends State<ScheduledJobsScreen> {
     return Scaffold(
       backgroundColor: white,
       appBar: const ConnectAppBarSP(),
+      endDrawer: const SPHamburgerMenu(),
       body: Stack(
         children: [
           SingleChildScrollView(

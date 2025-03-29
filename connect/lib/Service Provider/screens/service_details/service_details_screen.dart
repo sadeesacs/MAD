@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import '../../widgets/connect_app_bar_sp.dart';
 import '../../widgets/connect_nav_bar_sp.dart';
 
+import '../../widgets/sp_hamburger_menu.dart';
 import 'widgets/status_indicator.dart';
 import 'widgets/service_detail_card.dart';
 import 'widgets/job_description_card.dart';
@@ -80,6 +81,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const ConnectAppBarSP(),
+      endDrawer: const SPHamburgerMenu(),
       body: Stack(
         children: [
           SingleChildScrollView(

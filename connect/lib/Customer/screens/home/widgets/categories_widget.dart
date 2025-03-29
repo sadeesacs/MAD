@@ -24,7 +24,7 @@ class CategoriesWidget extends StatelessWidget {
         Row(
           children: const [
             Text(
-              'Categories',
+              'category_screen.dart',
               style: TextStyle(
                 fontFamily: 'Roboto',
                 fontWeight: FontWeight.w600,

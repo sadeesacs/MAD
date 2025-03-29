@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../widgets/connect_app_bar_sp.dart';
+import '../../widgets/sp_hamburger_menu.dart';
 import 'job_widgets/dual_image_picker.dart';
 
 class AddRecentJobScreen extends StatefulWidget {
@@ -43,6 +44,7 @@ class _AddRecentJobScreenState extends State<AddRecentJobScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const ConnectAppBarSP(),
+      endDrawer: const SPHamburgerMenu(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(25),
         child: Column(
