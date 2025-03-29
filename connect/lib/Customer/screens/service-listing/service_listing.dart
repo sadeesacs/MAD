@@ -138,10 +138,12 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
                     });
                   },
                 ),
+
+                SizedBox(height: 16),
                 // Service Listing Cards
                 Expanded(
                   child: ListView.builder(
-                    padding: const EdgeInsets.all(16.0),
+                    //padding: const EdgeInsets.all(16.0),
                     itemCount: _services.where((service) => service['category'] == _selectedCategory).length,
                     itemBuilder: (context, index) {
                       final service = _services.where((service) => service['category'] == _selectedCategory).toList()[index];
@@ -160,7 +162,7 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
             bottom: 30,
             child: const ConnectNavBar(
               isConstructionSelected: true,
-              isHomeSelected: false, 
+              isHomeSelected: false,
             ),
           ),
         ],
