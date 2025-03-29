@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class RecentJobsWidget extends StatelessWidget {
-  final List<Map<String, dynamic>> jobs; // Each job has 'images':[], 'description':''
+  final List<Map<String, dynamic>> jobs;
   final VoidCallback onAdd;
 
   const RecentJobsWidget({
-    Key? key,
+    super.key,
     required this.jobs,
     required this.onAdd,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

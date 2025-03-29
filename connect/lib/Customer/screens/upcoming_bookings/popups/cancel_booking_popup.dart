@@ -1,31 +1,28 @@
 import 'package:flutter/material.dart';
 
-class StatusConfirmationPopup extends StatelessWidget {
-  final bool isCurrentlyActive;
+class CancelBookingPopup extends StatelessWidget {
+  final Map<String, dynamic> bookingInfo;
   final VoidCallback onConfirm;
   final VoidCallback onCancel;
 
-  const StatusConfirmationPopup({
+  const CancelBookingPopup({
     super.key,
-    required this.isCurrentlyActive,
+    required this.bookingInfo,
     required this.onConfirm,
     required this.onCancel,
   });
 
   @override
   Widget build(BuildContext context) {
-    final String question = isCurrentlyActive
-        ? 'Are you sure you want to temporarily deactivate this Service?'
-        : 'Are you sure you want to Activate this Service?';
-
     return AlertDialog(
-      backgroundColor: Colors.white,
-      content: Text(
-        question,
+      insetPadding: const EdgeInsets.all(25), // 25 pixels margin from screen edges
+      content: const Text(
+        'Are you sure you want to cancel this booking?',
         textAlign: TextAlign.center,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Roboto',
-          fontSize: 20,
+          fontWeight: FontWeight.w500, // Medium
+          fontSize: 18,
           color: Colors.black,
         ),
       ),
@@ -38,7 +35,7 @@ class StatusConfirmationPopup extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
           child: const Text(
             'Cancel',
@@ -57,7 +54,7 @@ class StatusConfirmationPopup extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
           child: const Text(
             'Confirm',
