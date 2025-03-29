@@ -6,6 +6,7 @@ import '../screens/scheduled_jobs/scheduled_job.dart';
 import '../screens/service_listing/service_listing_screen.dart';
 import '../screens/pending_requests/pending_requests.dart';
 import '../screens/completed_jobs/completed_jobs.dart';
+import '../screens/profile/profile_screen.dart'; // Add your profile screen import here
 
 class SPHamburgerMenu extends StatelessWidget {
   const SPHamburgerMenu({Key? key}) : super(key: key);
@@ -19,7 +20,7 @@ class SPHamburgerMenu extends StatelessWidget {
       child: Container(
         width: drawerWidth,
         height: double.infinity,
-        color: Colors.white, // background color of the menu
+        color: Colors.white,
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -29,29 +30,45 @@ class SPHamburgerMenu extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 child: Row(
                   children: [
-                    // Profile Pic
-                    ClipOval(
-                      child: Image.asset(
-                        'assets/images/profile_pic/leo_perera.jpg',
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
+                    // Wrap image + name in GestureDetector
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context); // close the drawer
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ProfileScreen(),
+                          ),
+                        );
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Profile Pic
+                          ClipOval(
+                            child: Image.asset(
+                              'assets/images/profile_pic/leo_perera.jpg',
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
 
-                    // Name
-                    const Expanded(
-                      child: Text(
-                        'Leo Perera',
-                        style: TextStyle(
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 23,
-                          color: Colors.black,
-                        ),
+                          // Name
+                          const Text(
+                            'Leo Perera',
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 23,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+                    const Spacer(),
 
                     // Close Button
                     GestureDetector(
@@ -187,11 +204,9 @@ class SPHamburgerMenu extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        // Increased vertical spacing for bigger gap between items
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
         child: Row(
           children: [
-            // Icon with color #027335
             Icon(icon, color: const Color(0xFF027335)),
             const SizedBox(width: 16),
             Text(

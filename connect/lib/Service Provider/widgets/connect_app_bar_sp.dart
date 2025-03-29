@@ -29,7 +29,7 @@ class ConnectAppBarSP extends StatelessWidget implements PreferredSizeWidget {
                     'Connect',
                     style: TextStyle(
                       fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w800, // Extra Bold
+                      fontWeight: FontWeight.w800,
                       fontSize: 28,
                       color: const Color(0xFF027335),
                     ),
@@ -45,7 +45,6 @@ class ConnectAppBarSP extends StatelessWidget implements PreferredSizeWidget {
                   // Hamburger Menu Icon
                   GestureDetector(
                     onTap: () {
-                      // Opens the end drawer (SPHamburgerMenu)
                       Scaffold.of(context).openEndDrawer();
                     },
                     child: _buildIconWithBackground(Icons.menu),
