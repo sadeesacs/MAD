@@ -1,6 +1,4 @@
-// widgets/scheduled_job_card.dart
 import 'package:flutter/material.dart';
-
 import '../../booking_details-scheduled_jobs/bookings_details_jobs.dart';
 
 const Color darkGreen = Color(0xFF027335);
@@ -27,6 +25,8 @@ class ScheduledJobCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.transparent, // no fill
+      elevation: 0, // remove elevation/shadow
       shape: RoundedRectangleBorder(
         side: BorderSide(color: darkGreen, width: 1),
         borderRadius: BorderRadius.circular(8),
@@ -69,7 +69,6 @@ class ScheduledJobCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-
             // Complete and Details Buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -98,7 +97,6 @@ class ScheduledJobCard extends StatelessWidget {
                         builder: (context) => const BookingDetailsScreen(),
                       ),
                     );
-
                   },
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: darkGreen),

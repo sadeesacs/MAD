@@ -105,7 +105,6 @@ class _ScheduledJobsScreenState extends State<ScheduledJobsScreen> {
               child: ConnectNavBarSP(
                 isHomeSelected: false,
                 isToolsSelected: false,
-                isCalenderSelected: true,
               ),
             ),
           ),
