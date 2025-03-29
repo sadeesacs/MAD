@@ -1,6 +1,7 @@
 import 'package:connect/Customer/screens/service-listing/widget/category_selector.dart';
 import 'package:connect/Customer/screens/service-listing/widget/service_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import '../../widgets/connect_app_bar.dart';
 import '../../widgets/connect_nav_bar.dart';
 
@@ -34,8 +35,14 @@ class ServiceListingScreen extends StatefulWidget {
   State<ServiceListingScreen> createState() => _ServiceListingScreenState();
 }
 
+
 class _ServiceListingScreenState extends State<ServiceListingScreen> {
+  final ScrollController _scrollController = ScrollController();
+  bool _hideNavBar = false;
+  double _lastOffset = 0;
   String? _selectedCategory = 'Plumbing';
+
+
 
   final List<String> _categories = [
     'Plumbing',
@@ -96,6 +103,28 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
       'price': 'LKR 500.00/h',
       'image': 'assets/images/cover_image/cleaning_cover_image.jpg', // Replace with your asset path
     },
+
+    {
+      'category': 'Cleaning',
+      'serviceName': 'Window Cleaning',
+      'providerName': 'Mr. Richard Peters',
+      'location': 'Colombo, Gampha',
+      'rating': 4.9,
+      'reviews': 150,
+      'price': 'LKR 500.00/h',
+      'image': 'assets/images/cover_image/cleaning_cover_image.jpg', // Replace with your asset path
+    },
+
+    {
+      'category': 'Cleaning',
+      'serviceName': 'Window Cleaning',
+      'providerName': 'Mr. Richard Peters',
+      'location': 'Colombo, Gampha',
+      'rating': 4.9,
+      'reviews': 150,
+      'price': 'LKR 500.00/h',
+      'image': 'assets/images/cover_image/cleaning_cover_image.jpg', // Replace with your asset path
+    },
     // Add more services here
   ];
 
@@ -103,7 +132,34 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
   void initState() {
     super.initState();
     _selectedCategory = _categories[0]; // Set Plumbing as default
+    _scrollController.addListener(_onScroll);
   }
+
+
+  void _onScroll() {
+    final offset = _scrollController.position.pixels;
+    final direction = _scrollController.position.userScrollDirection;
+
+    // Hide nav bar on scroll down, show on scroll up
+    if (direction == ScrollDirection.reverse && offset > _lastOffset) {
+      if (!_hideNavBar) {
+        setState(() => _hideNavBar = true);
+      }
+    } else if (direction == ScrollDirection.forward && offset < _lastOffset) {
+      if (_hideNavBar) {
+        setState(() => _hideNavBar = false);
+      }
+    }
+    _lastOffset = offset;
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -140,10 +196,10 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
                 ),
 
                 SizedBox(height: 16),
-                // Service Listing Cards
                 Expanded(
                   child: ListView.builder(
-                    //padding: const EdgeInsets.all(16.0),
+                    controller: _scrollController, // Add controller here
+                    physics: const AlwaysScrollableScrollPhysics(),
                     itemCount: _services.where((service) => service['category'] == _selectedCategory).length,
                     itemBuilder: (context, index) {
                       final service = _services.where((service) => service['category'] == _selectedCategory).toList()[index];
@@ -160,9 +216,14 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
             left: 0,
             right: 0,
             bottom: 30,
-            child: const ConnectNavBar(
+            child: AnimatedSlide(
+                duration: const Duration(milliseconds: 500),
+                offset: _hideNavBar ? const Offset(0, 1.5) : const Offset(0, 0),
+                child: ConnectNavBar(
               isConstructionSelected: true,
               isHomeSelected: false,
+              isUpcomingSelected: false,
+             ),
             ),
           ),
         ],
