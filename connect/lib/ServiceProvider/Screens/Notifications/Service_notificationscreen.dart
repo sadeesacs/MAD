@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:connect/Customer/widgets/connect_app_bar.dart';
 import 'package:connect/Customer/widgets/connect_nav_bar.dart'; // Custom bottom nav bar
 
-class NotificationsScreen extends StatelessWidget {
-  const NotificationsScreen({super.key});
+class ServiceNotificationscreen extends StatelessWidget {
+  const ServiceNotificationscreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +24,7 @@ class NotificationsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 30),
+
             // List of notifications (Placeholder notifications for now)
             Expanded(
               child: ListView.builder(

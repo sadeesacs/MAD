@@ -1,8 +1,19 @@
+import 'package:connect/Customer/screens/category_based_service_listing/category_screen.dart/category_screen.dart';
 import 'package:flutter/material.dart';
+///////////////////////Customer Screens /////////////////////////////////////
 import 'Customer/screens/category_based_service_listing/service_listing_screen.dart'; // Import ServiceListingScreen
 import 'Customer/screens/Signup/register_screen.dart';
 import 'Customer/screens/Signup/email_verification_screen.dart'; // Import OTP Screen
-import 'Customer/screens/Notifications/Notifications.dart'; // Import NotificationsScreen
+import 'Customer/screens/Notifications/Notifications.dart'; //
+import 'Customer/screens/category_based_service_listing/service_listing_screen.dart';
+import 'Customer/screens/category_based_service_listing/category_screen.dart/Widgets/hamburger_menu.dart';
+import '/Customer/screens/Signup/profile_view.dart';
+/////////////////Service Provider //////////////////////
+import 'ServiceProvider/Screens/Profile_View/ServiceProfileView.dart'; // Import NotificationsScreen
+import 'ServiceProvider/Screens/Notifications/Service_notificationscreen.dart'; // Import NotificationsScreen
+import 'ServiceProvider/Screens/Hamburger Menu/Service_Hamburgermenu.dart';
+
+
 
 void main() {
   runApp(const MyApp());
@@ -19,17 +30,22 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: const NotificationsScreen(), // Start from NotificationsScreen
+      home: const EmailVerificationScreen(), // Start from NotificationsScreen
       routes: {
         '/home': (context) => const HomeScreen(), // HomeScreen route
         '/register': (context) => const RegisterScreen(), // RegisterScreen route
         '/otp': (context) => const EmailVerificationScreen(), // OTP Screen route
         '/category': (context) => const ServiceListingScreen(categoryName: 'Cleaning'), // Set the route for the ServiceListingScreen
         '/notifications': (context) => const NotificationsScreen(), // Add the NotificationsScreen route
+        '/notifications': (context) => const ServiceProfileViewScreen(), // Add the NotificationsScreen route
+
+
       },
     );
   }
 }
+
+
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

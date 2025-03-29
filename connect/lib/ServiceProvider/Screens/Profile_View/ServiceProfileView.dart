@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:connect/Customer/widgets/connect_app_bar.dart'; // Import your custom AppBar
 
-class ProfileViewScreen extends StatelessWidget {
-  const ProfileViewScreen({super.key});
+class ServiceProfileViewScreen extends StatelessWidget {
+  const ServiceProfileViewScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

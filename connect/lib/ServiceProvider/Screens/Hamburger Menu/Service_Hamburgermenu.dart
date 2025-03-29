@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:connect/Customer/screens/Signup/profile_view.dart'; // Import Profile view screen
 
-class Hamburgermenu extends StatelessWidget {
-  const Hamburgermenu({super.key});
+class ServiceHamburgermenu extends StatelessWidget {
+  const ServiceHamburgermenu({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -35,6 +35,7 @@ class EmailVerificationScreenState extends State<EmailVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // Set background color of the whole screen to white
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -47,7 +48,7 @@ class EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade200,  // Background color of the box
+                    color: Colors.grey.shade200,  // Light background color for the box
                     borderRadius: BorderRadius.circular(8),  // Rounded corners
                   ),
                   child: IconButton(

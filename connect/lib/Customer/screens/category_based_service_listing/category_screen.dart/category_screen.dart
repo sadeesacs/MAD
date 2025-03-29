@@ -11,7 +11,7 @@ class CategoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const ConnectAppBar(),  // Use the custom app bar
-      drawer: const HamburgerMenu(),  // Add the HamburgerMenu as the Drawer
+      drawer: const Hamburgermenu(),  // Add the HamburgerMenu as the Drawer
       body: Column(
         children: [
           const SizedBox(height: 20), // Adjust space for the back button

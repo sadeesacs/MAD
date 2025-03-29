@@ -1,3 +1,4 @@
+import 'package:connect/Customer/screens/Signup/email_verification_screen.dart';
 import 'package:flutter/material.dart';
 import 'Widgets/register_title.dart';
 
@@ -15,6 +16,7 @@ class RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // Set the background color of the whole screen to white
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -60,14 +62,27 @@ class RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 10),
                   Center(
-                    child: GestureDetector(
-                      onTap: () {
-                        // Navigate to login screen
-                      },
-                      child: const Text(
-                        "Already have an account? Login",
-                        style: TextStyle(fontSize: 14, color: Colors.black),
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "Already have an account? ",
+                          style: TextStyle(fontSize: 14, color: Colors.black),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            // Navigate to login page
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => EmailVerificationScreen()),
+                            );
+                          },
+                          child: const Text(
+                            "Login",
+                            style: TextStyle(fontSize: 14, color: Color(0xFF027335)), // Green text color for Login
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -100,8 +115,7 @@ class CustomTextField extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Color(
-                0xFF000000)),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Color(0xFF000000)),
           ),
           const SizedBox(height: 5),
           SizedBox(
@@ -114,7 +128,7 @@ class CustomTextField extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: const Color(0xEAF6FAF8), // Set background color to #F6FAF8
+                fillColor: Colors.white, // Set background color of the text field to white
               ),
             ),
           ),
