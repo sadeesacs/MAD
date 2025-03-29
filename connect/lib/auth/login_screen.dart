@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Customer/screens/Signup/register_screen.dart';
 import '../Customer/screens/home/home_screen.dart';
 import '../Service Provider/screens/dashboard/dashboard_screen.dart';
 import 'forgot_password_screen.dart';
@@ -204,7 +205,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   GestureDetector(
                     onTap: () {
-
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                      );
                     },
                     child: const Text(
                       'Sign up',
