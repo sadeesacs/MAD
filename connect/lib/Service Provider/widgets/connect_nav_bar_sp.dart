@@ -1,19 +1,16 @@
-import 'package:connect/Service%20Provider/screens/pending_requests/pending_requests.dart';
 import 'package:flutter/material.dart';
-import '../../Customer/screens/upcoming_bookings/upcoming_bookings.dart';
 import '../screens/dashboard/dashboard_screen.dart';
 import '../screens/service_listing/service_listing_screen.dart';
 
 class ConnectNavBarSP extends StatelessWidget {
   final bool isHomeSelected;
+
   final bool isToolsSelected;
-  final bool isCalendarSelected;
 
   const ConnectNavBarSP({
     super.key,
     this.isHomeSelected = false,
     this.isToolsSelected = false,
-    this.isCalendarSelected = false,
   });
 
   @override
@@ -31,9 +28,10 @@ class ConnectNavBarSP extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Home icon: navigates to DashboardScreen
+              // Home icon
               GestureDetector(
                 onTap: () {
+                  // Navigate to Dashboard
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
@@ -46,9 +44,11 @@ class ConnectNavBarSP extends StatelessWidget {
                   isActive: isHomeSelected,
                 ),
               ),
-              // Tools/Construction icon: navigates to ServiceListingScreen
+
+              // Tools/Construction icon
               GestureDetector(
                 onTap: () {
+                  // Navigate to Service Listing
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
@@ -61,30 +61,17 @@ class ConnectNavBarSP extends StatelessWidget {
                   isActive: isToolsSelected,
                 ),
               ),
-              // Calendar icon: navigates to UpcomingBookingsScreen
-              GestureDetector(
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PendingRequestsScreen(),
-                    ),
-                  );
-                },
-                child: _NavIcon(
-                  icon: Icons.calendar_today_outlined,
-                  isActive: isCalendarSelected,
-                ),
+
+              // Calendar icon
+              _NavIcon(
+                icon: Icons.calendar_today_outlined,
+                isActive: false,
               ),
-              // Messages icon (placeholder)
-              GestureDetector(
-                onTap: () {
-                  // Placeholder action
-                },
-                child: _NavIcon(
-                  icon: Icons.message_outlined,
-                  isActive: false,
-                ),
+
+              // Messages icon
+              _NavIcon(
+                icon: Icons.message_outlined,
+                isActive: false,
               ),
             ],
           ),
@@ -108,6 +95,7 @@ class _NavIcon extends StatelessWidget {
     final Color iconColor = isActive
         ? const Color(0xFF027335)
         : const Color(0xFF027335).withOpacity(0.7);
+
     return Container(
       width: 50,
       height: 50,
