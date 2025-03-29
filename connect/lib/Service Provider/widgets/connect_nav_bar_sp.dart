@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/completed_jobs/completed_jobs.dart';
 import '../screens/dashboard/dashboard_screen.dart';
+import '../screens/scheduled_jobs/scheduled_job.dart';
 import '../screens/service_listing/service_listing_screen.dart';
 import '../screens/pending_requests/pending_requests.dart';
 
@@ -67,7 +68,7 @@ class ConnectNavBarSP extends StatelessWidget {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const CompletedJobsScreen(),
+                      builder: (_) => const ScheduledJobsScreen(),
                     ),
                   );
                 },
@@ -79,7 +80,12 @@ class ConnectNavBarSP extends StatelessWidget {
               // Messages icon (placeholder)
               GestureDetector(
                 onTap: () {
-                  // Placeholder action
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const CompletedJobsScreen(),
+                    ),
+                  );
                 },
                 child: _NavIcon(
                   icon: Icons.message_outlined,
