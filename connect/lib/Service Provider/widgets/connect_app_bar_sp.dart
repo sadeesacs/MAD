@@ -16,6 +16,7 @@ class ConnectAppBarSP extends StatelessWidget implements PreferredSizeWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // Logo + App Name
               Row(
                 children: [
                   Image.asset(
@@ -36,11 +37,19 @@ class ConnectAppBarSP extends StatelessWidget implements PreferredSizeWidget {
                 ],
               ),
 
+              // Notifications + Menu
               Row(
                 children: [
                   _buildIconWithBackground(Icons.notifications),
                   const SizedBox(width: 8),
-                  _buildIconWithBackground(Icons.menu),
+                  // Hamburger Menu Icon
+                  GestureDetector(
+                    onTap: () {
+                      // Opens the end drawer (SPHamburgerMenu)
+                      Scaffold.of(context).openEndDrawer();
+                    },
+                    child: _buildIconWithBackground(Icons.menu),
+                  ),
                 ],
               ),
             ],

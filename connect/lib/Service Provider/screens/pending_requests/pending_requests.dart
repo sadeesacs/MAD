@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 
 import '../../widgets/connect_app_bar_sp.dart';
 import '../../widgets/connect_nav_bar_sp.dart';
+import '../../widgets/sp_hamburger_menu.dart';
 import 'widgets/pending_requests_card.dart';
 import 'detail_pending_request.dart';
 
@@ -75,6 +76,7 @@ class _PendingRequestsScreenState extends State<PendingRequestsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const ConnectAppBarSP(),
+      endDrawer: const SPHamburgerMenu(),
       body: Stack(
         children: [
           SingleChildScrollView(

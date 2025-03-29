@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../widgets/connect_app_bar_sp.dart';
+import '../../widgets/sp_hamburger_menu.dart';
 
 class DetailPendingRequestScreen extends StatelessWidget {
   final Map<String, dynamic> bookingData;
@@ -26,6 +27,7 @@ class DetailPendingRequestScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const ConnectAppBarSP(),
+      endDrawer: const SPHamburgerMenu(),
       body: Stack(
         children: [
           // Main content

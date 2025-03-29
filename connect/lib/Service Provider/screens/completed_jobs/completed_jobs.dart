@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import '../../widgets/connect_app_bar_sp.dart';
 import '../../widgets/connect_nav_bar_sp.dart';
+import '../../widgets/sp_hamburger_menu.dart';
 import 'widgets/completed_jobs_card.dart';
 
 final List<Map<String, dynamic>> sampleCompletedJobs = [
@@ -71,6 +72,7 @@ class _CompletedJobsScreenState extends State<CompletedJobsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const ConnectAppBarSP(),
+      endDrawer: const SPHamburgerMenu(),
       body: Stack(
         children: [
           SingleChildScrollView(

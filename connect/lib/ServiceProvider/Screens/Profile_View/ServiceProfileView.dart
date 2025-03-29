@@ -7,8 +7,8 @@ class ServiceProfileViewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const ConnectAppBar(),  // Use the custom ConnectAppBar here
-      backgroundColor: Colors.white,  // Set the background color to white
+      appBar: const ConnectAppBar(),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
