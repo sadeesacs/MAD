@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import '../../widgets/connect_app_bar_sp.dart';
 import '../../widgets/connect_nav_bar_sp.dart';
 import 'widgets/pending_requests_card.dart';
+import 'detail_pending_request.dart';
 
 final List<Map<String, dynamic>> samplePendingRequests = [
   {
@@ -14,6 +15,8 @@ final List<Map<String, dynamic>> samplePendingRequests = [
     'date': '2005-02-28',
     'time': '3 PM To 6 PM',
     'estimatedTotal': 'LKR 6000.00',
+    'district': 'Colombo',
+    'additionalNotes': 'Beware of dogs when entering the gate',
   },
   {
     'bookingId': '#1112223',
@@ -23,6 +26,8 @@ final List<Map<String, dynamic>> samplePendingRequests = [
     'date': '2005-03-01',
     'time': '10 AM To 12 PM',
     'estimatedTotal': 'LKR 5000.00',
+    'district': 'Galle',
+    'additionalNotes': 'Please call before arrival',
   },
 ];
 
@@ -94,6 +99,17 @@ class _PendingRequestsScreenState extends State<PendingRequestsScreen> {
                   children: pendingRequests.map((request) {
                     return PendingRequestsCard(
                       bookingData: request,
+                      onDetailsPressed: () {
+                        // Navigate to detail screen with booking data
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => DetailPendingRequestScreen(
+                              bookingData: request,
+                            ),
+                          ),
+                        );
+                      },
                     );
                   }).toList(),
                 ),
@@ -110,6 +126,7 @@ class _PendingRequestsScreenState extends State<PendingRequestsScreen> {
               duration: const Duration(milliseconds: 500),
               offset: _hideNavBar ? const Offset(0, 1.5) : const Offset(0, 0),
               child: const ConnectNavBarSP(
+                // highlight the calendar icon
                 isHomeSelected: false,
                 isToolsSelected: false,
                 isCalendarSelected: true,

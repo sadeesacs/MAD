@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
-
 class PendingRequestsCard extends StatelessWidget {
   final Map<String, dynamic> bookingData;
+  final VoidCallback onDetailsPressed;
 
   const PendingRequestsCard({
     Key? key,
     required this.bookingData,
+    required this.onDetailsPressed,
   }) : super(key: key);
 
   @override
@@ -47,8 +48,7 @@ class PendingRequestsCard extends StatelessWidget {
           Align(
             alignment: Alignment.bottomRight,
             child: ElevatedButton(
-              onPressed: () {
-              },
+              onPressed: onDetailsPressed,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF027335),
                 shape: RoundedRectangleBorder(
@@ -80,7 +80,7 @@ class PendingRequestsCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          flex: 3,
+          flex: 2,
           child: Text(
             label,
             style: const TextStyle(
