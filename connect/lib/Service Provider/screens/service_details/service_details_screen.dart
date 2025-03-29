@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import '../../widgets/connect_app_bar_sp.dart';
 import '../../widgets/connect_nav_bar_sp.dart';
 
+import '../../widgets/sp_hamburger_menu.dart';
 import 'widgets/status_indicator.dart';
 import 'widgets/service_detail_card.dart';
 import 'widgets/job_description_card.dart';
@@ -11,13 +12,17 @@ import 'widgets/recent_jobs_widget.dart';
 import 'popups/status_confirmation_popup.dart';
 import 'popups/edit_job_description_popup.dart';
 
+import 'edit_service_details_screen.dart';
+
+import 'add_recent_job_screen.dart';
+
 class ServiceDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> service;
 
   const ServiceDetailsScreen({
-    Key? key,
+    super.key,
     required this.service,
-  }) : super(key: key);
+  });
 
   @override
   State<ServiceDetailsScreen> createState() => _ServiceDetailsScreenState();
@@ -27,16 +32,13 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   bool _hideNavBar = false;
   double _lastOffset = 0.0;
 
-  // Clone the service map so we can edit status and description locally
   late Map<String, dynamic> service;
 
-  // ScrollController to hide/show the nav bar
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    // Clone the passed service map
     service = Map<String, dynamic>.from(widget.service);
     _scrollController.addListener(_onScroll);
   }
@@ -59,14 +61,13 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     super.dispose();
   }
 
-  /// Toggles the service's status between Active / Inactive
   void _toggleStatus() {
     setState(() {
-      service['status'] = (service['status'] == 'Active') ? 'Inactive' : 'Active';
+      service['status'] =
+      (service['status'] == 'Active') ? 'Inactive' : 'Active';
     });
   }
 
-  /// Updates the job description in the service object.
   void _editDescription(String newDesc) {
     setState(() {
       service['jobDescription'] = newDesc;
@@ -80,6 +81,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const ConnectAppBarSP(),
+      endDrawer: const SPHamburgerMenu(),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -88,7 +90,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Back button + Service Title + Status Indicator Row
+                // Row for the back button + Service Title + Status Indicator Row
                 Row(
                   children: [
                     // Back button: navigates back to previous screen
@@ -148,29 +150,39 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                 ),
                 const SizedBox(height: 30),
 
-                // Cover image of the service (fixed height: 250, with 10% rounded edges)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Image.asset(
-                    service['coverImage'] ??
-                        'assets/images/cover_image/cleaning2.png',
+                    service['coverImage'] ?? 'assets/images/cover_image/cleaning2.png',
                     width: double.infinity,
-                    height: 150,
+                    height: 250,
                     fit: BoxFit.cover,
                   ),
                 ),
                 const SizedBox(height: 30),
 
-                // Service Detail Card (separate widget)
+                // Service Detail Card
                 ServiceDetailCard(
                   service: service,
                   onEdit: () {
-                    // Placeholder: Implement editing for service details if needed
+                    // Navigate to EditServiceDetailsScreen and update service on return.
+                    Navigator.push<Map<String, dynamic>>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EditServiceDetailsScreen(service: service),
+                      ),
+                    ).then((updatedService) {
+                      if (updatedService != null) {
+                        setState(() {
+                          service = updatedService;
+                        });
+                      }
+                    });
                   },
                 ),
                 const SizedBox(height: 30),
 
-                // Job Description Card (separate widget)
+                // Job Description Card
                 JobDescriptionCard(
                   description: service['jobDescription'] ?? '',
                   onEdit: () {
@@ -193,7 +205,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                 ),
                 const SizedBox(height: 30),
 
-                // Recent Jobs Card (separate widget)
+                // Recent Jobs Card
                 RecentJobsWidget(
                   jobs: service['recentJobs'] ??
                       [
@@ -202,12 +214,26 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                             'assets/images/jobs/job1.png',
                             'assets/images/jobs/job2.png',
                           ],
-                          'description':
-                          'Sample recent job description goes here.',
+                          'description': 'Sample recent job description goes here.',
                         },
                       ],
                   onAdd: () {
-                    // Placeholder for navigation to add a new job
+                    // Navigate to AddRecentJobScreen.
+                    Navigator.push<Map<String, dynamic>>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const AddRecentJobScreen(),
+                      ),
+                    ).then((newJob) {
+                      if (newJob != null) {
+                        // If new job is returned, add it to the service's 'recentJobs'
+                        setState(() {
+                          final existingJobs = service['recentJobs'] as List<Map<String, dynamic>>? ?? [];
+                          existingJobs.add(newJob);
+                          service['recentJobs'] = existingJobs;
+                        });
+                      }
+                    });
                   },
                 ),
                 const SizedBox(height: 30),

@@ -3,10 +3,10 @@ import 'package:flutter/rendering.dart';
 
 import '../../widgets/connect_app_bar_sp.dart' show ConnectAppBarSP;
 import '../../widgets/connect_nav_bar_sp.dart' show ConnectNavBarSP;
+import '../../widgets/sp_hamburger_menu.dart';
+import '../service_details/add_service_detail_screen.dart';
 import 'widgets/service_card.dart';
 
-// Example "details" screen import (adjust path/name if different)
-// This is where the user ends up after tapping the arrow
 import '../service_details/service_details_screen.dart';
 
 class ServiceListingScreen extends StatefulWidget {
@@ -21,7 +21,6 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
   bool _hideNavBar = false;
   double _lastOffset = 0;
 
-  // Updated services list with new entity fields
   final List<Map<String, dynamic>> _services = [
     {
       'serviceName': 'Window Cleaning',
@@ -77,7 +76,6 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
       ],
       'status': 'Inactive',
     },
-    // Add more services as needed...
   ];
 
   @override
@@ -111,6 +109,7 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const ConnectAppBarSP(),
+      endDrawer: const SPHamburgerMenu(),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -138,14 +137,19 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
                     ),
                     InkWell(
                       onTap: () {
-                        // "Add" service placeholder
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AddServiceDetailsScreen(),
+                          ),
+                        ).then((newService) {
+                          if (newService != null) {
+                            // handle the newly added service
+                          }
+                        });
                       },
                       child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Color(0xFF027335)),
-                        ),
+                        // ...
                         child: const Icon(Icons.add, color: Color(0xFF027335)),
                       ),
                     ),

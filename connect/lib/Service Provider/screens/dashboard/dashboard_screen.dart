@@ -4,7 +4,8 @@ import 'package:flutter/rendering.dart';
 
 import '../../widgets/connect_app_bar_sp.dart' show ConnectAppBarSP;
 import '../../widgets/connect_nav_bar_sp.dart' show ConnectNavBarSP;
-import 'widgets/customer_reviews_sp_widget.dart'; // from your snippet
+import '../../widgets/sp_hamburger_menu.dart';
+import 'widgets/customer_reviews_sp_widget.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -181,6 +182,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const ConnectAppBarSP(),
+      endDrawer: const SPHamburgerMenu(),
       body: Stack(
         children: [
           SingleChildScrollView(

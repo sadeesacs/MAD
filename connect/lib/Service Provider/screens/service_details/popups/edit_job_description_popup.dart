@@ -5,10 +5,10 @@ class EditJobDescriptionPopup extends StatefulWidget {
   final ValueChanged<String> onSubmit;
 
   const EditJobDescriptionPopup({
-    Key? key,
+    super.key,
     required this.initialValue,
     required this.onSubmit,
-  }) : super(key: key);
+  });
 
   @override
   State<EditJobDescriptionPopup> createState() => _EditJobDescriptionPopupState();
@@ -30,7 +30,7 @@ class _EditJobDescriptionPopupState extends State<EditJobDescriptionPopup> {
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
-        height: screenHeight * 0.4, // Adjusted height (40% of screen)
+        height: screenHeight * 0.4,
         decoration: const BoxDecoration(
           color: Color(0xFFF3F5F7),
           borderRadius: BorderRadius.only(

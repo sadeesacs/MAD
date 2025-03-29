@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+// Adjust these import paths to your actual screen files
+import '../screens/home/home_screen.dart';
+import '../screens/upcoming_bookings/upcoming_bookings.dart';
 
 class ConnectNavBar extends StatelessWidget {
   final bool isHomeSelected;
+
   final bool isConstructionSelected;
-  const ConnectNavBar({super.key,
+
+  final bool isUpcomingSelected;
+
+  const ConnectNavBar({
+    super.key,
     this.isHomeSelected = false,
-    this.isConstructionSelected = false
+    this.isUpcomingSelected = false,
+    this.isConstructionSelected = false,
+
   });
 
   @override
@@ -23,11 +33,68 @@ class ConnectNavBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+
               _NavIcon(icon: Icons.construction, isActive: isConstructionSelected),
               _NavIcon(icon: Icons.message_outlined, isActive: false),
               _NavIcon(icon: Icons.home_filled, isActive: isHomeSelected),
               _NavIcon(icon: Icons.calendar_today_outlined, isActive: false),
               _NavIcon(icon: Icons.notifications_outlined, isActive: false),
+
+              // Construction icon (Placeholder)
+              GestureDetector(
+                onTap: () {
+                  // Placeholder: navigation if needed
+                },
+                child: _NavIcon(icon: Icons.construction, isActive: false),
+              ),
+              // Message icon (Placeholder)
+              GestureDetector(
+                onTap: () {
+                  // Placeholder: navigation if needed
+                },
+                child: _NavIcon(icon: Icons.message_outlined, isActive: false),
+              ),
+              // Home icon: navigates to HomeScreen
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const HomeScreen(),
+                    ),
+                  );
+                },
+                child: _NavIcon(
+                  icon: Icons.home_filled,
+                  isActive: isHomeSelected,
+                ),
+              ),
+              // Calendar icon: navigates to UpcomingBookingsScreen
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const UpcomingBookingsScreen(),
+                    ),
+                  );
+                },
+                child: _NavIcon(
+                  icon: Icons.calendar_today_outlined,
+                  isActive: isUpcomingSelected,
+                ),
+              ),
+              // Notifications icon (Placeholder)
+              GestureDetector(
+                onTap: () {
+                  // Placeholder: navigation if needed
+                },
+                child: _NavIcon(
+                  icon: Icons.notifications_outlined,
+                  isActive: false,
+                ),
+              ),
+
             ],
           ),
         ),
