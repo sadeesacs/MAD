@@ -159,7 +159,8 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
             right: 0,
             bottom: 30,
             child: const ConnectNavBar(
-              isHomeSelected: true, // Highlight the construction icon
+              isConstructionSelected: true,
+              isHomeSelected: false, 
             ),
           ),
         ],
