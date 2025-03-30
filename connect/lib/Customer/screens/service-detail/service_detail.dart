@@ -134,7 +134,7 @@ class ServiceDetailScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Roboto', // Apply Roboto font
+                        fontFamily: 'Roboto',
                       ),
                     ),
                   ],
@@ -174,14 +174,23 @@ class ServiceDetailScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
+        color: const Color(0xFFF6FAF8),
         border: Border.all(color: darkGreen),
         borderRadius: BorderRadius.circular(4),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 3,
+            spreadRadius: 0,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Text(
         label,
         style: TextStyle(
           color: black,
-          fontFamily: 'Roboto', // Apply Roboto font
+          fontFamily: 'Roboto',
         ),
       ),
     );
