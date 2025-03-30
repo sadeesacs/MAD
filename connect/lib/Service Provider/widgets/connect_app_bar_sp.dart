@@ -9,13 +9,14 @@ class ConnectAppBarSP extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFEDF9EB), // #EDF9EB
+      color: const Color(0xFFEDF9EB),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // Logo + App Name
               Row(
                 children: [
                   Image.asset(
@@ -28,7 +29,7 @@ class ConnectAppBarSP extends StatelessWidget implements PreferredSizeWidget {
                     'Connect',
                     style: TextStyle(
                       fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w800, // Extra Bold
+                      fontWeight: FontWeight.w800,
                       fontSize: 28,
                       color: const Color(0xFF027335),
                     ),
@@ -36,11 +37,18 @@ class ConnectAppBarSP extends StatelessWidget implements PreferredSizeWidget {
                 ],
               ),
 
+              // Notifications + Menu
               Row(
                 children: [
                   _buildIconWithBackground(Icons.notifications),
                   const SizedBox(width: 8),
-                  _buildIconWithBackground(Icons.menu),
+                  // Hamburger Menu Icon
+                  GestureDetector(
+                    onTap: () {
+                      Scaffold.of(context).openEndDrawer();
+                    },
+                    child: _buildIconWithBackground(Icons.menu),
+                  ),
                 ],
               ),
             ],

@@ -1,32 +1,29 @@
 import 'package:flutter/material.dart';
 
-class ConnectNavBarSP extends StatelessWidget {
+class ConnectNavBar extends StatelessWidget {
   final bool isHomeSelected;
-  const ConnectNavBarSP({super.key, this.isHomeSelected = false});
+  const ConnectNavBar({super.key, this.isHomeSelected = false});
 
   @override
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.bottomCenter,
       child: FractionallySizedBox(
-        widthFactor: 0.7,
+        widthFactor: 0.8, // Control width of the navbar
         child: Container(
           decoration: BoxDecoration(
             color: const Color(0xFFF1F1F1),
-            borderRadius: BorderRadius.circular(40), // 40% rounded edges
+            borderRadius: BorderRadius.circular(40),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 9),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Home
-              _NavIcon(icon: Icons.home_filled, isActive: isHomeSelected),
-              // Tools
               _NavIcon(icon: Icons.construction, isActive: false),
-              // Calendar
-              _NavIcon(icon: Icons.calendar_today_outlined, isActive: false),
-              // Messages
               _NavIcon(icon: Icons.message_outlined, isActive: false),
+              _NavIcon(icon: Icons.home_filled, isActive: isHomeSelected),
+              _NavIcon(icon: Icons.calendar_today_outlined, isActive: false),
+              _NavIcon(icon: Icons.notifications_outlined, isActive: false),
             ],
           ),
         ),
@@ -48,7 +45,7 @@ class _NavIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color iconColor = isActive
         ? const Color(0xFF027335)
-        : const Color(0xFF027335).withOpacity(0.7);
+        : const Color(0xFF027335);
 
     return Container(
       width: 50,
@@ -57,11 +54,7 @@ class _NavIcon extends StatelessWidget {
         border: Border.all(color: const Color(0xFF027335)),
         borderRadius: BorderRadius.circular(40),
       ),
-      child: Icon(
-        icon,
-        color: iconColor,
-        size: isActive ? 30 : 26,
-      ),
+      child: Icon(icon, color: iconColor, size: isActive ? 35 : 30),
     );
   }
 }

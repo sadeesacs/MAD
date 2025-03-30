@@ -40,6 +40,7 @@ class _BookingScreenState extends State<BookingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: const ConnectAppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(25),
