@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/chat/chat_list_screen.dart';
 import '../screens/completed_jobs/completed_jobs.dart';
 import '../screens/dashboard/dashboard_screen.dart';
 import '../screens/scheduled_jobs/scheduled_job.dart';
@@ -83,7 +84,7 @@ class ConnectNavBarSP extends StatelessWidget {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const CompletedJobsScreen(),
+                      builder: (_) => const ChatListScreen(),
                     ),
                   );
                 },
