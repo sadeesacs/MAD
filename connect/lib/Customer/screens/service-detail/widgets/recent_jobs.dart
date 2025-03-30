@@ -6,7 +6,7 @@ class RecentJobs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(13.0),
       children: [
         _buildJobCard(
           image1: 'assets/images/jobs/cleaningjob1.jpg',

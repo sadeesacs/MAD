@@ -6,7 +6,7 @@ class Reviews extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(13.0),
       child: Column(
         children: [
           _buildReviewCard(
