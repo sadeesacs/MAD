@@ -35,6 +35,8 @@ class ConnectApp extends StatelessWidget {
 class ServiceDetailScreen extends StatelessWidget {
   const ServiceDetailScreen({super.key});
 
+  get indicator => null;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +45,8 @@ class ServiceDetailScreen extends StatelessWidget {
       body: Stack(
         children: [
           SingleChildScrollView(
-            padding: const EdgeInsets.all(25.0), // Add 25 padding to the entire page
+            padding: const EdgeInsets.all(25.0),
+            // Add 25 padding to the entire page
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -52,10 +55,12 @@ class ServiceDetailScreen extends StatelessWidget {
                   children: [
                     // Back Button
                     GestureDetector(
-                      onTap: () => Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ServiceListingScreen()),
-                      ),
+                      onTap: () =>
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (
+                                context) => const ServiceListingScreen()),
+                          ),
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
@@ -69,7 +74,8 @@ class ServiceDetailScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const Spacer(), // Spacer to push the title to the center
+                    const Spacer(),
+                    // Spacer to push the title to the center
 
                     // Cleaning Text
                     Text(
@@ -80,10 +86,12 @@ class ServiceDetailScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const Spacer(), // Spacer to balance the row
+                    const Spacer(),
+                    // Spacer to balance the row
 
                     // Invisible placeholder to match the back button's width
-                    const SizedBox(width: 40), // Adjust width to match back button size
+                    const SizedBox(width: 40),
+                    // Adjust width to match back button size
                   ],
                 ),
                 const SizedBox(height: 18),
@@ -179,7 +187,7 @@ class ServiceDetailScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Color.fromRGBO(0, 0, 0, 0.3),
             blurRadius: 3,
             spreadRadius: 0,
             offset: const Offset(0, 2),
@@ -205,21 +213,22 @@ class ServiceDetailScreen extends StatelessWidget {
             indicatorColor: darkGreen,
             labelColor: black,
             unselectedLabelColor: greyText,
-            tabs: const [
-              Tab(text: 'Job Description'),
-              Tab(text: 'Recent Jobs'),
-              Tab(text: 'Reviews'),
+            labelPadding: const EdgeInsets.symmetric(horizontal: 3),
+            tabs: [
+              const Tab(text: 'Job Description'),
+              Padding(
+                padding: const EdgeInsets.only(left: 10.0),
+                child: const Tab(text: 'Recent Jobs'),
+              ),
+              const Tab(text: 'Reviews'),
             ],
           ),
           SizedBox(
-            height: 400, // Fixed height for TabBarView
+            height: 400,
             child: TabBarView(
               children: [
-                // Job Description Content
                 const JobDescription(),
-                // Recent Jobs Content
                 RecentJobs(),
-                // Reviews Content
                 Reviews(),
               ],
             ),
