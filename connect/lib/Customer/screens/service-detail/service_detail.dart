@@ -217,7 +217,7 @@ class ServiceDetailScreen extends StatelessWidget {
             tabs: [
               const Tab(text: 'Job Description'),
               Padding(
-                padding: const EdgeInsets.only(left: 10.0),
+                padding: const EdgeInsets.only(left: 8.0),
                 child: const Tab(text: 'Recent Jobs'),
               ),
               const Tab(text: 'Reviews'),

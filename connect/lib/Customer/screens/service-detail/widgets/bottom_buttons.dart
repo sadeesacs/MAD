@@ -7,7 +7,14 @@ class BottomButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16.0),
-      color: Colors.white,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3F5F7),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(28.0),
+          topRight: Radius.circular(28.0),
+        ),
+      ),
+
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
