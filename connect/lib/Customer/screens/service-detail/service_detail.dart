@@ -5,6 +5,7 @@ import 'package:connect/Customer/screens/service-detail/widgets/reviews.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/connect_app_bar.dart';
+import '../service-listing/service_listing.dart';
 
 const Color navbarColor = Color(0xFFF7FAF7);
 const Color darkGreen = Color(0xFF027335);
@@ -51,7 +52,10 @@ class ServiceDetailScreen extends StatelessWidget {
                   children: [
                     // Back Button
                     GestureDetector(
-                      onTap: () => Navigator.pop(context),
+                      onTap: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ServiceListingScreen()),
+                      ),
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
