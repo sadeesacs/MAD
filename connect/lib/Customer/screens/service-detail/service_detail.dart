@@ -1,50 +1,66 @@
+import 'package:connect/Customer/screens/service-detail/widgets/bottom_buttons.dart';
+import 'package:connect/Customer/screens/service-detail/widgets/job_description.dart';
+import 'package:connect/Customer/screens/service-detail/widgets/recent_jobs.dart';
+import 'package:connect/Customer/screens/service-detail/widgets/reviews.dart';
 import 'package:flutter/material.dart';
+
 import '../../widgets/connect_app_bar.dart';
-import '../../widgets/connect_nav_bar.dart';
-// For booking
-import '../bookings/booking/booking_screen.dart';
-import '../bookings/booking_form_data.dart';
+import '../service-listing/service_listing.dart';
 
-import 'widgets/bottom_buttons.dart';
-import 'widgets/job_description.dart';
-import 'widgets/recent_jobs.dart';
-import 'widgets/reviews.dart';
-
+const Color navbarColor = Color(0xFFF7FAF7);
 const Color darkGreen = Color(0xFF027335);
-const Color greyText  = Colors.grey;
-const Color white     = Colors.white;
-const Color black     = Colors.black;
+const Color greyText = Colors.grey;
+const Color white = Colors.white;
+const Color black = Colors.black;
 
-class ServiceDetailScreen extends StatelessWidget {
-  // This receives the entire service map
-  final Map<String, dynamic> service;
+void main() {
+  runApp(const ConnectApp());
+}
 
-  const ServiceDetailScreen({Key? key, required this.service}) : super(key: key);
+class ConnectApp extends StatelessWidget {
+  const ConnectApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Extract data from the service map
-    final String category = service['category'] ?? 'Service';
-    final String title    = service['title']    ?? 'Untitled';
-    final String provider = service['provider'] ?? 'Unknown';
-    final String image    = service['image']    ?? '';
-    final double price    = service['price']    ?? 0.0;
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        fontFamily: 'Roboto', // Apply Roboto font to the entire app
+      ),
+      home: const ServiceDetailScreen(),
+    );
+  }
+}
 
+class ServiceDetailScreen extends StatelessWidget {
+  const ServiceDetailScreen({super.key});
+
+  get indicator => null;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: white,
-      appBar: const ConnectAppBar(),
+      appBar: const ConnectAppBar(), // Use the ConnectAppBar widget
       body: Stack(
         children: [
           SingleChildScrollView(
             padding: const EdgeInsets.all(25.0),
+            // Add 25 padding to the entire page
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Row: back + category
+                // Row for Back Button and Cleaning Text
                 Row(
                   children: [
+                    // Back Button
                     GestureDetector(
-                      onTap: () => Navigator.pop(context),
+                      onTap: () =>
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (
+                                context) => const ServiceListingScreen()),
+                          ),
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
@@ -59,16 +75,23 @@ class ServiceDetailScreen extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
+                    // Spacer to push the title to the center
+
+                    // Cleaning Text
                     Text(
-                      category,
-                      style: const TextStyle(
+                      'Cleaning',
+                      style: TextStyle(
                         color: darkGreen,
                         fontSize: 29,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const Spacer(),
+                    // Spacer to balance the row
+
+                    // Invisible placeholder to match the back button's width
                     const SizedBox(width: 40),
+                    // Adjust width to match back button size
                   ],
                 ),
                 const SizedBox(height: 18),
@@ -76,29 +99,32 @@ class ServiceDetailScreen extends StatelessWidget {
                 // Cover Image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(image, fit: BoxFit.cover),
+                  child: Image.asset(
+                    'assets/images/cover_image/cleaning_cover_image.jpg',
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 const SizedBox(height: 12),
 
-                // Title + Provider
+                // Kitchen Cleaning Section
                 Text(
-                  title,
-                  style: const TextStyle(
+                  'Kitchen Cleaning',
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Roboto',
+                    fontFamily: 'Roboto', // Apply Roboto font
                   ),
                 ),
                 Text(
-                  'By $provider',
+                  'By Leo Perera',
                   style: TextStyle(
                     color: greyText,
-                    fontFamily: 'Roboto',
+                    fontFamily: 'Roboto', // Apply Roboto font
                   ),
                 ),
                 const SizedBox(height: 7),
 
-                // Hard-coded rating + dynamic price
+                // Stars and Price Row
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -112,8 +138,8 @@ class ServiceDetailScreen extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      'LKR ${price.toStringAsFixed(2)}/h',
-                      style: const TextStyle(
+                      'LKR 500.00/h',
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Roboto',
@@ -123,59 +149,36 @@ class ServiceDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
 
-                // Example location chips (optional)
+                // Locations
                 Wrap(
                   spacing: 8,
                   children: [
-                    _locationChip('Colombo'),
-                    _locationChip('Gampaha'),
-                    _locationChip('Kottawa'),
+                    locationChip('Colombo'),
+                    locationChip('Gampaha'),
+                    locationChip('Kottawa'),
                   ],
                 ),
                 const SizedBox(height: 16),
 
-                // Tab Section: job desc, recent jobs, reviews
+                // Job Description Section
                 _buildTabSection(),
                 const SizedBox(height: 80),
               ],
             ),
           ),
-
-          // Bottom Buttons
-          Positioned(
+          // Fixed Bottom Buttons
+          const Positioned(
             left: 0,
             right: 0,
             bottom: 0,
-            child: BottomButtons(
-              // We can define separate onTap for "Message" & "Book Now"
-              onMessageTap: () {
-                // Placeholder
-              },
-              onBookNowTap: () {
-                // Navigate to BookingScreen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => BookingScreen(
-                      formData: BookingFormData(
-                        serviceTitle: title,
-                        providerName: provider,
-                        pricePerHour: price,
-                        imageUrl: image,
-                        category: category,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
+            child: BottomButtons(),
           ),
         ],
       ),
     );
   }
 
-  Widget _locationChip(String label) {
+  Widget locationChip(String label) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -184,13 +187,20 @@ class ServiceDetailScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
         boxShadow: [
           BoxShadow(
-            color: black.withOpacity(0.3),
+            color: Color.fromRGBO(0, 0, 0, 0.3),
             blurRadius: 3,
+            spreadRadius: 0,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Text(label, style: const TextStyle(color: black)),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: black,
+          fontFamily: 'Roboto',
+        ),
+      ),
     );
   }
 
@@ -204,10 +214,13 @@ class ServiceDetailScreen extends StatelessWidget {
             labelColor: black,
             unselectedLabelColor: greyText,
             labelPadding: const EdgeInsets.symmetric(horizontal: 3),
-            tabs: const [
-              Tab(text: 'Job Description'),
-              Tab(text: 'Recent Jobs'),
-              Tab(text: 'Reviews'),
+            tabs: [
+              const Tab(text: 'Job Description'),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: const Tab(text: 'Recent Jobs'),
+              ),
+              const Tab(text: 'Reviews'),
             ],
           ),
           SizedBox(
@@ -215,8 +228,8 @@ class ServiceDetailScreen extends StatelessWidget {
             child: TabBarView(
               children: [
                 const JobDescription(),
-                const RecentJobs(),
-                const Reviews(),
+                RecentJobs(),
+                Reviews(),
               ],
             ),
           ),

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../screens/search-services/search_services.dart';
-
-
 class ConnectAppBar extends StatelessWidget implements PreferredSizeWidget {
   const ConnectAppBar({super.key});
 
@@ -12,14 +9,13 @@ class ConnectAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFEDF9EB),
+      color: const Color(0xFFEDF9EB), // #EDF9EB
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Logo + App Name
               Row(
                 children: [
                   Image.asset(
@@ -32,7 +28,7 @@ class ConnectAppBar extends StatelessWidget implements PreferredSizeWidget {
                     'Connect',
                     style: TextStyle(
                       fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w800, // Extra Bold
                       fontSize: 28,
                       color: const Color(0xFF027335),
                     ),
@@ -40,28 +36,11 @@ class ConnectAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ],
               ),
 
-              // Notifications + Menu
               Row(
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const SearchFunctionScreen(),
-                        ),
-                      );
-                    },
-                    child: _buildIconWithBackground(Icons.search),
-                  ),
+                  _buildIconWithBackground(Icons.search),
                   const SizedBox(width: 8),
-                  // Hamburger Menu Icon
-                  GestureDetector(
-                    onTap: () {
-                      Scaffold.of(context).openEndDrawer();
-                    },
-                    child: _buildIconWithBackground(Icons.menu),
-                  ),
+                  _buildIconWithBackground(Icons.menu),
                 ],
               ),
             ],

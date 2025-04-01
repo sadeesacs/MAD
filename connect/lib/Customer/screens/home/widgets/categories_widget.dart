@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../category_based_service_listing/category_service_listing_screen.dart';
-import '../../category_listing/category_screen.dart';
+import '../../category_based_service_listing/service_listing_screen.dart';
+// <-- Make sure this path is correct for your project
 
 class CategoriesWidget extends StatelessWidget {
   const CategoriesWidget({super.key});
@@ -22,9 +22,9 @@ class CategoriesWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          children: [
-            const Text(
-              'Categories',
+          children: const [
+            Text(
+              'category_screen.dart',
               style: TextStyle(
                 fontFamily: 'Roboto',
                 fontWeight: FontWeight.w600,
@@ -32,29 +32,20 @@ class CategoriesWidget extends StatelessWidget {
                 color: Color(0xFF027335),
               ),
             ),
-            const Spacer(),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const CategoriesScreen(),
-                  ),
-                );
-              },
-              child: const Text(
-                'See All',
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontSize: 16,
-                  color: Color(0xFF027335),
-                ),
+            Spacer(),
+            Text(
+              'See All',
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 16,
+                color: Color(0xFF027335),
               ),
             ),
           ],
         ),
         const SizedBox(height: 16),
-        // Grid with category items
+
+        /// Grid with category items
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -67,12 +58,14 @@ class CategoriesWidget extends StatelessWidget {
           itemCount: categories.length,
           itemBuilder: (context, index) {
             final category = categories[index];
+
             return InkWell(
               onTap: () {
+                // Navigate to the new screen, passing category name
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => CategoryServiceListingScreen(
+                    builder: (_) => ServiceListingScreen(
                       categoryName: category['name']!,
                     ),
                   ),

@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
-import '../screens/category_listing/category_screen.dart';
+// Adjust these import paths to your actual screen files
 import '../screens/customer_chats/customer_chat_list_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/service-detail/service_detail.dart';
-import '../screens/service-listing/service_listing.dart';
 import '../screens/upcoming_bookings/upcoming_bookings.dart';
 
 class ConnectNavBar extends StatelessWidget {
   final bool isHomeSelected;
   final bool isConstructionSelected;
   final bool isUpcomingSelected;
-  final bool isDashboardSelected; // New parameter for Categories screen
 
   const ConnectNavBar({
     super.key,
     this.isHomeSelected = false,
-    this.isConstructionSelected = false,
     this.isUpcomingSelected = false,
-    this.isDashboardSelected = false,
+    this.isConstructionSelected = false,
   });
 
   @override
@@ -35,27 +32,29 @@ class ConnectNavBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+
+
               // Construction icon (Placeholder)
-              GestureDetector(
-                onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const ServiceListingScreen(),
-                  ),
-                );
-                },
-                child: _NavIcon(icon: Icons.construction, isActive: isConstructionSelected),
-              ),
-              // Message icon (Placeholder)
               GestureDetector(
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const CustomerChatListScreen(),
+                      builder: (_) => const ServiceDetailScreen(),
                     ),
                   );
+                },
+                child: _NavIcon(icon: Icons.construction, isActive: false),
+              ),
+              // Message icon (Placeholder)
+              GestureDetector(
+                onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CustomerChatListScreen(),
+                  ),
+                );
                 },
                 child: _NavIcon(icon: Icons.message_outlined, isActive: false),
               ),
@@ -89,21 +88,17 @@ class ConnectNavBar extends StatelessWidget {
                   isActive: isUpcomingSelected,
                 ),
               ),
-              // Dashboard icon: navigates to CategoriesScreen
+              // Notifications icon (Placeholder)
               GestureDetector(
                 onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const CategoriesScreen(),
-                    ),
-                  );
+                  // Placeholder: navigation if needed
                 },
                 child: _NavIcon(
-                  icon: Icons.dashboard,
-                  isActive: isDashboardSelected,
+                  icon: Icons.notifications_outlined,
+                  isActive: false,
                 ),
               ),
+
             ],
           ),
         ),
