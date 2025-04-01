@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 
 import '../../widgets/connect_app_bar.dart';
 import '../../widgets/connect_nav_bar.dart';
+import '../../widgets/hamburger_menu.dart';
 import 'widgets/search_bar_widget.dart';
 import 'widgets/special_offers_widget.dart';
 import 'widgets/categories_widget.dart';
@@ -54,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const ConnectAppBar(),
+      endDrawer: const HamburgerMenu(),
       body: Stack(
         children: [
           SingleChildScrollView(

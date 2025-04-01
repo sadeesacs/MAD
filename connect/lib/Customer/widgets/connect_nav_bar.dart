@@ -82,7 +82,7 @@ class ConnectNavBar extends StatelessWidget {
                   // Placeholder: navigation if needed
                 },
                 child: _NavIcon(
-                  icon: Icons.notifications_outlined,
+                  icon: Icons.dashboard,
                   isActive: false,
                 ),
               ),
