@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import '../auth/login_screen.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
@@ -33,6 +34,11 @@ class RoleSelectionScreen extends StatelessWidget {
                     label: 'Customer',
                     imagePath: 'assets/images/role_selection/customer.png',
                     onTap: () {
+                      // Store role in GetStorage
+                      final storage = GetStorage();
+                      storage.write('userRole', 'CUSTOMER');
+                      print("Role set: CUSTOMER");
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -49,6 +55,11 @@ class RoleSelectionScreen extends StatelessWidget {
                     label: 'Service Provider',
                     imagePath: 'assets/images/role_selection/service_provider.png',
                     onTap: () {
+                      // Store role in GetStorage
+                      final storage = GetStorage();
+                      storage.write('userRole', 'SERVICE_PROVIDER');
+                      print("Role set: SERVICE_PROVIDER");
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
