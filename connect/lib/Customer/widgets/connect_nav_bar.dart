@@ -2,15 +2,21 @@ import 'package:flutter/material.dart';
 // Adjust these import paths to your actual screen files
 import '../screens/home/home_screen.dart';
 import '../screens/upcoming_bookings/upcoming_bookings.dart';
+import '../screens/service-listing/service_listing.dart';
 
 class ConnectNavBar extends StatelessWidget {
   final bool isHomeSelected;
+
+  final bool isConstructionSelected;
+
   final bool isUpcomingSelected;
 
   const ConnectNavBar({
     super.key,
     this.isHomeSelected = false,
     this.isUpcomingSelected = false,
+    this.isConstructionSelected = false,
+
   });
 
   @override
@@ -28,13 +34,23 @@ class ConnectNavBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+
+
               // Construction icon (Placeholder)
               GestureDetector(
                 onTap: () {
-                  // Placeholder: navigation if needed
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ServiceListingScreen(),
+                    ),
+                  );
                 },
-                child: _NavIcon(icon: Icons.construction, isActive: false),
+                child: _NavIcon(icon:
+                Icons.construction,
+                isActive: isConstructionSelected),
               ),
+
               // Message icon (Placeholder)
               GestureDetector(
                 onTap: () {
@@ -42,6 +58,7 @@ class ConnectNavBar extends StatelessWidget {
                 },
                 child: _NavIcon(icon: Icons.message_outlined, isActive: false),
               ),
+
               // Home icon: navigates to HomeScreen
               GestureDetector(
                 onTap: () {
@@ -57,6 +74,7 @@ class ConnectNavBar extends StatelessWidget {
                   isActive: isHomeSelected,
                 ),
               ),
+
               // Calendar icon: navigates to UpcomingBookingsScreen
               GestureDetector(
                 onTap: () {
@@ -72,6 +90,7 @@ class ConnectNavBar extends StatelessWidget {
                   isActive: isUpcomingSelected,
                 ),
               ),
+
               // Notifications icon (Placeholder)
               GestureDetector(
                 onTap: () {
@@ -82,6 +101,7 @@ class ConnectNavBar extends StatelessWidget {
                   isActive: false,
                 ),
               ),
+
             ],
           ),
         ),
