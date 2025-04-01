@@ -1,9 +1,10 @@
+import 'package:connect/Service%20Provider/screens/dashboard/widgets/manage_my_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import '../../widgets/connect_app_bar.dart' show ConnectAppBarSP;
-import '../../widgets/connect_nav_bar.dart' show ConnectNavBarSP;
-import 'widgets/manage_my_services.dart';
+import '../../widgets/connect_app_bar_sp.dart' show ConnectAppBarSP;
+import '../../widgets/connect_nav_bar_sp.dart' show ConnectNavBarSP;
+import '../../widgets/sp_hamburger_menu.dart';
 import 'widgets/customer_reviews_sp_widget.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -14,7 +15,6 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  // Scroll controller to hide nav bar on scroll
   final ScrollController _scrollController = ScrollController();
   bool _hideNavBar = false;
   double _lastOffset = 0;
@@ -55,6 +55,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final offset = _scrollController.position.pixels;
     final direction = _scrollController.position.userScrollDirection;
 
+    // Hide nav bar on scroll down, show on scroll up
     if (direction == ScrollDirection.reverse && offset > _lastOffset) {
       if (!_hideNavBar) {
         setState(() => _hideNavBar = true);
@@ -72,131 +73,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: const ConnectAppBarSP(),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            controller: _scrollController,
-            padding: const EdgeInsets.all(25),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Welcome and Profile Picture
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Welcome, Leo Perera',
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 26,
-                        color: Color(0xFF027335),
-                      ),
-                    ),
-                    ClipOval(
-                      child: Image.asset(
-                        'assets/images/profile_pic/leo_perera.jpg',
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-
-                // Completed & Upcoming Services Cards
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildStatsCard(
-                        title: 'Completed Services',
-                        count: completedServices,
-                        icon: Icons.check,
-                      ),
-                    ),
-                    const SizedBox(width: 18),
-                    Expanded(
-                      child: _buildStatsCard(
-                        title: 'Upcoming Services',
-                        count: upcomingServices,
-                        icon: Icons.priority_high,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-
-                // New Job Requests Title
-                const Text(
-                  'New Job Requests',
-                  style: TextStyle(
-                    fontFamily: 'Roboto',
-                    fontWeight: FontWeight.w600, // SemiBold
-                    fontSize: 22,
-                    color: Color(0xFF027335),
-                  ),
-                ),
-                const SizedBox(height: 30),
-
-                // scrollable container
-                Container(
-                  height: 253,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF6FAF6),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.black12),
-                  ),
-                  child: ListView.separated(
-                    // vertical scrolling inside container
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: _jobRequests.length,
-                    separatorBuilder: (_, __) => const Divider(
-                      color: Colors.black,
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    itemBuilder: (context, index) {
-                      final job = _jobRequests[index];
-                      return _buildJobRequestCard(job);
-                    },
-                  ),
-                ),
-                const SizedBox(height: 30),
-
-                // Top Rated Services
-                const TopRatedSPWidget(),
-                const SizedBox(height: 30),
-
-                // Customer Reviews
-                const CustomerReviewsSPWidget(),
-              ],
-            ),
-          ),
-
-          // Navigation Bar with hide-on-scroll
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 30,
-            child: AnimatedSlide(
-              duration: const Duration(milliseconds: 500),
-              offset: _hideNavBar ? const Offset(0, 1.5) : const Offset(0, 0),
-              child: const ConnectNavBarSP(
-                isHomeSelected: true,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildStatsCard({
@@ -295,6 +171,133 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: const ConnectAppBarSP(),
+      endDrawer: const SPHamburgerMenu(),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            controller: _scrollController,
+            padding: const EdgeInsets.all(25),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Welcome & Profile
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Welcome, Leo Perera',
+                      style: TextStyle(
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 26,
+                        color: Color(0xFF027335),
+                      ),
+                    ),
+                    ClipOval(
+                      child: Image.asset(
+                        'assets/images/profile_pic/leo_perera.jpg',
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
+
+                // Completed & Upcoming Services
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildStatsCard(
+                        title: 'Completed Services',
+                        count: completedServices,
+                        icon: Icons.check,
+                      ),
+                    ),
+                    const SizedBox(width: 18),
+                    Expanded(
+                      child: _buildStatsCard(
+                        title: 'Upcoming Services',
+                        count: upcomingServices,
+                        icon: Icons.priority_high,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
+
+                // New Job Requests
+                const Text(
+                  'New Job Requests',
+                  style: TextStyle(
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.w600, // SemiBold
+                    fontSize: 22,
+                    color: Color(0xFF027335),
+                  ),
+                ),
+                const SizedBox(height: 30),
+
+                Container(
+                  height: 253,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF6FAF6),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.black12),
+                  ),
+                  child: ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: _jobRequests.length,
+                    separatorBuilder: (_, __) => const Divider(
+                      color: Colors.black,
+                      thickness: 1,
+                      height: 1,
+                    ),
+                    itemBuilder: (context, index) {
+                      final job = _jobRequests[index];
+                      return _buildJobRequestCard(job);
+                    },
+                  ),
+                ),
+                const SizedBox(height: 30),
+
+                // Top Rated
+                const TopRatedSPWidget(),
+                const SizedBox(height: 30),
+
+                // Customer Reviews
+                const CustomerReviewsSPWidget(),
+
+              ],
+            ),
+          ),
+
+          // Floating Nav Bar that hides on scroll
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 30,
+            child: AnimatedSlide(
+              duration: const Duration(milliseconds: 500),
+              offset: _hideNavBar ? const Offset(0, 1.5) : const Offset(0, 0),
+              child: ConnectNavBarSP(
+                // Home is highlighted here
+                isHomeSelected: true,
+                isToolsSelected: false,
+              ),
+            ),
           ),
         ],
       ),

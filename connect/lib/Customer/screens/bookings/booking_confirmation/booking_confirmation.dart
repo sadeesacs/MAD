@@ -1,5 +1,8 @@
+// lib/Customer/screens/booking_confirmation/booking_confirmation.dart
+
 import 'package:flutter/material.dart';
 import '../../../widgets/connect_app_bar.dart';
+import '../../upcoming_bookings/upcoming_bookings.dart';
 
 class BookingConfirmation extends StatelessWidget {
   const BookingConfirmation({super.key});
@@ -7,6 +10,7 @@ class BookingConfirmation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: const ConnectAppBar(),
       body: Center(
         child: SingleChildScrollView(
@@ -59,7 +63,7 @@ class BookingConfirmation extends StatelessWidget {
                 height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: Color(0xFF027335), width: 2),
+                  border: Border.all(color: const Color(0xFF027335), width: 2),
                   color: const Color(0xFFEFF8F3),
                 ),
                 child: const Icon(
@@ -71,7 +75,13 @@ class BookingConfirmation extends StatelessWidget {
               const SizedBox(height: 35),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  // Navigate to upcoming bookings
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const UpcomingBookingsScreen(),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF027335),

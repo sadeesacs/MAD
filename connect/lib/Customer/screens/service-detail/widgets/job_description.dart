@@ -1,3 +1,4 @@
+// job_description.dart
 import 'package:flutter/material.dart';
 
 class JobDescription extends StatelessWidget {
@@ -6,9 +7,9 @@ class JobDescription extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Padding(
-      padding: EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(13.0),
       child: Text(
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        'Lorem ipsum dolor sit amet...',
         style: TextStyle(color: Colors.black),
       ),
     );
