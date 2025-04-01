@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 // Adjust these import paths to your actual screen files
+import '../screens/customer_chats/customer_chat_list_screen.dart';
 import '../screens/home/home_screen.dart';
+import '../screens/service-detail/service_detail.dart';
 import '../screens/upcoming_bookings/upcoming_bookings.dart';
 
 class ConnectNavBar extends StatelessWidget {
   final bool isHomeSelected;
+  final bool isConstructionSelected;
   final bool isUpcomingSelected;
 
   const ConnectNavBar({
     super.key,
     this.isHomeSelected = false,
     this.isUpcomingSelected = false,
+    this.isConstructionSelected = false,
   });
 
   @override
@@ -28,17 +32,24 @@ class ConnectNavBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+
+
               // Construction icon (Placeholder)
               GestureDetector(
                 onTap: () {
-                  // Placeholder: navigation if needed
+
                 },
                 child: _NavIcon(icon: Icons.construction, isActive: false),
               ),
               // Message icon (Placeholder)
               GestureDetector(
                 onTap: () {
-                  // Placeholder: navigation if needed
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CustomerChatListScreen(),
+                  ),
+                );
                 },
                 child: _NavIcon(icon: Icons.message_outlined, isActive: false),
               ),
@@ -82,6 +93,7 @@ class ConnectNavBar extends StatelessWidget {
                   isActive: false,
                 ),
               ),
+
             ],
           ),
         ),

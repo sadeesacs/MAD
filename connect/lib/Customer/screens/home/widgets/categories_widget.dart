@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../category_based_service_listing/service_listing_screen.dart';
+import '../../category_based_service_listing/category_service_listing_screen.dart';
 // <-- Make sure this path is correct for your project
 
 class CategoriesWidget extends StatelessWidget {
@@ -65,7 +65,7 @@ class CategoriesWidget extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => ServiceListingScreen(
+                    builder: (_) => CategoryServiceListingScreen(
                       categoryName: category['name']!,
                     ),
                   ),
