@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/connect_app_bar.dart';
-import '../widgets/hamburger_menu.dart';
+import '../../widgets/connect_app_bar.dart';
+import '../../widgets/hamburger_menu.dart';
 
 class CustomerProfileScreen extends StatefulWidget {
   const CustomerProfileScreen({Key? key}) : super(key: key);

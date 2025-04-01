@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../profile/customer_profile_screen.dart';
 import '../screens/home/home_screen.dart';
+import '../screens/profile/customer_profile_screen.dart';
 import '../screens/upcoming_bookings/upcoming_bookings.dart';
-
-// Adjust these imports to your actual screen files
-
 
 class HamburgerMenu extends StatelessWidget {
   const HamburgerMenu({Key? key}) : super(key: key);

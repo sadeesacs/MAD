@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../screens/search-services/search_services.dart';
+
+
 class ConnectAppBar extends StatelessWidget implements PreferredSizeWidget {
   const ConnectAppBar({super.key});
 
@@ -40,7 +43,17 @@ class ConnectAppBar extends StatelessWidget implements PreferredSizeWidget {
               // Notifications + Menu
               Row(
                 children: [
-                  _buildIconWithBackground(Icons.search),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SearchFunctionScreen(),
+                        ),
+                      );
+                    },
+                    child: _buildIconWithBackground(Icons.search),
+                  ),
                   const SizedBox(width: 8),
                   // Hamburger Menu Icon
                   GestureDetector(
