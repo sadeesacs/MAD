@@ -16,10 +16,11 @@ class CompletedJobsCard extends StatelessWidget {
     final String customer       = bookingData['customer']       ?? '';
     final String date           = bookingData['date']           ?? '';
     final String time           = bookingData['time']           ?? '';
-    final String estimatedTotal = bookingData['estimatedTotal'] ?? '';
+    final String total          = bookingData['total']          ?? '';
     // rating & review for bottom sheet
     final int rating            = bookingData['rating']         ?? 0;
     final String review         = bookingData['review']         ?? '';
+    final String reviewDate     = bookingData['reviewDate']     ?? '';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -41,8 +42,33 @@ class CompletedJobsCard extends StatelessWidget {
           const SizedBox(height: 8),
           _buildRow('Time', time),
           const SizedBox(height: 8),
-          _buildRow('Estimated Total', estimatedTotal),
+          _buildRow('Estimated Total', total),
           const SizedBox(height: 16),
+          
+          // Show stars for the rating
+          if (rating > 0)
+            Row(
+              children: [
+                const Text(
+                  'Rating: ',
+                  style: TextStyle(
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    color: Colors.black,
+                  ),
+                ),
+                ...List.generate(5, (index) {
+                  return Icon(
+                    index < rating ? Icons.star : Icons.star_border,
+                    color: Colors.amber,
+                    size: 18,
+                  );
+                }),
+              ],
+            ),
+          const SizedBox(height: 16),
+          
           // "View Rating" button
           Align(
             alignment: Alignment.bottomRight,
@@ -56,6 +82,8 @@ class CompletedJobsCard extends StatelessWidget {
                     return ViewRatingBottomSheet(
                       rating: rating,
                       review: review,
+                      customerName: customer,
+                      reviewDate: reviewDate,
                     );
                   },
                 );
@@ -70,9 +98,9 @@ class CompletedJobsCard extends StatelessWidget {
                   vertical: 12,
                 ),
               ),
-              child: const Text(
-                'View Rating',
-                style: TextStyle(
+              child: Text(
+                rating > 0 ? 'View Rating' : 'No Rating Yet',
+                style: const TextStyle(
                   fontFamily: 'Roboto',
                   fontWeight: FontWeight.bold,
                   fontSize: 16,

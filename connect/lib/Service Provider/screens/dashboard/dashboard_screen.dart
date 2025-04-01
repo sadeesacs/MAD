@@ -1,6 +1,10 @@
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connect/Service%20Provider/screens/dashboard/widgets/manage_my_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../widgets/connect_app_bar_sp.dart' show ConnectAppBarSP;
 import '../../widgets/connect_nav_bar_sp.dart' show ConnectNavBarSP;
@@ -19,36 +23,156 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _hideNavBar = false;
   double _lastOffset = 0;
 
-  int completedServices = 15;
-  int upcomingServices = 10;
+  // User profile data
+  User? user = FirebaseAuth.instance.currentUser;
+  String _userName = 'User';
+  String? _profilePicUrl;
 
-  final List<Map<String, String>> _jobRequests = [
-    {
-      'serviceTitle': 'Kitchen cleaning',
-      'customerName': 'Kusal Mendis',
-      'requestedDate': '2025-05-07',
-    },
-    {
-      'serviceTitle': 'Gardening',
-      'customerName': 'Dasun Shanaka',
-      'requestedDate': '2025-05-07',
-    },
-    {
-      'serviceTitle': 'Tree Planter',
-      'customerName': 'Ryan Renolds',
-      'requestedDate': '2025-05-07',
-    },
-    {
-      'serviceTitle': 'Car Wash',
-      'customerName': 'Chamika Karun',
-      'requestedDate': '2025-05-08',
-    },
-  ];
+  // Service counts
+  int completedServices = 0;
+  int upcomingServices = 0;
+
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    _fetchUserData();
+    _fetchServiceCounts();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      if (user == null || user!.email == null) {
+        print('User or user email is null');
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      print('Fetching user data for email: ${user!.email}');
+
+      // Try to get user by email first
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user!.email)
+          .limit(1)
+          .get();
+
+      // If no documents found by email, try with UID
+      if (querySnapshot.docs.isEmpty) {
+        print('No user found by email, trying with UID: ${user!.uid}');
+        querySnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('uid', isEqualTo: user!.uid)
+            .limit(1)
+            .get();
+      }
+
+      // If still no document, try direct document lookup by UID
+      if (querySnapshot.docs.isEmpty) {
+        print('Trying direct document lookup with UID: ${user!.uid}');
+        final docSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user!.uid)
+            .get();
+
+        if (docSnapshot.exists) {
+          final userData = docSnapshot.data()!;
+          print('Found user data by direct lookup: ${userData['name']}');
+
+          setState(() {
+            _userName = userData['name'] ?? 'User';
+            _profilePicUrl = userData['profile_pic'];
+          });
+        } else {
+          print('No user document found by any method');
+          // Use Firebase Auth data as fallback
+          setState(() {
+            _userName = user!.displayName ?? 'User';
+            _profilePicUrl = user!.photoURL;
+          });
+        }
+      } else {
+        final userData = querySnapshot.docs.first.data();
+        print('Found user data by query: ${userData['name']}');
+
+        setState(() {
+          _userName = userData['name'] ?? 'User';
+          _profilePicUrl = userData['profile_pic'];
+        });
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+      // Use Firebase Auth data as fallback
+      if (user != null) {
+        setState(() {
+          _userName = user!.displayName ?? 'User';
+          _profilePicUrl = user!.photoURL;
+        });
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _fetchServiceCounts() async {
+    try {
+      if (user == null) {
+        print('User is null, cannot fetch service counts');
+        return;
+      }
+
+      // First get all bookings
+      final bookingsSnapshot = await FirebaseFirestore.instance
+          .collection('booking')
+          .get();
+      
+      int completed = 0;
+      int upcoming = 0;
+      
+      // Process each booking to check if the current user is the service provider
+      for (var booking in bookingsSnapshot.docs) {
+        final bookingData = booking.data();
+        
+        // Get the service reference from booking
+        if (bookingData['service'] != null) {
+          final serviceRef = bookingData['service'] as DocumentReference;
+          final serviceDoc = await serviceRef.get();
+          
+          if (serviceDoc.exists) {
+            final serviceData = serviceDoc.data() as Map<String, dynamic>;
+            
+            // Check if serviceProvider field exists and points to current user
+            if (serviceData['serviceProvider'] != null) {
+              final serviceProviderRef = serviceData['serviceProvider'] as DocumentReference;
+              
+              // If this booking's service provider is the current user
+              if (serviceProviderRef.id == user!.uid) {
+                // Count based on status
+                final status = bookingData['status'];
+                if (status == 'completed') {
+                  completed++;
+                } else if (status == 'accepted') {
+                  upcoming++;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      setState(() {
+        completedServices = completed;
+        upcomingServices = upcoming;
+      });
+    } catch (e) {
+      print('Error fetching service counts: $e');
+    }
   }
 
   void _onScroll() {
@@ -132,7 +256,71 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildJobRequestCard(Map<String, String> job) {
+  // Profile image widget based on _profilePicUrl
+  Widget _buildProfileImage() {
+    if (_profilePicUrl != null && _profilePicUrl!.isNotEmpty) {
+      if (_profilePicUrl!.startsWith('/')) {
+        // Local file path
+        return ClipOval(
+          child: Image.file(
+            File(_profilePicUrl!),
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Image.asset(
+                'assets/images/profile_pic/leo_perera.jpg',
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+              );
+            },
+          ),
+        );
+      } else {
+        // Remote URL
+        return ClipOval(
+          child: Image.network(
+            _profilePicUrl!,
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Container(
+                width: 50,
+                height: 50,
+                color: Colors.grey[200],
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            },
+            errorBuilder: (context, error, stackTrace) {
+              return Image.asset(
+                'assets/images/profile_pic/leo_perera.jpg',
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+              );
+            },
+          ),
+        );
+      }
+    } else {
+      // Fallback to default image
+      return ClipOval(
+        child: Image.asset(
+          'assets/images/profile_pic/leo_perera.jpg',
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+  }
+
+  Widget _buildJobRequestCard(Map<String, dynamic> job) {
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Column(
@@ -177,8 +365,61 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  Future<Map<String, dynamic>> _fetchServiceData(
+      DocumentReference serviceRef) async {
+    final serviceDoc = await serviceRef.get();
+    return serviceDoc.data() as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> _fetchCustomerData(
+      DocumentReference customerRef) async {
+    final customerDoc = await customerRef.get();
+    return customerDoc.data() as Map<String, dynamic>;
+  }
+  
+  // Filter bookings to only show those belonging to current service provider
+  Future<List<DocumentSnapshot>> _filterBookingsByServiceProvider(
+      List<DocumentSnapshot> bookings) async {
+    List<DocumentSnapshot> filteredBookings = [];
+    
+    for (var booking in bookings) {
+      final bookingData = booking.data() as Map<String, dynamic>;
+      
+      // Skip if booking doesn't have service reference
+      if (bookingData['service'] == null) continue;
+      
+      final serviceRef = bookingData['service'] as DocumentReference;
+      final serviceDoc = await serviceRef.get();
+      
+      if (serviceDoc.exists) {
+        final serviceData = serviceDoc.data() as Map<String, dynamic>;
+        
+        // Check if serviceProvider field exists and points to current user
+        if (serviceData['serviceProvider'] != null) {
+          final serviceProviderRef = serviceData['serviceProvider'] as DocumentReference;
+          
+          // If this booking's service provider is the current user
+          if (user != null && serviceProviderRef.id == user!.uid) {
+            // Only add pending requests
+            if (bookingData['status'] == 'pending') {
+              filteredBookings.add(booking);
+            }
+          }
+        }
+      }
+    }
+    
+    return filteredBookings;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const ConnectAppBarSP(),
@@ -195,23 +436,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Welcome, Leo Perera',
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 26,
-                        color: Color(0xFF027335),
+                    Expanded(
+                      child: Text(
+                        'Welcome, $_userName',
+                        style: const TextStyle(
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 26,
+                          color: Color(0xFF027335),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
-                    ClipOval(
-                      child: Image.asset(
-                        'assets/images/profile_pic/leo_perera.jpg',
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                    _buildProfileImage(),
                   ],
                 ),
                 const SizedBox(height: 30),
@@ -257,17 +494,96 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: Colors.black12),
                   ),
-                  child: ListView.separated(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: _jobRequests.length,
-                    separatorBuilder: (_, __) => const Divider(
-                      color: Colors.black,
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    itemBuilder: (context, index) {
-                      final job = _jobRequests[index];
-                      return _buildJobRequestCard(job);
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('booking')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return const Text('Something went wrong');
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                            child: CircularProgressIndicator());
+                      }
+
+                      final bookings = snapshot.data!.docs;
+                      // Filter bookings after we fetch them
+                      return FutureBuilder<List<DocumentSnapshot>>(
+                        future: _filterBookingsByServiceProvider(bookings),
+                        builder: (context, filteredSnapshot) {
+                          if (filteredSnapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+                          
+                          if (filteredSnapshot.hasError) {
+                            return const Text('Error filtering bookings');
+                          }
+                          
+                          final filteredBookings = filteredSnapshot.data ?? [];
+                          
+                          if (filteredBookings.isEmpty) {
+                            return const Center(
+                              child: Text(
+                                'No job requests available',
+                                style: TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            );
+                          }
+
+                          return ListView.separated(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            itemCount: filteredBookings.length,
+                            separatorBuilder: (_, __) => const Divider(
+                              color: Colors.black,
+                              thickness: 1,
+                              height: 1,
+                            ),
+                            itemBuilder: (context, index) {
+                              final booking = filteredBookings[index];
+                              final bookingData =
+                                  booking.data() as Map<String, dynamic>;
+                              final serviceRef =
+                                  bookingData['service'] as DocumentReference;
+                              final customerRef =
+                                  bookingData['customer'] as DocumentReference;
+
+                              return FutureBuilder<Map<String, dynamic>>(
+                                future: Future.wait([
+                                  _fetchServiceData(serviceRef),
+                                  _fetchCustomerData(customerRef),
+                                ]).then((results) => {
+                                      'serviceTitle': results[0]['serviceName'],
+                                      'customerName': results[1]['name'],
+                                      'requestedDate': DateFormat('yyyy-MM-dd HH:mm')
+                                          .format((bookingData['date'] as Timestamp)
+                                              .toDate()),
+                                    }),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                        child: CircularProgressIndicator());
+                                  }
+
+                                  if (snapshot.hasError) {
+                                    return const Text('Error loading job request');
+                                  }
+
+                                  final job = snapshot.data!;
+                                  return _buildJobRequestCard(job);
+                                },
+                              );
+                            },
+                          );
+                        },
+                      );
                     },
                   ),
                 ),
@@ -279,7 +595,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 // Customer Reviews
                 const CustomerReviewsSPWidget(),
-
               ],
             ),
           ),

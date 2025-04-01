@@ -1,4 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 import '../../widgets/connect_app_bar_sp.dart';
 import '../../widgets/sp_hamburger_menu.dart';
@@ -12,38 +17,31 @@ class AddServiceDetailsScreen extends StatefulWidget {
   const AddServiceDetailsScreen({Key? key}) : super(key: key);
 
   @override
-  State<AddServiceDetailsScreen> createState() => _AddServiceDetailsScreenState();
+  State<AddServiceDetailsScreen> createState() =>
+      _AddServiceDetailsScreenState();
 }
 
 class _AddServiceDetailsScreenState extends State<AddServiceDetailsScreen> {
-  // Controllers for text input
   final TextEditingController _serviceNameController = TextEditingController();
   final TextEditingController _hourlyRateController = TextEditingController();
-  final TextEditingController _jobDescriptionController = TextEditingController();
+  final TextEditingController _jobDescriptionController =
+      TextEditingController();
   final TextEditingController _coverImageController = TextEditingController();
 
-  // Single-choice category
   String? _selectedCategory;
-
-  // Multi-choice locations
   List<String> _selectedLocations = [];
-
-  // Time input (From and To)
   String? _fromTime;
   String? _toTime;
-
-  // Days of week
   Set<String> _selectedDays = {};
 
-  // Validation flags
-  bool _serviceNameError     = false;
-  bool _categoryError        = false;
-  bool _hourlyRateError      = false;
-  bool _locationsError       = false;
-  bool _timeError            = false;
-  bool _datesError           = false;
-  bool _coverImageError      = false;
-  bool _jobDescriptionError  = false;
+  bool _serviceNameError = false;
+  bool _categoryError = false;
+  bool _hourlyRateError = false;
+  bool _locationsError = false;
+  bool _timeError = false;
+  bool _datesError = false;
+  bool _coverImageError = false;
+  bool _jobDescriptionError = false;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +53,6 @@ class _AddServiceDetailsScreenState extends State<AddServiceDetailsScreen> {
         padding: const EdgeInsets.all(25),
         child: Column(
           children: [
-            // Back button and Title row
             Row(
               children: [
                 GestureDetector(
@@ -88,8 +85,6 @@ class _AddServiceDetailsScreenState extends State<AddServiceDetailsScreen> {
               ],
             ),
             const SizedBox(height: 30),
-
-            // Service Name
             _buildLabel('Service Name'),
             const SizedBox(height: 12),
             TextField(
@@ -119,12 +114,10 @@ class _AddServiceDetailsScreenState extends State<AddServiceDetailsScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Category
             _buildLabel('Category'),
             const SizedBox(height: 12),
             CategorySelector(
-              selectedCategory: _selectedCategory, // initially null
+              selectedCategory: _selectedCategory,
               isError: _categoryError,
               onCategorySelected: (cat) {
                 setState(() {
@@ -133,8 +126,6 @@ class _AddServiceDetailsScreenState extends State<AddServiceDetailsScreen> {
               },
             ),
             const SizedBox(height: 20),
-
-            // Hourly Rate
             _buildLabel('Hourly Rate'),
             const SizedBox(height: 8),
             TextField(
@@ -163,12 +154,10 @@ class _AddServiceDetailsScreenState extends State<AddServiceDetailsScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Location
             _buildLabel('Location'),
             const SizedBox(height: 8),
             LocationSelector(
-              selectedLocations: _selectedLocations, // empty initially
+              selectedLocations: _selectedLocations,
               isError: _locationsError,
               onLocationsChanged: (locs) {
                 setState(() {
@@ -177,8 +166,6 @@ class _AddServiceDetailsScreenState extends State<AddServiceDetailsScreen> {
               },
             ),
             const SizedBox(height: 20),
-
-            // Available Hours
             _buildLabel('Available Hours'),
             const SizedBox(height: 8),
             TimeInput(
@@ -193,12 +180,10 @@ class _AddServiceDetailsScreenState extends State<AddServiceDetailsScreen> {
               },
             ),
             const SizedBox(height: 20),
-
-            // Available Dates
             _buildLabel('Available Dates'),
             const SizedBox(height: 8),
             AvailableDatesPicker(
-              selectedDays: _selectedDays, // empty initially
+              selectedDays: _selectedDays,
               isError: _datesError,
               onDayToggled: (day) {
                 setState(() {
@@ -211,8 +196,6 @@ class _AddServiceDetailsScreenState extends State<AddServiceDetailsScreen> {
               },
             ),
             const SizedBox(height: 20),
-
-            // Extra: Job Description
             _buildLabel('Job Description'),
             const SizedBox(height: 8),
             TextField(
@@ -241,12 +224,10 @@ class _AddServiceDetailsScreenState extends State<AddServiceDetailsScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Cover Image
             _buildLabel('Cover Image'),
             const SizedBox(height: 8),
             CoverImagePicker(
-              imagePath: _coverImageController.text, // empty initially
+              imagePath: _coverImageController.text,
               isError: _coverImageError,
               onImagePicked: (path) {
                 setState(() {
@@ -255,8 +236,6 @@ class _AddServiceDetailsScreenState extends State<AddServiceDetailsScreen> {
               },
             ),
             const SizedBox(height: 30),
-
-            // Add Service button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -306,7 +285,8 @@ class _AddServiceDetailsScreenState extends State<AddServiceDetailsScreen> {
       _serviceNameError = _serviceNameController.text.trim().isEmpty;
       if (_serviceNameError) valid = false;
 
-      _categoryError = (_selectedCategory == null || _selectedCategory!.isEmpty);
+      _categoryError =
+          (_selectedCategory == null || _selectedCategory!.isEmpty);
       if (_categoryError) valid = false;
 
       _hourlyRateError = !_validateHourlyRate(_hourlyRateController.text);
@@ -315,7 +295,10 @@ class _AddServiceDetailsScreenState extends State<AddServiceDetailsScreen> {
       _locationsError = _selectedLocations.isEmpty;
       if (_locationsError) valid = false;
 
-      _timeError = (_fromTime == null || _fromTime!.isEmpty || _toTime == null || _toTime!.isEmpty);
+      _timeError = (_fromTime == null ||
+          _fromTime!.isEmpty ||
+          _toTime == null ||
+          _toTime!.isEmpty);
       if (_timeError) valid = false;
 
       _datesError = _selectedDays.isEmpty;
@@ -338,30 +321,64 @@ class _AddServiceDetailsScreenState extends State<AddServiceDetailsScreen> {
     return double.tryParse(numberPart) != null;
   }
 
-  void _onAddService() {
-    // Validate fields
+  Future<void> _onAddService() async {
     if (!_validateInputs()) return;
 
-    // If all validations pass, create a service map (like in edit)
-    final double newRate = double.parse(_hourlyRateController.text.substring(4).trim());
-
-    // Convert selectedDays back to strings
+    final double newRate =
+        double.parse(_hourlyRateController.text.substring(4).trim());
     final dayStrings = _selectedDays.map(_mapLetterToFullDay).toList();
+
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final userDocID = user.uid;
+    if (userDocID.isEmpty) return;
+
+    final serviceProviderId = userDocID;
 
     final newService = <String, dynamic>{
       'serviceName': _serviceNameController.text.trim(),
+      'serviceProvider': FirebaseFirestore.instance.doc('/users/$serviceProviderId'),
       'category': _selectedCategory,
       'hourlyRate': newRate,
       'locations': _selectedLocations,
-      'availableFrom': _fromTime,
-      'availableTo': _toTime,
+      'availableHours': '$_fromTime - $_toTime',
       'availableDates': dayStrings,
       'jobDescription': _jobDescriptionController.text.trim(),
-      'coverImage': _coverImageController.text.trim(),
+      'coverImage': '',
+      'rating': 0.0,
+      'status': 'Active',
     };
 
-    // For now, just pop with the newService
+
+    final serviceDoc = await FirebaseFirestore.instance.collection('services').add(newService);
+    final serviceId = serviceDoc.id;
+
+    await _saveImageLocally(serviceProviderId, serviceId);
+
     Navigator.pop(context, newService);
+  }
+
+  Future<void> _saveImageLocally(String serviceProviderId, String serviceId) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final serviceDir = Directory('${directory.path}/images/service/$serviceProviderId');
+      if (!await serviceDir.exists()) {
+        await serviceDir.create(recursive: true);
+      }
+
+      final String fileName = "${serviceProviderId}_${serviceId}_cover.png";
+      final coverImagePath = path.join(serviceDir.path, fileName);
+      final coverImageFile = File(_coverImageController.text);
+      await coverImageFile.copy(coverImagePath);
+
+      // Update the service document with the local image path
+      await FirebaseFirestore.instance.collection('services').doc(serviceId).update({
+        'coverImage': coverImagePath,
+      });
+    } catch (e) {
+      print("Error saving image: $e");
+    }
   }
 
   String _mapLetterToFullDay(String letter) {

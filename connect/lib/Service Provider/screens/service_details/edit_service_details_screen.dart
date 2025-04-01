@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 import '../../widgets/connect_app_bar_sp.dart';
-
 import '../../widgets/sp_hamburger_menu.dart';
 import 'edit_widgets/category_selector.dart';
 import 'edit_widgets/location_selector.dart';
@@ -18,30 +21,20 @@ class EditServiceDetailsScreen extends StatefulWidget {
   });
 
   @override
-  State<EditServiceDetailsScreen> createState() =>
-      _EditServiceDetailsScreenState();
+  State<EditServiceDetailsScreen> createState() => _EditServiceDetailsScreenState();
 }
 
 class _EditServiceDetailsScreenState extends State<EditServiceDetailsScreen> {
-  // Controllers for text input
   final TextEditingController _serviceNameController = TextEditingController();
   final TextEditingController _hourlyRateController = TextEditingController();
   final TextEditingController _coverImageController = TextEditingController();
 
-  // Single-choice category
   String? _selectedCategory;
-
-  // Multi-choice locations
   List<String> _selectedLocations = [];
-
-  // Time input (From and To)
   String? _fromTime;
   String? _toTime;
-
-  // Days of week
   Set<String> _selectedDays = {};
 
-  // Validation flags
   bool _serviceNameError = false;
   bool _categoryError = false;
   bool _hourlyRateError = false;
@@ -53,18 +46,27 @@ class _EditServiceDetailsScreenState extends State<EditServiceDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize fields from the service map
+    _initializeFields();
+  }
+
+  void _initializeFields() {
     _serviceNameController.text = widget.service['serviceName'] ?? '';
     double rate = widget.service['hourlyRate']?.toDouble() ?? 0.0;
     _hourlyRateController.text = 'LKR ${rate.toStringAsFixed(2)}';
     _selectedCategory = widget.service['category'];
     List<dynamic> locs = widget.service['locations'] ?? [];
     _selectedLocations = locs.map((e) => e.toString()).toList();
-    _fromTime = widget.service['availableFrom'] ?? '';
-    _toTime = widget.service['availableTo'] ?? '';
+    _coverImageController.text = widget.service['coverImage'] ?? '';
+
+    String availableHours = widget.service['availableHours'] ?? '';
+    List<String> hours = availableHours.split(' - ');
+    if (hours.length == 2) {
+      _fromTime = hours[0];
+      _toTime = hours[1];
+    }
+
     List<String> days = (widget.service['availableDates'] ?? []).cast<String>();
     _selectedDays = days.map((d) => _mapDayToSingleLetter(d)).toSet();
-    _coverImageController.text = widget.service['coverImage'] ?? '';
   }
 
   String _mapDayToSingleLetter(String day) {
@@ -105,29 +107,18 @@ class _EditServiceDetailsScreenState extends State<EditServiceDetailsScreen> {
     }
   }
 
-  /// Validate each field. If something is empty, highlight it in red.
   bool _validateInputs() {
     setState(() {
       _serviceNameError = _serviceNameController.text.trim().isEmpty;
-      _categoryError =
-      (_selectedCategory == null || _selectedCategory!.isEmpty);
+      _categoryError = (_selectedCategory == null || _selectedCategory!.isEmpty);
       _hourlyRateError = !_validateHourlyRate(_hourlyRateController.text);
       _locationsError = _selectedLocations.isEmpty;
-      _timeError = (_fromTime == null ||
-          _fromTime!.isEmpty ||
-          _toTime == null ||
-          _toTime!.isEmpty);
+      _timeError = (_fromTime == null || _fromTime!.isEmpty || _toTime == null || _toTime!.isEmpty);
       _datesError = _selectedDays.isEmpty;
       _coverImageError = _coverImageController.text.trim().isEmpty;
     });
 
-    return !(_serviceNameError ||
-        _categoryError ||
-        _hourlyRateError ||
-        _locationsError ||
-        _timeError ||
-        _datesError ||
-        _coverImageError);
+    return !(_serviceNameError || _categoryError || _hourlyRateError || _locationsError || _timeError || _datesError || _coverImageError);
   }
 
   bool _validateHourlyRate(String text) {
@@ -137,11 +128,10 @@ class _EditServiceDetailsScreenState extends State<EditServiceDetailsScreen> {
     return double.tryParse(numberPart) != null;
   }
 
-  void _onSaveChanges() {
+  void _onSaveChanges() async {
     if (!_validateInputs()) return;
 
-    final double newRate =
-    double.parse(_hourlyRateController.text.substring(4).trim());
+    final double newRate = double.parse(_hourlyRateController.text.substring(4).trim());
     List<String> dayStrings = _selectedDays.map(_mapLetterToFullDay).toList();
 
     final updatedService = Map<String, dynamic>.from(widget.service);
@@ -149,12 +139,52 @@ class _EditServiceDetailsScreenState extends State<EditServiceDetailsScreen> {
     updatedService['category'] = _selectedCategory;
     updatedService['hourlyRate'] = newRate;
     updatedService['locations'] = List<String>.from(_selectedLocations);
-    updatedService['availableFrom'] = _fromTime;
-    updatedService['availableTo'] = _toTime;
+    updatedService['availableHours'] = '$_fromTime - $_toTime';
     updatedService['availableDates'] = dayStrings;
     updatedService['coverImage'] = _coverImageController.text.trim();
 
+    await _updateServiceInFirestore(updatedService);
     Navigator.pop(context, updatedService);
+  }
+
+  Future<void> _updateServiceInFirestore(Map<String, dynamic> updatedService) async {
+    final serviceId = widget.service['id'];
+    final serviceDocRef = FirebaseFirestore.instance.collection('services').doc(serviceId);
+
+    try {
+      final docSnapshot = await serviceDocRef.get();
+      if (docSnapshot.exists) {
+        await serviceDocRef.update(updatedService);
+        await _saveImageLocally(serviceId);
+        print("Service updated successfully");
+      } else {
+        print("Service document not found");
+      }
+    } catch (e) {
+      print("Error updating service: $e");
+    }
+  }
+
+  Future<void> _saveImageLocally(String serviceId) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final serviceDir = Directory('${directory.path}/images/service/${widget.service['serviceProvider'].id}');
+      if (!await serviceDir.exists()) {
+        await serviceDir.create(recursive: true);
+      }
+
+      final String fileName = "${widget.service['serviceProvider'].id}_${serviceId}_cover.png";
+      final coverImagePath = path.join(serviceDir.path, fileName);
+      final coverImageFile = File(_coverImageController.text);
+      await coverImageFile.copy(coverImagePath);
+
+      // Update the service document with the local image path
+      await FirebaseFirestore.instance.collection('services').doc(serviceId).update({
+        'coverImage': coverImagePath,
+      });
+    } catch (e) {
+      print("Error saving image: $e");
+    }
   }
 
   Widget _buildLabel(String text) {
@@ -181,7 +211,6 @@ class _EditServiceDetailsScreenState extends State<EditServiceDetailsScreen> {
         padding: const EdgeInsets.all(25),
         child: Column(
           children: [
-            // Back button and Title row (below the common app bar)
             Row(
               children: [
                 GestureDetector(
@@ -265,7 +294,7 @@ class _EditServiceDetailsScreenState extends State<EditServiceDetailsScreen> {
             const SizedBox(height: 8),
             TextField(
               controller: _hourlyRateController,
-              keyboardType: TextInputType.number, // Opens numberpad only
+              keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 hintText: 'LKR 99.00',
                 hintStyle: const TextStyle(

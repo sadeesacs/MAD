@@ -1,31 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../widgets/connect_app_bar_sp.dart';
 import '../../widgets/sp_hamburger_menu.dart';
+import '../../services/chat_service.dart';
 import 'chat_screen.dart';
-
-final List<Map<String, dynamic>> sampleChats = [
-  {
-    'profilePic': 'assets/images/profile_pic/profile1.png',
-    'name': 'Victoria Avila',
-    'lastMessage': "That's great, I look forward to hearing back!",
-    'time': '11:20 am',
-    'unreadCount': 1,
-  },
-  {
-    'profilePic': 'assets/images/profile_pic/ftd.png',
-    'name': 'Fitted - Tech & Design',
-    'lastMessage': 'Thecla: @Ovo How is it going?',
-    'time': '11:11 am',
-    'unreadCount': 2,
-  },
-  {
-    'profilePic': 'assets/images/profile_pic/profile2.png',
-    'name': 'Demola Andreas',
-    'lastMessage': 'Job Description.docx',
-    'time': 'Yesterday',
-    'unreadCount': 1,
-  },
-];
+import 'dart:io';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({Key? key}) : super(key: key);
@@ -36,12 +15,78 @@ class ChatListScreen extends StatefulWidget {
 
 class _ChatListScreenState extends State<ChatListScreen> {
   final TextEditingController _searchController = TextEditingController();
-  List<Map<String, dynamic>> chats = [];
+  final ChatService _chatService = ChatService();
+  String _searchQuery = '';
+  // Cache for user data to avoid repeated Firestore lookups
+  final Map<String, Map<String, dynamic>> _userDataCache = {};
 
   @override
   void initState() {
     super.initState();
-    chats = List<Map<String, dynamic>>.from(sampleChats);
+  }
+
+  // Get user data with caching
+  Future<Map<String, dynamic>> _getCachedUserData(String userId) async {
+    if (_userDataCache.containsKey(userId)) {
+      return _userDataCache[userId]!;
+    }
+    
+    final userData = await _chatService.getUserData(userId);
+    _userDataCache[userId] = userData;
+    return userData;
+  }
+
+  // Preload user data for better search functionality
+  Future<void> _preloadUserData(List<DocumentSnapshot> chats) async {
+    // Extract all user IDs from chat participants
+    final Set<String> userIds = {};
+    for (var chatDoc in chats) {
+      final data = chatDoc.data() as Map<String, dynamic>;
+      final List<dynamic> participants = data['participants'];
+      
+      for (var userId in participants) {
+        if (userId != _chatService.currentUserId && !_userDataCache.containsKey(userId)) {
+          userIds.add(userId.toString());
+        }
+      }
+    }
+    
+    // Fetch user data in parallel
+    await Future.wait(
+      userIds.map((userId) async {
+        final userData = await _chatService.getUserData(userId);
+        _userDataCache[userId] = userData;
+      })
+    );
+  }
+  
+  // Search in chats using cached user data
+  List<DocumentSnapshot> _filterChatsBySearchQuery(List<DocumentSnapshot> chats, String query) {
+    if (query.isEmpty) return chats;
+    
+    return chats.where((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      final List<dynamic> participants = data['participants'];
+      final String lastMessage = (data['lastMessage'] ?? '').toString().toLowerCase();
+      
+      // Check last message content
+      if (lastMessage.contains(query)) {
+        return true;
+      }
+      
+      // Check participant names
+      for (var userId in participants) {
+        if (userId != _chatService.currentUserId) {
+          if (_userDataCache.containsKey(userId)) {
+            final userName = _userDataCache[userId]!['name']?.toString().toLowerCase() ?? '';
+            if (userName.contains(query)) {
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    }).toList();
   }
 
   @override
@@ -83,7 +128,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     contentPadding: EdgeInsets.symmetric(vertical: 14),
                   ),
                   onChanged: (val) {
-                    // Filter logic if needed
+                    setState(() {
+                      _searchQuery = val.toLowerCase();
+                    });
                   },
                 ),
               ),
@@ -91,11 +138,42 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
               // List of chats
               Expanded(
-                child: ListView.builder(
-                  itemCount: chats.length,
-                  itemBuilder: (context, index) {
-                    final chat = chats[index];
-                    return _buildChatCard(chat);
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: _chatService.getChats(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return const Center(child: Text('No chats available'));
+                    }
+
+                    final allChats = snapshot.data!.docs;
+            
+                    // Preload user data for better search
+                    _preloadUserData(allChats);
+            
+                    // Filter chats based on search query
+                    final filteredChats = _filterChatsBySearchQuery(allChats, _searchQuery);
+            
+                    // Sort by latest message
+                    final sortedChats = _chatService.sortChatsByLatestMessage(filteredChats);
+            
+                    if (sortedChats.isEmpty && _searchQuery.isNotEmpty) {
+                      return Center(child: Text('No results for "$_searchQuery"'));
+                    }
+
+                    return ListView.builder(
+                      itemCount: sortedChats.length,
+                      itemBuilder: (context, index) {
+                        return _buildChatCard(sortedChats[index]);
+                      },
+                    );
                   },
                 ),
               ),
@@ -106,103 +184,225 @@ class _ChatListScreenState extends State<ChatListScreen> {
     );
   }
 
-  Widget _buildChatCard(Map<String, dynamic> chat) {
-    final String profilePic  = chat['profilePic'];
-    final String name        = chat['name'];
-    final String lastMessage = chat['lastMessage'];
-    final String time        = chat['time'];
-    final int unreadCount    = chat['unreadCount'] ?? 0;
+  // Helper method to build profile image
+  Widget _buildProfileImage(String imagePath, double width, double height) {
+    // Check if image path is a URL or local file path
+    if (imagePath.startsWith('http')) {
+      // It's a network image
+      return Image.network(
+        imagePath,
+        width: width,
+        height: height,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildDefaultProfileImage(width, height),
+      );
+    } else {
+      // It's a local file path
+      final file = File(imagePath);
+      return FutureBuilder<bool>(
+        future: file.exists(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Container(
+              width: width,
+              height: height,
+              color: Colors.grey[200],
+              child: const Center(
+                child: SizedBox(
+                  width: 15,
+                  height: 15,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            );
+          }
+          
+          if (snapshot.hasData && snapshot.data == true) {
+            return Image.file(
+              file,
+              width: width,
+              height: height,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => _buildDefaultProfileImage(width, height),
+            );
+          } else {
+            return _buildDefaultProfileImage(width, height);
+          }
+        },
+      );
+    }
+  }
 
-    return InkWell(
-      onTap: () {
-        // Navigate to chat screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ChatScreen(
-              profilePic: profilePic,
-              userName: name,
+  // Default profile image placeholder
+  Widget _buildDefaultProfileImage(double width, double height) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(width / 2), // Make it circular
+      ),
+      child: Icon(
+        Icons.person,
+        size: width * 0.6,
+        color: Colors.grey,
+      ),
+    );
+  }
+
+  Widget _buildChatCard(DocumentSnapshot document) {
+    // Safely convert document data with null check
+    final data = document.data() as Map<String, dynamic>? ?? {};
+    final chatId = document.id;
+    final List<dynamic> participants = data['participants'] as List<dynamic>? ?? [];
+    
+    // Find the other user's ID
+    final String? otherUserId = participants.firstWhere(
+      (id) => id != _chatService.currentUserId, 
+      orElse: () => null
+    ) as String?;
+    
+    if (otherUserId == null) {
+      return const SizedBox.shrink(); // Skip if no other user found
+    }
+
+    final lastMessage = data['lastMessage'] ?? '';
+    final Timestamp? lastMessageTime = data['lastMessageTime'];
+    final time = _formatTimestamp(lastMessageTime);
+    
+    // Get unread count for current user
+    final Map<String, dynamic>? unreadCountMap = data['unreadCount'] as Map<String, dynamic>?;
+    final int unreadCount = unreadCountMap?[_chatService.currentUserId.toString()] ?? 0;
+    
+    return FutureBuilder<Map<String, dynamic>>(
+      future: _getCachedUserData(otherUserId),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          );
+        }
+        
+        final userData = snapshot.data!;
+        final String name = userData['name'] ?? 'Unknown';
+        final String profilePic = userData['profile_pic'] ?? 'https://via.placeholder.com/150';
+
+        return InkWell(
+          onTap: () async {
+            // Mark messages as read when chat is opened
+            await _chatService.markMessagesAsRead(chatId);
+            
+            // Navigate to chat screen
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ChatScreen(
+                  chatId: chatId,
+                  profilePic: profilePic,
+                  userName: name,
+                  otherUserId: otherUserId,
+                ),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              children: [
+                // Profile Picture - Handle both network and local files
+                ClipOval(
+                  child: _buildProfileImage(profilePic, 50, 50),
+                ),
+                const SizedBox(width: 12),
+                // Name + last message
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        lastMessage,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: 14,
+                          color: Colors.black.withOpacity(0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Time + unread
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      time,
+                      style: const TextStyle(
+                        fontFamily: 'Roboto',
+                        fontSize: 13,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    unreadCount > 0
+                        ? Container(
+                      width: 24,
+                      height: 24,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFF6B6B),
+                        shape: BoxShape.circle,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        '$unreadCount',
+                        style: const TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: 12,
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
+                        : const SizedBox.shrink(),
+                  ],
+                ),
+              ],
             ),
           ),
         );
       },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        child: Row(
-          children: [
-            // Profile Picture
-            ClipOval(
-              child: Image.asset(
-                profilePic,
-                width: 50,
-                height: 50,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(width: 12),
-            // Name + last message
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    lastMessage,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontFamily: 'Roboto',
-                      fontSize: 14,
-                      color: Colors.black.withOpacity(0.6),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Time + unread
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  time,
-                  style: const TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: 13,
-                    color: Colors.black54,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                unreadCount > 0
-                    ? Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFF6B6B),
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    '$unreadCount',
-                    style: const TextStyle(
-                      fontFamily: 'Roboto',
-                      fontSize: 12,
-                      color: Colors.white,
-                    ),
-                  ),
-                )
-                    : const SizedBox.shrink(),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
+  }
+  
+  String _formatTimestamp(Timestamp? timestamp) {
+    if (timestamp == null) return '';
+    
+    final now = DateTime.now();
+    final date = timestamp.toDate();
+    final diff = now.difference(date);
+    
+    if (diff.inDays == 0) {
+      // Today, show time
+      return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    } else if (diff.inDays == 1) {
+      // Yesterday
+      return 'Yesterday';
+    } else if (diff.inDays < 7) {
+      // Days of the week
+      final weekday = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      return weekday[date.weekday - 1];
+    } else {
+      // Show date
+      return '${date.day}/${date.month}/${date.year}';
+    }
   }
 }

@@ -16,8 +16,9 @@ class ServiceDetailCard extends StatelessWidget {
     final category = service['category'] ?? 'Cleaning';
     final hourlyRate = service['hourlyRate'] ?? 0.0;
     final locations = service['locations'] ?? ['Colombo', 'Kalutara', 'Galle'];
-    final dates = service['dates'] ?? ['Monday', 'Tuesday', 'Friday'];
-    final hours = service['hours'] ?? '8AM - 5 PM';
+    final dates = _getFriendlyDates(List<String>.from(service['availableDates'] ?? ['Monday', 'Tuesday', 'Friday']));
+    final hours = service['availableHours'] ?? '8AM - 5 PM';
+   
 
     return Container(
       decoration: BoxDecoration(
@@ -65,6 +66,7 @@ class ServiceDetailCard extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 20),
           const SizedBox(height: 20),
 
           // Service Name
@@ -117,5 +119,18 @@ class ServiceDetailCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  List<String> _getFriendlyDates(List<String> dates) {
+    return dates.map((date) {
+      switch (date) {
+        case 'T2':
+          return 'Thursday';
+        case 'S2':
+          return 'Sunday';
+        default:
+          return date;
+      }
+    }).toList();
   }
 }

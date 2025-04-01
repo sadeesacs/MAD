@@ -72,6 +72,7 @@ class _EditJobDescriptionPopupState extends State<EditJobDescriptionPopup> {
               child: ElevatedButton(
                 onPressed: () {
                   widget.onSubmit(_controller.text.trim());
+                  Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF027335),

@@ -18,7 +18,7 @@ class PendingRequestsCard extends StatelessWidget {
     final String serviceName    = bookingData['serviceName']    ?? '';
     final String date           = bookingData['date']           ?? '';
     final String time           = bookingData['time']           ?? '';
-    final String estimatedTotal = bookingData['estimatedTotal'] ?? '';
+    final String total = bookingData['total'] ?? '';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -42,7 +42,7 @@ class PendingRequestsCard extends StatelessWidget {
           const SizedBox(height: 8),
           _buildRow('Time', time),
           const SizedBox(height: 8),
-          _buildRow('Estimated Total', estimatedTotal),
+          _buildRow('Estimated Total', total),
           const SizedBox(height: 16),
           // "Details" button
           Align(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../booking_details-scheduled_jobs/bookings_details_jobs.dart';
 
 const Color darkGreen = Color(0xFF027335);
 const Color white = Colors.white;
@@ -10,7 +9,9 @@ class ScheduledJobCard extends StatelessWidget {
   final String customerName;
   final String date;
   final String time;
-  final String estimatedTotal;
+  final String total;
+  final VoidCallback onComplete;
+  final VoidCallback onViewDetails;
 
   const ScheduledJobCard({
     super.key,
@@ -19,7 +20,9 @@ class ScheduledJobCard extends StatelessWidget {
     required this.customerName,
     required this.date,
     required this.time,
-    required this.estimatedTotal,
+    required this.total,
+    required this.onComplete,
+    required this.onViewDetails,
   });
 
   @override
@@ -63,20 +66,21 @@ class ScheduledJobCard extends StatelessWidget {
                     Text(customerName),
                     Text(date),
                     Text(time),
-                    Text(estimatedTotal),
+                    Text(total),
                   ],
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            // Complete and Details Buttons
+            // Action buttons row
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                // Cancel button
+                const SizedBox(width: 8),
+                // Complete button
                 ElevatedButton(
-                  onPressed: () {
-                    // Handle Complete button press
-                  },
+                  onPressed: onComplete,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: darkGreen,
                     shape: RoundedRectangleBorder(
@@ -89,15 +93,9 @@ class ScheduledJobCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
+                // Details button
                 OutlinedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const BookingDetailsScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: onViewDetails,
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: darkGreen),
                     shape: RoundedRectangleBorder(

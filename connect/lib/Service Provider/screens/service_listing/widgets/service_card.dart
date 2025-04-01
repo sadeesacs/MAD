@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 class ServiceCard extends StatelessWidget {
@@ -40,11 +41,26 @@ class ServiceCard extends StatelessWidget {
           // Cover image
           Padding(
             padding: const EdgeInsets.only(right: 17),
-            child: Image.asset(
-              coverImage,
+            child: coverImage.isNotEmpty
+                ? Image.file(
+              File(coverImage),
               width: 120,
               height: 131,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: 120,
+                  height: 131,
+                  color: Colors.grey[300],
+                  child: const Icon(Icons.error),
+                );
+              },
+            )
+                : Container(
+              width: 120,
+              height: 131,
+              color: Colors.grey[300],
+              child: const Icon(Icons.image),
             ),
           ),
 

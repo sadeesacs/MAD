@@ -3,101 +3,98 @@ import 'package:flutter/material.dart';
 class ViewRatingBottomSheet extends StatelessWidget {
   final int rating;
   final String review;
+  final String customerName;
+  final String reviewDate;
 
   const ViewRatingBottomSheet({
     Key? key,
     required this.rating,
     required this.review,
+    this.customerName = '',
+    this.reviewDate = '',
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
       ),
-      child: SingleChildScrollView(
-        child: Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFFF3F5F7),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-          ),
-          padding: const EdgeInsets.all(25),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Title
-              const Center(
-                child: Text(
-                  'Customer Review',
-                  style: TextStyle(
-                    fontFamily: 'Roboto',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25,
-                    color: Color(0xFF027335),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              // Service Rating
               const Text(
-                'Service Rating',
+                'Customer Rating',
                 style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontWeight: FontWeight.w500,
                   fontSize: 20,
-                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8),
-              // Stars
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: List.generate(5, (index) {
-                  final bool filled = index < rating;
-                  return Icon(
-                    filled ? Icons.star : Icons.star_border,
-                    color: const Color(0xFFFFC48D),
-                    size: 32,
-                  );
-                }),
-              ),
-              const SizedBox(height: 12),
-              // Customer Experience label
-              const Text(
-                'Customer Experience',
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 20,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 8),
-              // The message
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  review.isNotEmpty ? review : 'No review provided',
-                  style: const TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: 16,
-                    color: Colors.black87,
-                  ),
-                ),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.pop(context),
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 20),
+          
+          // Star rating display
+          Row(
+            children: List.generate(5, (index) {
+              return Icon(
+                index < rating ? Icons.star : Icons.star_border,
+                color: Colors.amber,
+                size: 30,
+              );
+            }),
+          ),
+          
+          if (customerName.isNotEmpty) ...[
+            const SizedBox(height: 15),
+            Text(
+              'By: $customerName',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+          
+          if (reviewDate.isNotEmpty) ...[
+            const SizedBox(height: 5),
+            Text(
+              'Date: $reviewDate',
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+          
+          const SizedBox(height: 15),
+          const Text(
+            'Review:',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            review,
+            style: const TextStyle(fontSize: 16),
+          ),
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }

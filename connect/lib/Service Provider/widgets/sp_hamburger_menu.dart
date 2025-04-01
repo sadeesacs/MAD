@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // Adjust these imports to your actual screen files
 import '../screens/dashboard/dashboard_screen.dart';
@@ -6,10 +9,171 @@ import '../screens/scheduled_jobs/scheduled_job.dart';
 import '../screens/service_listing/service_listing_screen.dart';
 import '../screens/pending_requests/pending_requests.dart';
 import '../screens/completed_jobs/completed_jobs.dart';
-import '../screens/profile/profile_screen.dart'; // Add your profile screen import here
+import '../screens/profile/profile_screen.dart';
+import '../screens/chat/chat_list_screen.dart';
+import '../../auth/login_screen.dart'; // Make sure this path is correct for your login screen
 
-class SPHamburgerMenu extends StatelessWidget {
+class SPHamburgerMenu extends StatefulWidget {
   const SPHamburgerMenu({Key? key}) : super(key: key);
+
+  @override
+  State<SPHamburgerMenu> createState() => _SPHamburgerMenuState();
+}
+
+class _SPHamburgerMenuState extends State<SPHamburgerMenu> {
+  User? user = FirebaseAuth.instance.currentUser;
+  String userName = "User";
+  String? profilePicUrl;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+
+    try {
+      if (user == null || user!.email == null) {
+        print('User or user email is null in SPHamburgerMenu');
+        return;
+      }
+
+      // Try to get user by email
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user!.email)
+          .limit(1)
+          .get();
+
+      // If no documents found by email, try with UID
+      if (querySnapshot.docs.isEmpty) {
+        querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('uid', isEqualTo: user!.uid)
+          .limit(1)
+          .get();
+      }
+
+      // If still no document, try direct document lookup by UID
+      if (querySnapshot.docs.isEmpty) {
+        final docSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .get();
+        
+        if (docSnapshot.exists) {
+          final userData = docSnapshot.data()!;
+          
+          if (mounted) {
+            setState(() {
+              userName = userData['name'] ?? 'User';
+              profilePicUrl = userData['profile_pic'];
+            });
+          }
+        } else {
+          // Use Firebase Auth data as fallback
+          if (mounted) {
+            setState(() {
+              userName = user!.displayName ?? 'User';
+              profilePicUrl = user!.photoURL;
+            });
+          }
+        }
+      } else {
+        final userData = querySnapshot.docs.first.data();
+        
+        if (mounted) {
+          setState(() {
+            userName = userData['name'] ?? 'User';
+            profilePicUrl = userData['profile_pic'];
+          });
+        }
+      }
+    } catch (e) {
+      print('Error fetching user data for SP hamburger menu: $e');
+      
+      // Use Firebase Auth data as fallback
+      if (user != null && mounted) {
+        setState(() {
+          userName = user!.displayName ?? 'User';
+          profilePicUrl = user!.photoURL;
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  Widget _buildProfileImage() {
+    if (profilePicUrl != null && profilePicUrl!.isNotEmpty) {
+      if (profilePicUrl!.startsWith('/')) {
+        // Local file path
+        return ClipOval(
+          child: Image.file(
+            File(profilePicUrl!),
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Image.asset(
+                'assets/images/profile_pic/leo_perera.jpg',
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+              );
+            },
+          ),
+        );
+      } else {
+        // Network URL
+        return ClipOval(
+          child: Image.network(
+            profilePicUrl!,
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return SizedBox(
+                width: 50,
+                height: 50,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            },
+            errorBuilder: (context, error, stackTrace) {
+              return Image.asset(
+                'assets/images/profile_pic/leo_perera.jpg',
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+              );
+            },
+          ),
+        );
+      }
+    }
+    
+    // Default fallback image
+    return ClipOval(
+      child: Image.asset(
+        'assets/images/profile_pic/leo_perera.jpg',
+        width: 50,
+        height: 50,
+        fit: BoxFit.cover,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,20 +209,23 @@ class SPHamburgerMenu extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           // Profile Pic
-                          ClipOval(
-                            child: Image.asset(
-                              'assets/images/profile_pic/leo_perera.jpg',
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                          isLoading
+                              ? Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.grey[300],
+                                  ),
+                                  child: Center(child: CircularProgressIndicator()),
+                                )
+                              : _buildProfileImage(),
                           const SizedBox(width: 12),
 
                           // Name
-                          const Text(
-                            'Leo Perera',
-                            style: TextStyle(
+                          Text(
+                            isLoading ? "Loading..." : userName,
+                            style: const TextStyle(
                               fontFamily: 'Roboto',
                               fontWeight: FontWeight.bold,
                               fontSize: 23,
@@ -162,7 +329,10 @@ class SPHamburgerMenu extends StatelessWidget {
                 label: 'Chats',
                 onTap: () {
                   Navigator.pop(context);
-                  // Placeholder
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ChatListScreen()),
+                  );
                 },
               ),
               _buildMenuItem(
@@ -185,8 +355,12 @@ class SPHamburgerMenu extends StatelessWidget {
                 icon: Icons.logout,
                 label: 'Logout',
                 onTap: () {
+                  FirebaseAuth.instance.signOut();
                   Navigator.pop(context);
-                  // Placeholder
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                  );
                 },
               ),
             ],

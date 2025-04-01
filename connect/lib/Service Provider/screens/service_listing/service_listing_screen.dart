@@ -1,12 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/rendering.dart';
 
-import '../../widgets/connect_app_bar_sp.dart' show ConnectAppBarSP;
-import '../../widgets/connect_nav_bar_sp.dart' show ConnectNavBarSP;
+import '../../widgets/connect_app_bar_sp.dart';
+import '../../widgets/connect_nav_bar_sp.dart';
 import '../../widgets/sp_hamburger_menu.dart';
 import '../service_details/add_service_detail_screen.dart';
 import 'widgets/service_card.dart';
-
 import '../service_details/service_details_screen.dart';
 
 class ServiceListingScreen extends StatefulWidget {
@@ -21,63 +22,6 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
   bool _hideNavBar = false;
   double _lastOffset = 0;
 
-  final List<Map<String, dynamic>> _services = [
-    {
-      'serviceName': 'Window Cleaning',
-      'category': 'Cleaning',
-      'hourlyRate': 1000.0,
-      'locations': ['Colombo', 'Kalutara'],
-      'availableHours': '8AM - 5PM',
-      'availableDates': ['Monday', 'Friday'],
-      'jobDescription': 'Professional window cleaning services...',
-      'coverImage': 'assets/images/cover_image/cleaning1.png',
-      'rating': 4.5,
-      'recentJobs': [
-        {
-          'images': ['assets/images/jobs/job1.png', 'assets/images/jobs/job2.png'],
-          'description': 'Cleaned windows of a large house.'
-        }
-      ],
-      'reviews': [
-        {
-          'rating': 5.0,
-          'comment': 'Excellent service!',
-          'author': 'John'
-        }
-      ],
-      'status': 'Active',
-    },
-    {
-      'serviceName': 'Garden Maintenance',
-      'category': 'Gardening',
-      'hourlyRate': 500.0,
-      'locations': ['Galle', 'Matara'],
-      'availableHours': '9AM - 3PM',
-      'availableDates': ['Tuesday', 'Thursday'],
-      'jobDescription': 'We take care of all your gardening needs...',
-      'coverImage': 'assets/images/cover_image/gardening1.jpg',
-      'rating': 3.8,
-      'recentJobs': [
-        {
-          'images': ['assets/images/jobs/job1.png', 'assets/images/jobs/job2.png'],
-          'description': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-        },
-        {
-          'images': ['assets/images/jobs/job1.png', 'assets/images/jobs/job2.png'],
-          'description': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-        },
-      ],
-      'reviews': [
-        {
-          'rating': 4.0,
-          'comment': 'Good job, but took a bit longer.',
-          'author': 'Alice'
-        }
-      ],
-      'status': 'Inactive',
-    },
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -88,11 +32,14 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
     final offset = _scrollController.position.pixels;
     final direction = _scrollController.position.userScrollDirection;
 
-    // Hide nav bar on scroll down, show on scroll up
     if (direction == ScrollDirection.reverse && offset > _lastOffset) {
-      if (!_hideNavBar) setState(() => _hideNavBar = true);
+      if (!_hideNavBar) {
+        setState(() => _hideNavBar = true);
+      }
     } else if (direction == ScrollDirection.forward && offset < _lastOffset) {
-      if (_hideNavBar) setState(() => _hideNavBar = false);
+      if (_hideNavBar) {
+        setState(() => _hideNavBar = false);
+      }
     }
     _lastOffset = offset;
   }
@@ -114,25 +61,20 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
         children: [
           SingleChildScrollView(
             controller: _scrollController,
-            padding: const EdgeInsets.all(25),
+            padding: const EdgeInsets.fromLTRB(25, 25, 25, 125), // Added bottom padding
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Title + Add icon alignment
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      width: 225,
-                      alignment: Alignment.centerRight,
-                      child: const Text(
-                        'Services',
-                        style: TextStyle(
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 32,
-                          color: Color(0xFF027335),
-                        ),
+                    const Text(
+                      'My Services',
+                      style: TextStyle(
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                        color: Color(0xFF027335),
                       ),
                     ),
                     InkWell(
@@ -140,51 +82,84 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const AddServiceDetailsScreen(),
+                            builder: (context) => const AddServiceDetailsScreen(),
                           ),
-                        ).then((newService) {
-                          if (newService != null) {
-                            // handle the newly added service
-                          }
-                        });
+                        );
                       },
                       child: Container(
-                        // ...
-                        child: const Icon(Icons.add, color: Color(0xFF027335)),
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.red),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.add,
+                          color: Colors.red,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 30),
+                // Update the StreamBuilder in ServiceListingScreen
+                StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('services')
+                      .where('serviceProvider', isEqualTo: FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid))
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return const Text('Something went wrong');
+                    }
 
-                // Service Cards
-                Column(
-                  children: _services.map((service) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 20),
-                      child: ServiceCard(
-                        serviceData: service,
-                        onArrowTap: () {
-                          // Navigate to details, passing entire service map
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ServiceDetailsScreen(
-                                service: service,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    final services = snapshot.data!.docs.map((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      data['id'] = doc.id; // Include the document ID
+                      return data;
+                    }).toList();
+
+                    if (services.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'No services available',
+                          style: TextStyle(
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
+                        ),
+                      );
+                    }
+
+                    return Column(
+                      children: services.map((service) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: ServiceCard(
+                            serviceData: service,
+                            onArrowTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ServiceDetailsScreen(service: service),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      }).toList(),
                     );
-                  }).toList(),
-                ),
-                const SizedBox(height: 80),
+                  },
+                )
               ],
             ),
           ),
-
-          // Nav bar
           Positioned(
             left: 0,
             right: 0,
@@ -193,8 +168,8 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
               duration: const Duration(milliseconds: 500),
               offset: _hideNavBar ? const Offset(0, 1.5) : const Offset(0, 0),
               child: const ConnectNavBarSP(
-                isHomeSelected: false,
-                isToolsSelected: true,
+                isHomeSelected: true,
+                isToolsSelected: false,
               ),
             ),
           ),
