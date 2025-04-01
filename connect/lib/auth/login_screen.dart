@@ -1,7 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connect/auth/register_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../Customer/screens/Signup/register_screen.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+
+
 import '../Customer/screens/home/home_screen.dart';
 import '../Service Provider/screens/dashboard/dashboard_screen.dart';
+import '../repository/authentication_repository.dart';
+import '../role_selection/role_selection.dart';
 import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -19,6 +27,12 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController    = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
               // Login Button
               Center(
                 child: ElevatedButton(
-                  onPressed: _onLoginPressed,
+                  onPressed: _isLoading ? null : _onLoginPressed,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF427E4E),
                     shape: RoundedRectangleBorder(
@@ -178,7 +192,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       vertical: 10,
                     ),
                   ),
-                  child: const Text(
+                  child: _isLoading
+                      ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                      : const Text(
                     'Login',
                     style: TextStyle(
                       fontFamily: 'Roboto',
@@ -228,23 +251,78 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _onLoginPressed() {
-    if (widget.isServiceProvider) {
-      // Navigate to Dashboard
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const DashboardScreen(),
-        ),
+  Future<void> _onLoginPressed() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      // Authenticate with Firebase
+      print("Attempting to login with email: ${_emailController.text.trim()}");
+      final userCredential = await _auth.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
       );
-    } else {
-      // Navigate to Home
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const HomeScreen(),
-        ),
+
+      print("User authenticated: ${userCredential.user!.uid}");
+
+      // Fetch user role from Firestore
+      final userDoc = await _firestore.collection('users').doc(userCredential.user!.uid).get();
+
+      if (userDoc.exists && userDoc.data() != null) {
+        final role = userDoc.data()!['role'];
+        print("User role: $role");
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        onLoginSuccess(userCredential.user!);
+
+        // Navigate based on role
+        if (role == 'CUSTOMER') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+          );
+        } else if (role == 'SERVICE_PROVIDER') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const DashboardScreen()),
+          );
+        } else {
+          // Invalid role - redirect to role selection
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
+          );
+        }
+      } else {
+        print("User document not found in Firestore");
+        setState(() {
+          _isLoading = false;
+          _errorMessage = "User profile not found. Please contact support.";
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User profile not found')),
+        );
+      }
+    } catch (e) {
+      print("Login error: $e");
+      setState(() {
+        _isLoading = false;
+        _errorMessage = e.toString();
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login failed: ${e is FirebaseAuthException ? e.message : e}')),
       );
     }
+  }
+
+  void onLoginSuccess(User user) {
+    final authRepo = Get.find<AuthenticationRepository>();
+    authRepo.checkPhoneVerification(user);
   }
 }

@@ -1,9 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'verification_code_screen.dart';
 import 'success_password_change_screen.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({Key? key}) : super(key: key);
+  final String email;
+
+  const ResetPasswordScreen({
+    Key? key,
+    required this.email,
+  }) : super(key: key);
+
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -12,6 +20,9 @@ class ResetPasswordScreen extends StatefulWidget {
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final TextEditingController _newPasswordController     = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+
+  bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -128,6 +139,18 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 ),
               ),
               const SizedBox(height: 30),
+              if (_errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Text(
+                    _errorMessage!,
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontSize: 14,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
 
               // Set New Password button
               Center(
@@ -161,12 +184,83 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 
-  void _onSetNewPassword() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const SuccessPasswordChangeScreen(),
-      ),
-    );
+  Future<void> _onSetNewPassword() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      // Validate passwords match
+      if (_newPasswordController.text != _confirmPasswordController.text) {
+        throw Exception("Passwords don't match");
+      }
+
+      // Validate password strength
+      if (_newPasswordController.text.length < 6) {
+        throw Exception("Password must be at least 6 characters");
+      }
+
+      // Send a password reset email with the built-in Firebase feature
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: widget.email);
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      // Show success screen with instructions to check email
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: const Text('Password Reset Link Sent'),
+          content: Text(
+              'A password reset link has been sent to ${widget.email}.\n\n'
+                  'Please check your email and click the link to complete the password reset process.'
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Navigate to success screen and clear history
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SuccessPasswordChangeScreen()),
+                      (route) => false,
+                );
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+
+    } catch (e) {
+      String errorMessage = 'Failed to reset password';
+
+      if (e is FirebaseAuthException) {
+        if (e.code == 'user-not-found') {
+          errorMessage = 'No user found with this email address';
+        } else if (e.message != null) {
+          errorMessage = e.message!;
+        }
+      } else {
+        errorMessage = e.toString();
+      }
+
+      setState(() {
+        _isLoading = false;
+        _errorMessage = errorMessage;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 }
