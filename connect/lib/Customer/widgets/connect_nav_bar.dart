@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 // Adjust these import paths to your actual screen files
+import '../screens/customer_chats/customer_chat_list_screen.dart';
 import '../screens/home/home_screen.dart';
+import '../screens/service-detail/service_detail.dart';
 import '../screens/upcoming_bookings/upcoming_bookings.dart';
 
 class ConnectNavBar extends StatelessWidget {
@@ -35,14 +37,19 @@ class ConnectNavBar extends StatelessWidget {
               // Construction icon (Placeholder)
               GestureDetector(
                 onTap: () {
-                  // Placeholder: navigation if needed
+
                 },
                 child: _NavIcon(icon: Icons.construction, isActive: false),
               ),
               // Message icon (Placeholder)
               GestureDetector(
                 onTap: () {
-                  // Placeholder: navigation if needed
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CustomerChatListScreen(),
+                  ),
+                );
                 },
                 child: _NavIcon(icon: Icons.message_outlined, isActive: false),
               ),

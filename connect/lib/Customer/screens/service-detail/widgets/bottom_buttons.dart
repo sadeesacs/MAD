@@ -1,39 +1,47 @@
 import 'package:flutter/material.dart';
 
+const Color darkGreen = Color(0xFF027335);
+const Color white = Colors.white;
+
 class BottomButtons extends StatelessWidget {
-  const BottomButtons({super.key});
+  final VoidCallback? onMessageTap;
+  final VoidCallback? onBookNowTap;
+
+  const BottomButtons({
+    Key? key,
+    this.onMessageTap,
+    this.onBookNowTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF3F5F7),
-        borderRadius: const BorderRadius.only(
+      decoration: const BoxDecoration(
+        color: Color(0xFFF3F5F7),
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(28.0),
           topRight: Radius.circular(28.0),
         ),
       ),
-
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildButton('Message'),
-          _buildButton('Book Now'),
+          _buildButton('Message', onPressed: onMessageTap),
+          _buildButton('Book Now', onPressed: onBookNowTap),
         ],
       ),
     );
   }
 
-  Widget _buildButton(String text) {
+  Widget _buildButton(String text, {VoidCallback? onPressed}) {
     return SizedBox(
       width: 150,
       height: 50,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF027335),
-          padding: EdgeInsets.zero,
+          backgroundColor: darkGreen,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
@@ -41,8 +49,8 @@ class BottomButtons extends StatelessWidget {
         child: Text(
           text,
           style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,  
+            color: white,
+            fontSize: 18,
           ),
         ),
       ),
