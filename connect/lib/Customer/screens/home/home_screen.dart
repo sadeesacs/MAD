@@ -3,11 +3,14 @@ import 'package:flutter/rendering.dart';
 
 import '../../widgets/connect_app_bar.dart';
 import '../../widgets/connect_nav_bar.dart';
+import '../../widgets/hamburger_menu.dart';
+import '../search-services/search_services.dart';
 import 'widgets/search_bar_widget.dart';
 import 'widgets/special_offers_widget.dart';
 import 'widgets/categories_widget.dart';
 import 'widgets/top_rated_widget.dart';
 import 'widgets/customer_reviews_widget.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -54,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const ConnectAppBar(),
+      endDrawer: const HamburgerMenu(),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -68,7 +72,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: SearchBarWidget(
                     onTap: () {
-                      Navigator.pushNamed(context, '/search');
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SearchFunctionScreen(),
+                        ),
+                      );
                     },
                   ),
                 ),
