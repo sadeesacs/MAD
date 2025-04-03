@@ -1,8 +1,9 @@
-import 'dart:developer';
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
+// Import your custom widgets/screens
 import '../../widgets/connect_app_bar.dart';
 import '../../widgets/connect_nav_bar.dart';
 import '../booking_history/booking_history.dart';
@@ -22,16 +23,13 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
   bool _hideNavBar = false;
   double _lastOffset = 0;
 
-  /// We’ll store the fetched booking docs here so we can remove them after cancellation.
-  late Future<List<DocumentSnapshot>> _futureBookingDocs;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
     super.initState();
-    // Begin listening to scroll for hiding nav bar.
     _scrollController.addListener(_onScroll);
-    // Fetch upcoming bookings once (FutureBuilder).
-    _futureBookingDocs = _fetchUpcomingBookings();
   }
 
   @override
@@ -41,7 +39,6 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
     super.dispose();
   }
 
-  /// Scroll logic: show/hide bottom nav bar.
   void _onScroll() {
     final offset = _scrollController.position.pixels;
     final direction = _scrollController.position.userScrollDirection;
@@ -53,65 +50,165 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
     _lastOffset = offset;
   }
 
-  /// Query Firestore for all bookings for the current user, except `status == "completed"`.
-  Future<List<DocumentSnapshot>> _fetchUpcomingBookings() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      log('No user is signed in!');
-      return [];
-    }
-
-    final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
-
-    // Example: if your "booking" docs store "customer" as a reference to /users/uid
-    Query query = FirebaseFirestore.instance
-        .collection('bookings')
-        .where('customer', isEqualTo: userRef)
-        .where('status', isNotEqualTo: 'completed');
-
-    final QuerySnapshot snapshot = await query.get();
-    return snapshot.docs;
+  /// Deletes the booking document from Firestore.
+  Future<void> _deleteBooking(DocumentSnapshot bookingDoc) async {
+    await bookingDoc.reference.delete();
   }
 
-  /// Called when "Cancel" is confirmed in the popup. We update the booking’s status
-  /// to "cancelled" in Firestore, then remove it from our local list so it disappears.
-  void _onCancelBookingConfirmed(
-      List<DocumentSnapshot> bookingDocs, DocumentSnapshot bookingDoc) async {
-    try {
-      // Update the booking doc's status to "cancelled".
-      await bookingDoc.reference.update({'status': 'cancelled'});
-
-      // Remove from the in-memory list so UI updates.
-      setState(() {
-        bookingDocs.removeWhere((doc) => doc.id == bookingDoc.id);
-      });
-    } catch (e) {
-      log('Error cancelling booking: $e');
-    }
+  /// Retrieves all bookings for the logged-in customer.
+  /// We use the user's document reference to match the 'customer' field.
+  Stream<QuerySnapshot> _getUpcomingBookings() {
+    final user = _auth.currentUser;
+    if (user == null) return const Stream.empty();
+    final userDocRef = _firestore.collection('users').doc(user.uid);
+    return _firestore
+        .collection('booking')
+        .where('customer', isEqualTo: userDocRef)
+        .snapshots();
   }
 
-  /// Show the confirmation popup for cancellation.
-  void _showCancelPopup(
-      BuildContext context,
-      List<DocumentSnapshot> bookingDocs,
-      DocumentSnapshot bookingDoc,
-      ) {
+  /// Builds a booking card for each booking document.
+  /// This uses nested FutureBuilders to fetch the service details and the service provider's name.
+  Widget _buildBookingCard(BuildContext context, DocumentSnapshot bookingDoc) {
+    final bookingData = bookingDoc.data() as Map<String, dynamic>;
+    final status = bookingData['status'] ?? '';
+    // Skip if the booking is completed.
+    if (status.toLowerCase() == "completed") {
+      return const SizedBox.shrink();
+    }
+
+    // Generate a random display booking ID using the document ID.
+    final docId = bookingDoc.id;
+    final displayedBookingId = "#${docId.substring(0, 6)}";
+
+    // Format the date.
+    final Timestamp? dateTs = bookingData['date'];
+    final String dateString = dateTs != null
+        ? "${dateTs.toDate().year}-${dateTs.toDate().month.toString().padLeft(2, '0')}-${dateTs.toDate().day.toString().padLeft(2, '0')}"
+        : '';
+    final String timeString = bookingData['time'] ?? '';
+    final String totalString = bookingData['total'] ?? '';
+
+    // Get the service reference from the booking.
+    final serviceRef = bookingData['service'] as DocumentReference?;
+    if (serviceRef == null) {
+      return UpcomingBookingCard(
+        bookingData: {
+          'bookingId': displayedBookingId,
+          'serviceType': '[No service]',
+          'serviceProvider': '[No provider]',
+          'serviceName': '[No serviceName]',
+          'date': dateString,
+          'time': timeString,
+          'estimatedTotal': totalString,
+        },
+        onCancel: () {
+          _showCancelDialog(context, bookingDoc);
+        },
+      );
+    }
+
+    return FutureBuilder<DocumentSnapshot>(
+      future: serviceRef.get(),
+      builder: (context, serviceSnap) {
+        if (serviceSnap.connectionState == ConnectionState.waiting) {
+          return const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (!serviceSnap.hasData || !serviceSnap.data!.exists) {
+          return const Text("Error loading service details");
+        }
+        final serviceData = serviceSnap.data!.data() as Map<String, dynamic>;
+        final serviceType = serviceData['category'] ?? '';
+        final serviceName = serviceData['serviceName'] ?? '';
+
+        // Now fetch the service provider document.
+        final providerRef = serviceData['serviceProvider'] as DocumentReference?;
+        if (providerRef == null) {
+          return UpcomingBookingCard(
+            bookingData: {
+              'bookingId': displayedBookingId,
+              'serviceType': serviceType,
+              'serviceProvider': '[No provider]',
+              'serviceName': serviceName,
+              'date': dateString,
+              'time': timeString,
+              'estimatedTotal': totalString,
+            },
+            onCancel: () {
+              _showCancelDialog(context, bookingDoc);
+            },
+          );
+        }
+
+        return FutureBuilder<DocumentSnapshot>(
+          future: providerRef.get(),
+          builder: (context, providerSnap) {
+            if (providerSnap.connectionState == ConnectionState.waiting) {
+              return const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+            if (!providerSnap.hasData || !providerSnap.data!.exists) {
+              return UpcomingBookingCard(
+                bookingData: {
+                  'bookingId': displayedBookingId,
+                  'serviceType': serviceType,
+                  'serviceProvider': '[No provider data]',
+                  'serviceName': serviceName,
+                  'date': dateString,
+                  'time': timeString,
+                  'estimatedTotal': totalString,
+                },
+                onCancel: () {
+                  _showCancelDialog(context, bookingDoc);
+                },
+              );
+            }
+            final providerData = providerSnap.data!.data() as Map<String, dynamic>;
+            final providerName = providerData['name'] ?? '';
+
+            return UpcomingBookingCard(
+              bookingData: {
+                'bookingId': displayedBookingId,
+                'serviceType': serviceType,
+                'serviceProvider': providerName,
+                'serviceName': serviceName,
+                'date': dateString,
+                'time': timeString,
+                'estimatedTotal': totalString,
+              },
+              onCancel: () {
+                _showCancelDialog(context, bookingDoc);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// Displays the cancellation popup.
+  void _showCancelDialog(BuildContext context, DocumentSnapshot bookingDoc) {
+    final docId = bookingDoc.id;
+    final displayedBookingId = "#${docId.substring(0, 6)}";
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) {
         return CancelBookingPopup(
           bookingInfo: {
-            // We can pass any data if we want to show in the popup.
-            // For now, let's just pass "bookingId".
-            'bookingId': '#${bookingDoc.id.substring(0, 8)}',
+            'bookingId': displayedBookingId,
           },
-          onConfirm: () {
-            Navigator.pop(context); // Close popup
-            _onCancelBookingConfirmed(bookingDocs, bookingDoc);
+          onConfirm: () async {
+            Navigator.pop(context);
+            await _deleteBooking(bookingDoc);
           },
           onCancel: () {
-            Navigator.pop(context); // Close popup
+            Navigator.pop(context);
           },
         );
       },
@@ -125,35 +222,18 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
       appBar: const ConnectAppBar(),
       body: Stack(
         children: [
-          FutureBuilder<List<DocumentSnapshot>>(
-            future: _futureBookingDocs,
+          StreamBuilder<QuerySnapshot>(
+            stream: _getUpcomingBookings(),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
               if (snapshot.hasError) {
-                return Center(
-                  child: Text('Error: ${snapshot.error}'),
+                return const Center(
+                  child: Text("Error loading bookings."),
                 );
               }
-              if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Padding(
-                  padding: EdgeInsets.all(25),
-                  child: Text(
-                    'No upcoming bookings found.',
-                    style: TextStyle(
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: Color(0xFF027335),
-                    ),
-                  ),
-                );
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
               }
-
-              final bookingDocs = snapshot.data!;
+              final docs = snapshot.data?.docs ?? [];
               return SingleChildScrollView(
                 controller: _scrollController,
                 padding: const EdgeInsets.all(25),
@@ -171,11 +251,11 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 25),
-                    // Upcoming / History Toggle
+                    // Toggle widget to switch between Upcoming Bookings and Booking History.
                     UpcomingHistoryToggle(
                       isUpcomingSelected: true,
                       onUpcomingPressed: () {
-                        // Already on upcoming screen, do nothing.
+                        // Already on Upcoming Bookings screen.
                       },
                       onHistoryPressed: () {
                         Navigator.pushReplacement(
@@ -187,12 +267,11 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
                       },
                     ),
                     const SizedBox(height: 25),
-
-                    // Render each booking doc
-                    ...bookingDocs.map((doc) {
+                    // Render booking cards.
+                    ...docs.map((bookingDoc) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 5),
-                        child: _buildUpcomingBookingCard(bookingDocs, doc),
+                        child: _buildBookingCard(context, bookingDoc),
                       );
                     }).toList(),
                   ],
@@ -200,7 +279,7 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
               );
             },
           ),
-          // Slide-in bottom nav bar
+          // Floating navigation bar that hides on scroll.
           Positioned(
             left: 0,
             right: 0,
@@ -216,150 +295,6 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  /// Builds a single upcoming booking card. We’ll fetch the associated service doc
-  /// (and provider doc) so we can display "serviceType", "serviceProvider", "serviceName".
-  Widget _buildUpcomingBookingCard(
-      List<DocumentSnapshot> bookingDocs,
-      DocumentSnapshot bookingDoc,
-      ) {
-    final data = bookingDoc.data() as Map<String, dynamic>;
-    // We'll display a pseudo-random booking ID by using part of the doc.id:
-    final bookingId = '#${bookingDoc.id.substring(0, 8)}';
-
-    // We'll show "date" as a string. The doc has a Firestore Timestamp in data['date'].
-    DateTime? dateTime;
-    if (data['date'] != null && data['date'] is Timestamp) {
-      dateTime = (data['date'] as Timestamp).toDate();
-    }
-    final dateString = (dateTime != null)
-        ? '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}'
-        : 'Unknown';
-
-    final timeString = data['time'] ?? 'N/A';
-    final totalString = data['total'] ?? 'LKR 0.00';
-
-    // We'll do a FutureBuilder to fetch the "service" doc for service type, name, provider, etc.
-    final DocumentReference? serviceRef = data['service'];
-    if (serviceRef == null) {
-      // If no "service" reference, build the card with unknown service fields:
-      return UpcomingBookingCard(
-        bookingData: {
-          'bookingId': bookingId,
-          'serviceType': 'Unknown',
-          'serviceProvider': 'Unknown',
-          'serviceName': 'Unknown',
-          'date': dateString,
-          'time': timeString,
-          'estimatedTotal': totalString,
-        },
-        onCancel: () => _showCancelPopup(context, bookingDocs, bookingDoc),
-      );
-    }
-
-    // If there's a valid service doc, fetch it.
-    return FutureBuilder<DocumentSnapshot>(
-      future: serviceRef.get(),
-      builder: (context, serviceSnap) {
-        if (serviceSnap.connectionState == ConnectionState.waiting) {
-          return const SizedBox(
-            height: 80,
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
-        if (serviceSnap.hasError ||
-            !serviceSnap.hasData ||
-            !serviceSnap.data!.exists) {
-          // If error or service doc doesn't exist:
-          return UpcomingBookingCard(
-            bookingData: {
-              'bookingId': bookingId,
-              'serviceType': 'Unknown',
-              'serviceProvider': 'Unknown',
-              'serviceName': 'Unknown',
-              'date': dateString,
-              'time': timeString,
-              'estimatedTotal': totalString,
-            },
-            onCancel: () => _showCancelPopup(context, bookingDocs, bookingDoc),
-          );
-        }
-
-        // We have service data
-        final serviceData = serviceSnap.data!.data() as Map<String, dynamic>;
-        final serviceType = serviceData['category'] ?? 'Unknown';
-        final serviceName = serviceData['serviceName'] ?? 'Unknown';
-
-        // Now fetch the provider user doc from 'serviceProvider' field:
-        final DocumentReference? providerRef = serviceData['serviceProvider'];
-        if (providerRef == null) {
-          // If no provider reference, show fallback
-          return UpcomingBookingCard(
-            bookingData: {
-              'bookingId': bookingId,
-              'serviceType': serviceType,
-              'serviceProvider': 'Unknown',
-              'serviceName': serviceName,
-              'date': dateString,
-              'time': timeString,
-              'estimatedTotal': totalString,
-            },
-            onCancel: () => _showCancelPopup(context, bookingDocs, bookingDoc),
-          );
-        }
-
-        // Nested FutureBuilder for the provider doc
-        return FutureBuilder<DocumentSnapshot>(
-          future: providerRef.get(),
-          builder: (context, providerSnap) {
-            if (providerSnap.connectionState == ConnectionState.waiting) {
-              return const SizedBox(
-                height: 80,
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
-            if (providerSnap.hasError ||
-                !providerSnap.hasData ||
-                !providerSnap.data!.exists) {
-              return UpcomingBookingCard(
-                bookingData: {
-                  'bookingId': bookingId,
-                  'serviceType': serviceType,
-                  'serviceProvider': 'Unknown',
-                  'serviceName': serviceName,
-                  'date': dateString,
-                  'time': timeString,
-                  'estimatedTotal': totalString,
-                },
-                onCancel: () =>
-                    _showCancelPopup(context, bookingDocs, bookingDoc),
-              );
-            }
-
-            final providerData =
-            providerSnap.data!.data() as Map<String, dynamic>;
-            final providerName = providerData['displayName'] ??
-                providerData['name'] ??
-                'Unknown';
-
-            // Finally, build the card with all data
-            return UpcomingBookingCard(
-              bookingData: {
-                'bookingId': bookingId,
-                'serviceType': serviceType,
-                'serviceProvider': providerName,
-                'serviceName': serviceName,
-                'date': dateString,
-                'time': timeString,
-                'estimatedTotal': totalString,
-              },
-              onCancel: () => _showCancelPopup(context, bookingDocs, bookingDoc),
-            );
-          },
-        );
-      },
     );
   }
 }

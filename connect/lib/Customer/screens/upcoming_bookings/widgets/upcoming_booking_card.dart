@@ -30,27 +30,35 @@ class UpcomingBookingCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Booking ID
           _buildLabelValueRow('Booking ID', bookingId),
           const SizedBox(height: 10),
 
+          // Service Type
           _buildLabelValueRow('Service Type', serviceType),
           const SizedBox(height: 10),
 
+          // Service Provider
           _buildLabelValueRow('Service Provider', serviceProvider),
           const SizedBox(height: 10),
 
+          // Service Name
           _buildLabelValueRow('Service Name', serviceName),
           const SizedBox(height: 10),
 
+          // Date
           _buildLabelValueRow('Date', date),
           const SizedBox(height: 10),
 
+          // Time
           _buildLabelValueRow('Time', time),
           const SizedBox(height: 10),
 
+          // Estimated Total
           _buildLabelValueRow('Estimated Total', estimatedTotal),
           const SizedBox(height: 15),
 
+          // Cancel button (bottom right)
           Align(
             alignment: Alignment.bottomRight,
             child: ElevatedButton(
@@ -60,7 +68,10 @@ class UpcomingBookingCard extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
               ),
               child: const Text(
                 'Cancel',
