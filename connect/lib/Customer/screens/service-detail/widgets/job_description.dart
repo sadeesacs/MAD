@@ -1,16 +1,18 @@
-// job_description.dart
+// lib/Customer/screens/service-detail/widgets/job_description.dart
 import 'package:flutter/material.dart';
 
 class JobDescription extends StatelessWidget {
-  const JobDescription({super.key});
+  final String description;
+
+  const JobDescription({Key? key, required this.description}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(13.0),
+    return Padding(
+      padding: const EdgeInsets.all(13.0),
       child: Text(
-        'Lorem ipsum dolor sit amet...',
-        style: TextStyle(color: Colors.black),
+        description.isEmpty ? 'No job description provided.' : description,
+        style: const TextStyle(color: Colors.black),
       ),
     );
   }
