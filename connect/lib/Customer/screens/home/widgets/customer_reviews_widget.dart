@@ -1,31 +1,15 @@
+// lib/Customer/screens/home/widgets/customer_reviews_widget.dart
 import 'package:flutter/material.dart';
 
 class CustomerReviewsWidget extends StatelessWidget {
-  const CustomerReviewsWidget({super.key});
+  /// If the user wants the last 5 star reviews from Firestore
+  /// we pass them in here
+  final List<Map<String, dynamic>> latestReviews;
+
+  const CustomerReviewsWidget({super.key, required this.latestReviews});
 
   @override
   Widget build(BuildContext context) {
-    final reviews = [
-      {
-        'category': 'Cleaning',
-        'review':
-        '“The service marketplace app is a fantastic platform for connecting customers with service providers seamlessly.”',
-        'author': '~ Quinn',
-      },
-      {
-        'category': 'Laundry',
-        'review':
-        '“Super convenient! Scheduling laundry pickup has never been easier.”',
-        'author': '~ Alex',
-      },
-      {
-        'category': 'Gardening',
-        'review': '“My garden looks amazing now!”',
-        'author': '~ Sam',
-      },
-      // Add more if you want...
-    ];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -39,15 +23,21 @@ class CustomerReviewsWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        // Increased height to 150 to avoid overflow
         SizedBox(
           height: 150,
-          child: ListView.separated(
+          child: latestReviews.isEmpty
+              ? const Center(child: Text('No recent 5-star reviews'))
+              : ListView.separated(
             scrollDirection: Axis.horizontal,
-            itemCount: reviews.length,
+            itemCount: latestReviews.length,
             separatorBuilder: (context, index) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
-              final rv = reviews[index];
+              final rv = latestReviews[index];
+              final category = rv['category'] ?? 'Unknown';
+              final reviewText = rv['comment'] ?? 'No comment';
+              // Possibly fetch author name if you want
+              final author = '~ Unnamed';
+
               return Container(
                 width: 220,
                 padding: const EdgeInsets.all(8),
@@ -59,7 +49,7 @@ class CustomerReviewsWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      rv['category']!,
+                      category,
                       style: const TextStyle(
                         fontFamily: 'Roboto',
                         fontWeight: FontWeight.w600,
@@ -69,7 +59,7 @@ class CustomerReviewsWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      rv['review']!,
+                      '“$reviewText”',
                       style: const TextStyle(
                         fontFamily: 'Roboto',
                         fontSize: 12,
@@ -80,7 +70,7 @@ class CustomerReviewsWidget extends StatelessWidget {
                     Align(
                       alignment: Alignment.bottomRight,
                       child: Text(
-                        rv['author']!,
+                        author,
                         style: const TextStyle(
                           fontFamily: 'Roboto',
                           fontSize: 12,
