@@ -1,19 +1,21 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 
-/// Returns an ImageProvider based on the provided [imagePath]:
-/// - If [imagePath] is null or empty, returns a placeholder asset image.
-/// - If [imagePath] starts with 'http', returns a NetworkImage.
-/// - Otherwise, checks if the local file exists and returns a FileImage if so;
-///   otherwise, falls back to the placeholder.
-ImageProvider getImageProvider(String? imagePath) {
-  const String placeholder = 'assets/images/monkey.png';
-  if (imagePath == null || imagePath.isEmpty) {
-    return const AssetImage(placeholder);
+/// Returns a FileImage if [coverImagePath] starts with '/' and exists;
+/// otherwise, returns a NetworkImage if [coverImagePath] is a valid URL.
+/// If [coverImagePath] is empty or the file does not exist, returns a fallback asset.
+ImageProvider getImageProvider(String coverImagePath) {
+  if (coverImagePath.isNotEmpty) {
+    if (coverImagePath.startsWith('/')) {
+      final file = File(coverImagePath);
+      if (file.existsSync()) {
+        return FileImage(file);
+      }
+    } else {
+      // You can add additional URL validation if needed.
+      return NetworkImage(coverImagePath);
+    }
   }
-  if (imagePath.startsWith('http')) {
-    return NetworkImage(imagePath);
-  }
-  final file = File(imagePath);
-  return file.existsSync() ? FileImage(file) : const AssetImage(placeholder);
+  // Fallback asset
+  return const AssetImage('assets/images/monkey.png');
 }
