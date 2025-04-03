@@ -19,9 +19,7 @@ class _RateReviewBottomSheetState extends State<RateReviewBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: SingleChildScrollView(
         child: Container(
           decoration: const BoxDecoration(
@@ -36,8 +34,8 @@ class _RateReviewBottomSheetState extends State<RateReviewBottomSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Centered Title
-              Center(
-                child: const Text(
+              const Center(
+                child: Text(
                   'Leave a Review',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -149,6 +147,7 @@ class _RateReviewBottomSheetState extends State<RateReviewBottomSheet> {
   void _onSubmit() {
     final int rating = _selectedStars;
     final String review = _reviewController.text.trim();
+    // Pass this back to the caller
     Navigator.pop(context, {
       'rating': rating,
       'review': review,
