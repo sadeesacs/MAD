@@ -18,7 +18,4 @@ class AuthService {
       );
     }
   }
-
-
-
 }

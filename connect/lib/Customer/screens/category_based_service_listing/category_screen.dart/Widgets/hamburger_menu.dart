@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:connect/Customer/screens/Signup/profile_view.dart'; // Import Profile view screen
+
+import '../../../profile/customer_profile_screen.dart'; // Import Profile view screen
 
 class Hamburgermenu extends StatelessWidget {
   const Hamburgermenu({super.key});
@@ -61,7 +62,7 @@ class Hamburgermenu extends StatelessWidget {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => ProfileViewScreen()), // Navigate to ProfileViewScreen
+                                  MaterialPageRoute(builder: (context) => CustomerProfileScreen()), // Navigate to ProfileViewScreen
                                 );
                               },
                             )
