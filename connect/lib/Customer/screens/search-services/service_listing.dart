@@ -1,8 +1,10 @@
+// lib/Customer/screens/search-services/service_listing.dart
+
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../../../widgets/connect_app_bar.dart';
-import '../../../widgets/connect_nav_bar.dart';
-import '../../service-detail/service_detail.dart';
+import '../../widgets/connect_app_bar.dart';
+import '../../widgets/connect_nav_bar.dart';
+import '../service-detail/service_detail.dart';
 
 class SearchedServiceListingScreen extends StatelessWidget {
   final List<Map<String, dynamic>> services;
@@ -11,7 +13,7 @@ class SearchedServiceListingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Debug print to ensure we have data
+    // Debug print: check how many services we got
     print("SearchedServiceListingScreen: Received ${services.length} services.");
 
     return Scaffold(
@@ -24,42 +26,38 @@ class SearchedServiceListingScreen extends StatelessWidget {
         itemCount: services.length,
         itemBuilder: (context, index) {
           final service = services[index];
-          return ServiceListingCard(service: service);
+          return _buildServiceCard(context, service);
         },
       ),
     );
   }
-}
 
-class ServiceListingCard extends StatelessWidget {
-  final Map<String, dynamic> service;
-
-  const ServiceListingCard({Key? key, required this.service}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // Safely extract values with defaults:
-    final String coverImage = service['coverImage'] as String? ?? '';
-    final String serviceName = service['serviceName'] as String? ?? 'Unknown Service';
-    final String providerName = service['serviceProviderName'] as String? ?? 'Unknown Provider';
+  Widget _buildServiceCard(BuildContext context, Map<String, dynamic> service) {
+    // Read fields from the service map; if missing, fallback to default values.
+    final coverImage = service['coverImage'] ?? '';
+    final serviceName = service['serviceName'] ?? 'Unknown Service';
+    final providerName = service['serviceProviderName'] ?? 'Unknown Provider';
     final List<dynamic> locs = service['locations'] as List<dynamic>? ?? [];
-    final String locationString = locs.join(', ');
+    final locationString = locs.join(', ');
+
+    // Parse rating and hourlyRate
     final double rating = service['rating'] != null
         ? (service['rating'] as num).toDouble()
         : 0.0;
-    final int reviewsCount = service['reviews'] is List
+    // If reviews are stored as an array, you might calculate the count.
+    final int reviewsCount = (service['reviews'] is List)
         ? (service['reviews'] as List).length
         : 0;
     final double hourlyRate = service['hourlyRate'] != null
         ? (service['hourlyRate'] as num).toDouble()
         : 0.0;
 
-    // Debug print each card's key data.
+    // Debug print: show key details for each service
     print("Service Card: $serviceName by $providerName, rating: $rating, rate: $hourlyRate");
 
     return GestureDetector(
       onTap: () {
-        // Navigate to service detail screen and pass the entire service map.
+        // Navigate to service detail screen with full service data.
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -84,7 +82,7 @@ class ServiceListingCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              // Service cover image; if file loading fails, fallback to an asset.
+              // Cover image with fallback to asset if file not found
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: coverImage.isNotEmpty
@@ -115,7 +113,7 @@ class ServiceListingCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Service Name
+                    // Service name
                     Text(
                       serviceName,
                       style: const TextStyle(
@@ -126,7 +124,7 @@ class ServiceListingCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    // Provider Name
+                    // Provider name
                     Text(
                       'By $providerName',
                       style: const TextStyle(
@@ -137,7 +135,7 @@ class ServiceListingCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    // Location(s)
+                    // Locations
                     Row(
                       children: [
                         const Text(
@@ -165,7 +163,7 @@ class ServiceListingCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    // Rating & Reviews
+                    // Rating & reviews
                     Row(
                       children: [
                         const Icon(

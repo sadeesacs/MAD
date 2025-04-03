@@ -1,3 +1,4 @@
+// lib/Customer/screens/search-services/widgets/select_rating.dart
 import 'package:flutter/material.dart';
 
 class SelectRating extends StatelessWidget {
@@ -5,10 +6,10 @@ class SelectRating extends StatelessWidget {
   final Function(int?) onChanged;
 
   SelectRating({
-    super.key,
+    Key? key,
     required this.selectedRating,
     required this.onChanged,
-  });
+  }) : super(key: key);
 
   final List<int> _ratings = [1, 2, 3, 4, 5];
 

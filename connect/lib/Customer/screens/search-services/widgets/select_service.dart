@@ -1,3 +1,4 @@
+// lib/Customer/screens/search-services/widgets/select_service.dart
 import 'package:flutter/material.dart';
 
 class SelectServiceCategory extends StatelessWidget {
@@ -5,10 +6,10 @@ class SelectServiceCategory extends StatelessWidget {
   final Function(String?) onChanged;
 
   SelectServiceCategory({
-    super.key,
+    Key? key,
     required this.selectedServiceCategory,
     required this.onChanged,
-  });
+  }) : super(key: key);
 
   final List<String> _serviceCategories = [
     'Plumbing',
@@ -32,7 +33,11 @@ class SelectServiceCategory extends StatelessWidget {
       children: [
         const Text(
           'Select Service Category',
-          style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+              fontWeight: FontWeight.bold
+          ),
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
