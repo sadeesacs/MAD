@@ -1,4 +1,5 @@
 class BookingFormData {
+  String? serviceId;
   String? date;
   String? fromTime;
   String? toTime;
@@ -7,7 +8,6 @@ class BookingFormData {
   double? latitude;
   double? longitude;
   String? additionalNotes;
-
   final String serviceTitle;
   final String providerName;
   final double pricePerHour;
@@ -15,6 +15,7 @@ class BookingFormData {
   final String imageUrl;
 
   BookingFormData({
+    this.serviceId,
     required this.serviceTitle,
     required this.providerName,
     required this.pricePerHour,

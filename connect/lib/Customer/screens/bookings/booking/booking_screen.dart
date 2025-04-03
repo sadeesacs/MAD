@@ -1,4 +1,7 @@
+// lib/Customer/screens/bookings/booking/booking_screen.dart
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../widgets/connect_app_bar.dart';
 import '../booking_form_data.dart';
 import 'widgets/date_input.dart';
@@ -6,6 +9,7 @@ import 'widgets/time_input.dart';
 import 'widgets/district_input.dart';
 import 'widgets/location_input.dart';
 import '../booking_summary/booking_summary.dart';
+import 'package:connect/util/image_provider_helper.dart'; // Import your image provider helper
 
 class BookingScreen extends StatefulWidget {
   final BookingFormData formData;
@@ -47,6 +51,7 @@ class _BookingScreenState extends State<BookingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Back Button and Title Row
             Row(
               children: [
                 GestureDetector(
@@ -79,24 +84,24 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
             const SizedBox(height: 30),
 
-            /// Service card
+            // Service Card with Cover Image, Title, Provider, and Price
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Cover image from formData
+                // Cover image using our helper to support local files or fallback placeholder
                 Container(
                   width: 100,
                   height: 75,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
                     image: DecorationImage(
-                      image: AssetImage(widget.formData.imageUrl),
+                      image: getImageProvider(widget.formData.imageUrl),
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Title, provider, price
+                // Service details: Title, Provider, and Price
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,7 +182,7 @@ class _BookingScreenState extends State<BookingScreen> {
               isError: !_isTimeValid,
               onTimeSelected: (from, to) {
                 setState(() {
-                  // Make sure we store times in "3:00 PM" format
+                  // Store times in "h:mm AM/PM" format
                   widget.formData.fromTime = from;
                   widget.formData.toTime = to;
                   _isTimeValid = true;
@@ -230,7 +235,7 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
             const SizedBox(height: 25),
 
-            /// 5) Select location (map)
+            /// 5) Select Location (map)
             const Text(
               'Select Location',
               style: TextStyle(
@@ -287,7 +292,7 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
             const SizedBox(height: 25),
 
-            /// Next Button
+            /// Next Button - to move to Booking Summary
             Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton(
@@ -312,7 +317,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -338,7 +343,7 @@ class _BookingScreenState extends State<BookingScreen> {
           color: Color(0xFF838383),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8), // 10%
+          borderRadius: BorderRadius.circular(8), // 10% rounded edges
           borderSide: BorderSide(
             color: isError ? Colors.red : Colors.black,
           ),
@@ -358,12 +363,12 @@ class _BookingScreenState extends State<BookingScreen> {
     // Validate required fields:
     bool valid = true;
 
-    // Date
+    // Date validation
     if (widget.formData.date == null || widget.formData.date!.isEmpty) {
       _isDateValid = false;
       valid = false;
     }
-    // Time
+    // Time validation
     if (widget.formData.fromTime == null ||
         widget.formData.fromTime!.isEmpty ||
         widget.formData.toTime == null ||
@@ -371,17 +376,17 @@ class _BookingScreenState extends State<BookingScreen> {
       _isTimeValid = false;
       valid = false;
     }
-    // District
+    // District validation
     if (widget.formData.district == null || widget.formData.district!.isEmpty) {
       _isDistrictValid = false;
       valid = false;
     }
-    // Address
+    // Address validation
     if (widget.formData.address == null || widget.formData.address!.isEmpty) {
       _isAddressValid = false;
       valid = false;
     }
-    // Location
+    // Location validation
     if (widget.formData.latitude == null || widget.formData.longitude == null) {
       _isLocationValid = false;
       valid = false;
@@ -391,12 +396,11 @@ class _BookingScreenState extends State<BookingScreen> {
 
     if (!valid) return;
 
+    // Navigate to Booking Summary screen with the form data
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => BookingSummary(
-          formData: widget.formData,
-        ),
+        builder: (_) => BookingSummary(formData: widget.formData),
       ),
     );
   }

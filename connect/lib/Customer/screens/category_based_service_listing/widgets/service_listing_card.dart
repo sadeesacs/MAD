@@ -41,6 +41,7 @@ class ServiceListingCard extends StatelessWidget {
                 pricePerHour: price,
                 imageUrl: imagePath,
                 category: category,
+                serviceId: '',
               ),
             ),
           ),
