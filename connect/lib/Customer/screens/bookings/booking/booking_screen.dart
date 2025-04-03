@@ -47,6 +47,7 @@ class _BookingScreenState extends State<BookingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Top row with back button and title
             Row(
               children: [
                 GestureDetector(
@@ -154,7 +155,7 @@ class _BookingScreenState extends State<BookingScreen> {
               onDateSelected: (val) {
                 setState(() {
                   widget.formData.date = val;
-                  _isDateValid = true; // user picked a date => valid
+                  _isDateValid = true;
                 });
               },
             ),
@@ -177,7 +178,6 @@ class _BookingScreenState extends State<BookingScreen> {
               isError: !_isTimeValid,
               onTimeSelected: (from, to) {
                 setState(() {
-                  // Make sure we store times in "3:00 PM" format
                   widget.formData.fromTime = from;
                   widget.formData.toTime = to;
                   _isTimeValid = true;
@@ -230,7 +230,7 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
             const SizedBox(height: 25),
 
-            /// 5) Select location (map)
+            /// 5) Select Location (Map)
             const Text(
               'Select Location',
               style: TextStyle(
@@ -272,7 +272,6 @@ class _BookingScreenState extends State<BookingScreen> {
               isError: false,
               maxLines: 4,
               onChanged: (val) {
-                // Limit to 100 words
                 final words = val.trim().split(RegExp(r'\s+'));
                 if (words.length > 100) {
                   final truncated = words.take(100).join(' ');
@@ -338,7 +337,7 @@ class _BookingScreenState extends State<BookingScreen> {
           color: Color(0xFF838383),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8), // 10%
+          borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(
             color: isError ? Colors.red : Colors.black,
           ),
@@ -355,15 +354,12 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   void _onNextPressed() {
-    // Validate required fields:
     bool valid = true;
 
-    // Date
     if (widget.formData.date == null || widget.formData.date!.isEmpty) {
       _isDateValid = false;
       valid = false;
     }
-    // Time
     if (widget.formData.fromTime == null ||
         widget.formData.fromTime!.isEmpty ||
         widget.formData.toTime == null ||
@@ -371,17 +367,14 @@ class _BookingScreenState extends State<BookingScreen> {
       _isTimeValid = false;
       valid = false;
     }
-    // District
     if (widget.formData.district == null || widget.formData.district!.isEmpty) {
       _isDistrictValid = false;
       valid = false;
     }
-    // Address
     if (widget.formData.address == null || widget.formData.address!.isEmpty) {
       _isAddressValid = false;
       valid = false;
     }
-    // Location
     if (widget.formData.latitude == null || widget.formData.longitude == null) {
       _isLocationValid = false;
       valid = false;
@@ -394,9 +387,7 @@ class _BookingScreenState extends State<BookingScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => BookingSummary(
-          formData: widget.formData,
-        ),
+        builder: (_) => BookingSummary(formData: widget.formData),
       ),
     );
   }

@@ -1,5 +1,3 @@
-// lib/Customer/screens/booking_confirmation/booking_confirmation.dart
-
 import 'package:flutter/material.dart';
 import '../../../widgets/connect_app_bar.dart';
 import '../../upcoming_bookings/upcoming_bookings.dart';
@@ -22,7 +20,7 @@ class BookingConfirmation extends StatelessWidget {
                 'Successful!',
                 style: TextStyle(
                   fontFamily: 'Roboto',
-                  fontWeight: FontWeight.w800, // ExtraBold
+                  fontWeight: FontWeight.w800,
                   fontSize: 35,
                   color: Color(0xFF027335),
                 ),
@@ -32,7 +30,7 @@ class BookingConfirmation extends StatelessWidget {
                 'Booking ID - 565332',
                 style: TextStyle(
                   fontFamily: 'Roboto',
-                  fontWeight: FontWeight.w500, // Medium
+                  fontWeight: FontWeight.w500,
                   fontSize: 20,
                   color: Colors.black,
                 ),
@@ -42,7 +40,7 @@ class BookingConfirmation extends StatelessWidget {
                 'Your booking request has been sent!',
                 style: TextStyle(
                   fontFamily: 'Roboto',
-                  fontWeight: FontWeight.w400, // Regular
+                  fontWeight: FontWeight.w400,
                   fontSize: 18,
                   color: Colors.black,
                 ),
@@ -63,7 +61,7 @@ class BookingConfirmation extends StatelessWidget {
                 height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFF027335), width: 2),
+                  border: Border.all(color: Color(0xFF027335), width: 2),
                   color: const Color(0xFFEFF8F3),
                 ),
                 child: const Icon(
@@ -75,7 +73,6 @@ class BookingConfirmation extends StatelessWidget {
               const SizedBox(height: 35),
               ElevatedButton(
                 onPressed: () {
-                  // Navigate to upcoming bookings
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(

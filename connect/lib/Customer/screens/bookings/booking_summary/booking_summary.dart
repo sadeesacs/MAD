@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import '../../../widgets/connect_app_bar.dart';
 import '../booking_confirmation/booking_confirmation.dart';
 import '../booking_form_data.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class BookingSummary extends StatefulWidget {
   final BookingFormData formData;
@@ -37,9 +39,7 @@ class _BookingSummaryState extends State<BookingSummary> {
     final toDt = _parseTime(toStr, baseDate);
 
     int diffInMinutes = toDt.difference(fromDt).inMinutes;
-    if (diffInMinutes < 0) {
-      diffInMinutes = 0;
-    }
+    if (diffInMinutes < 0) diffInMinutes = 0;
     final diffInHours = diffInMinutes / 60.0;
 
     setState(() {
@@ -48,36 +48,43 @@ class _BookingSummaryState extends State<BookingSummary> {
   }
 
   DateTime _parseTime(String timeStr, DateTime baseDate) {
-    timeStr = timeStr.trim();
-    if (!timeStr.contains('AM') && !timeStr.contains('PM')) {
-      // If no AM/PM, fallback to base date
-      throw FormatException("No AM/PM in time string: $timeStr");
-    }
-
     final parts = timeStr.split(' ');
-    if (parts.length != 2) {
-      throw FormatException("Invalid time format: $timeStr");
-    }
-
     final hourMin = parts[0].split(':');
-    if (hourMin.length != 2) {
-      throw FormatException("Invalid HH:MM in $timeStr");
-    }
-
     int hour = int.parse(hourMin[0]);
     int minute = int.parse(hourMin[1]);
     final meridiem = parts[1].toUpperCase();
-
     if (meridiem == 'PM' && hour < 12) hour += 12;
     if (meridiem == 'AM' && hour == 12) hour = 0;
-
     return DateTime(baseDate.year, baseDate.month, baseDate.day, hour, minute);
+  }
+
+  // Save booking to Firestore
+  Future<void> _saveBooking() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    // Prepare the booking data according to your requirements
+    final bookingData = {
+      'additional_notes': widget.formData.additionalNotes ?? '',
+      'address': widget.formData.address ?? '',
+      'createdAt': FieldValue.serverTimestamp(),
+      'customer': FirebaseFirestore.instance.collection('users').doc(user.uid),
+      'date': DateFormat('yyyy/MM/dd').parse(widget.formData.date!),
+      'district': widget.formData.district,
+      'location': GeoPoint(widget.formData.latitude ?? 0, widget.formData.longitude ?? 0),
+      'service': FirebaseFirestore.instance.collection('services').doc(widget.formData.serviceId),
+      'status': 'pending',
+      'time': '${widget.formData.fromTime} To ${widget.formData.toTime}',
+      'total': 'LKR ${_estimatedTotal?.toStringAsFixed(2) ?? '0.00'}',
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+
+    await FirebaseFirestore.instance.collection('booking').add(bookingData);
   }
 
   @override
   Widget build(BuildContext context) {
     final form = widget.formData;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const ConnectAppBar(),
@@ -86,14 +93,11 @@ class _BookingSummaryState extends State<BookingSummary> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Back + "Booking Summary"
+            // Back + Booking Summary title
             Row(
               children: [
                 GestureDetector(
-                  onTap: () {
-                    // Go back to booking screen
-                    Navigator.pop(context);
-                  },
+                  onTap: () => Navigator.pop(context),
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -123,42 +127,17 @@ class _BookingSummaryState extends State<BookingSummary> {
             ),
             const SizedBox(height: 30),
 
-            // Service Type
-            _buildSummaryRow(
-              label: 'Service Type',
-              value: form.category,
-            ),
+            // Summary Rows
+            _buildSummaryRow(label: 'Service Type', value: form.category ?? ''),
             const SizedBox(height: 25),
-
-            // Service Provider
-            _buildSummaryRow(
-              label: 'Service Provider',
-              value: form.providerName,
-            ),
+            _buildSummaryRow(label: 'Service Provider', value: form.providerName),
             const SizedBox(height: 25),
-
-            // Service Name
-            _buildSummaryRow(
-              label: 'Service Name',
-              value: form.serviceTitle,
-            ),
+            _buildSummaryRow(label: 'Service Name', value: form.serviceTitle),
             const SizedBox(height: 15),
-
-            // Date
-            _buildSummaryRow(
-              label: 'Date',
-              value: form.date ?? '',
-            ),
+            _buildSummaryRow(label: 'Date', value: form.date ?? ''),
             const SizedBox(height: 25),
-
-            // Time
-            _buildSummaryRow(
-              label: 'Time',
-              value: '${form.fromTime} To ${form.toTime}',
-            ),
+            _buildSummaryRow(label: 'Time', value: '${form.fromTime} To ${form.toTime}'),
             const SizedBox(height: 25),
-
-            // Estimated total
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -195,7 +174,15 @@ class _BookingSummaryState extends State<BookingSummary> {
             // Confirm Booking button
             Center(
               child: ElevatedButton(
-                onPressed: _onConfirmBooking,
+                onPressed: () async {
+                  await _saveBooking();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const BookingConfirmation(),
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF027335),
                   shape: RoundedRectangleBorder(
@@ -227,7 +214,6 @@ class _BookingSummaryState extends State<BookingSummary> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Label
         Expanded(
           flex: 3,
           child: Text(
@@ -240,7 +226,6 @@ class _BookingSummaryState extends State<BookingSummary> {
             ),
           ),
         ),
-        // Value
         Expanded(
           flex: 2,
           child: Text(
@@ -254,15 +239,6 @@ class _BookingSummaryState extends State<BookingSummary> {
           ),
         ),
       ],
-    );
-  }
-
-  void _onConfirmBooking() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const BookingConfirmation(),
-      ),
     );
   }
 }
