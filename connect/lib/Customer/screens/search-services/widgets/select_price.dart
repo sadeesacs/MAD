@@ -1,3 +1,4 @@
+// lib/Customer/screens/search-services/widgets/select_price.dart
 import 'package:flutter/material.dart';
 
 class SelectPriceRange extends StatelessWidget {
@@ -5,10 +6,10 @@ class SelectPriceRange extends StatelessWidget {
   final TextEditingController maxPriceController;
 
   const SelectPriceRange({
-    super.key,
+    Key? key,
     required this.minPriceController,
     required this.maxPriceController,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

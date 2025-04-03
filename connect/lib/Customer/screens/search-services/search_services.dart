@@ -1,13 +1,18 @@
-import 'package:connect/Customer/screens/search-services/widgets/reset_button.dart';
-import 'package:connect/Customer/screens/search-services/widgets/select_button.dart';
-import 'package:connect/Customer/screens/search-services/widgets/select_location.dart';
-import 'package:connect/Customer/screens/search-services/widgets/select_price.dart';
-import 'package:connect/Customer/screens/search-services/widgets/select_rating.dart';
-import 'package:connect/Customer/screens/search-services/widgets/select_service.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+// Local widget imports
+import 'widgets/reset_button.dart';
+import 'widgets/select_button.dart';
+import 'widgets/select_location.dart';
+import 'widgets/select_price.dart';
+import 'widgets/select_rating.dart';
+import 'widgets/select_service.dart';
+
+// The listing screen we will push to
+import 'service_listing.dart';
 
 import '../../widgets/connect_app_bar.dart';
-
 
 const Color darkGreen = Color(0xFF027335);
 const Color white = Colors.white;
@@ -15,22 +20,6 @@ const Color black = Colors.black;
 const Color lightBlack = Color(0xFF666666);
 const Color bodyBackgroundColor = Color(0xFFF6FBF6);
 const Color textBoxBackgroundColor = Color(0xFFF6FAF8);
-
-void main() {
-  runApp(const ConnectApp());
-}
-
-class ConnectApp extends StatelessWidget {
-  const ConnectApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SearchFunctionScreen(),
-    );
-  }
-}
 
 class SearchFunctionScreen extends StatefulWidget {
   const SearchFunctionScreen({super.key});
@@ -40,16 +29,16 @@ class SearchFunctionScreen extends StatefulWidget {
 }
 
 class _SearchFunctionScreenState extends State<SearchFunctionScreen> {
-  // Controllers for text fields
+  // Controllers for price range
   final TextEditingController _minPriceController = TextEditingController();
   final TextEditingController _maxPriceController = TextEditingController();
 
-  // Variables to store selected values
+  // Selected filters
   String? _selectedDistrict;
   String? _selectedServiceCategory;
   int? _selectedRating;
 
-  // Function to reset filters
+  // Reset filters
   void _resetFilters() {
     setState(() {
       _selectedDistrict = null;
@@ -58,6 +47,102 @@ class _SearchFunctionScreenState extends State<SearchFunctionScreen> {
       _minPriceController.clear();
       _maxPriceController.clear();
     });
+  }
+
+  /// Builds and executes a query for Firestore 'services' collection,
+  /// does local filter for rating & price, fetches provider name,
+  /// then navigates to SearchedServiceListingScreen.
+  Future<void> _performSearch() async {
+    try {
+      final firestore = FirebaseFirestore.instance;
+
+      // 1) Start with services where status == "Active"
+      Query query = firestore
+          .collection('services')
+          .where('status', isEqualTo: 'Active');
+
+      // 2) If a category is selected
+      if (_selectedServiceCategory != null && _selectedServiceCategory!.isNotEmpty) {
+        query = query.where('category', isEqualTo: _selectedServiceCategory);
+      }
+
+      // 3) If a district is selected
+      if (_selectedDistrict != null && _selectedDistrict!.isNotEmpty) {
+        // 'locations' array must contain the chosen district
+        query = query.where('locations', arrayContains: _selectedDistrict);
+      }
+
+      // 4) Get the docs
+      final querySnapshot = await query.get();
+
+      // 5) Prepare local filters for price/rating
+      double minPrice = 0.0;
+      double maxPrice = double.infinity;
+
+      if (_minPriceController.text.trim().isNotEmpty) {
+        minPrice = double.tryParse(_minPriceController.text.trim()) ?? 0.0;
+      }
+      if (_maxPriceController.text.trim().isNotEmpty) {
+        maxPrice = double.tryParse(_maxPriceController.text.trim()) ?? double.infinity;
+      }
+
+      final List<Map<String, dynamic>> finalServices = [];
+
+      // 6) Local filtering
+      for (var doc in querySnapshot.docs) {
+        final data = (doc.data() as Map<String, dynamic>?) ?? {};
+
+        // rating & hourlyRate may be null => default to 0
+        final double docRating = (data['rating'] ?? 0).toDouble();
+        final double docRate   = (data['hourlyRate'] ?? 0).toDouble();
+
+        // check rating
+        if (_selectedRating != null && docRating < _selectedRating!) {
+          continue;
+        }
+        // check price
+        if (docRate < minPrice || docRate > maxPrice) {
+          continue;
+        }
+
+        // Passed all checks => add to final list
+        finalServices.add({
+          ...data,
+          'docId': doc.id, // keep the doc id
+        });
+      }
+
+      // 7) For each service, fetch provider's name from 'users' doc
+      final List<Map<String, dynamic>> finalWithProvider = [];
+      for (var serviceMap in finalServices) {
+        String providerName = 'Unknown Provider';
+        final providerRef = serviceMap['serviceProvider'];
+        if (providerRef is DocumentReference) {
+          final providerSnap = await providerRef.get();
+          if (providerSnap.exists) {
+            final userData = providerSnap.data() as Map<String, dynamic>;
+            providerName = userData['name'] ?? 'Unknown Provider';
+          }
+        }
+        // store the provider name in the map
+        serviceMap['serviceProviderName'] = providerName;
+        finalWithProvider.add(serviceMap);
+      }
+
+      // 8) Navigate to listing screen
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => SearchedServiceListingScreen(services: finalWithProvider),
+        ),
+      );
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Search Error: $e')),
+      );
+    }
   }
 
   @override
@@ -70,7 +155,7 @@ class _SearchFunctionScreenState extends State<SearchFunctionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Back Button and Search Services Text
+            // Top Row: Back & Title
             Row(
               children: [
                 // Back Button
@@ -89,61 +174,85 @@ class _SearchFunctionScreenState extends State<SearchFunctionScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 20,),
+                const SizedBox(width: 20),
                 const Text(
                   'Search Services',
-                  style: TextStyle(color: darkGreen, fontWeight: FontWeight.bold, fontSize: 25),
+                  style: TextStyle(
+                    color: darkGreen,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 2),
 
-            // Reset Filters Button
+            // Reset Filters
             ResetFiltersButton(onPressed: _resetFilters),
             const SizedBox(height: 10),
 
-            // Select Location
+            // Select location
             SelectLocation(
               selectedDistrict: _selectedDistrict,
-              onChanged: (String? value) {
+              onChanged: (String? val) {
                 setState(() {
-                  _selectedDistrict = value;
+                  _selectedDistrict = val;
                 });
               },
             ),
             const SizedBox(height: 16),
 
-            // Select Service Category
+            // Select service category
             SelectServiceCategory(
               selectedServiceCategory: _selectedServiceCategory,
-              onChanged: (String? value) {
+              onChanged: (String? val) {
                 setState(() {
-                  _selectedServiceCategory = value;
+                  _selectedServiceCategory = val;
                 });
               },
             ),
             const SizedBox(height: 16),
 
-            // Select Price Range
+            // Price range
             SelectPriceRange(
               minPriceController: _minPriceController,
               maxPriceController: _maxPriceController,
             ),
             const SizedBox(height: 16),
 
-            // Select Rating
+            // Rating
             SelectRating(
               selectedRating: _selectedRating,
-              onChanged: (int? value) {
+              onChanged: (int? val) {
                 setState(() {
-                  _selectedRating = value;
+                  _selectedRating = val;
                 });
               },
             ),
             const SizedBox(height: 24),
 
             // Search Button
-            const SearchButton(),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _performSearch,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF027335),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Search',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
