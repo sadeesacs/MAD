@@ -5,10 +5,10 @@ class UpcomingBookingCard extends StatelessWidget {
   final VoidCallback onCancel;
 
   const UpcomingBookingCard({
-    super.key,
+    Key? key,
     required this.bookingData,
     required this.onCancel,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,40 +25,32 @@ class UpcomingBookingCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xFF027335)),
-        borderRadius: BorderRadius.circular(16), // 10% corners
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Booking ID
           _buildLabelValueRow('Booking ID', bookingId),
           const SizedBox(height: 10),
 
-          // Service Type
           _buildLabelValueRow('Service Type', serviceType),
           const SizedBox(height: 10),
 
-          // Service Provider
           _buildLabelValueRow('Service Provider', serviceProvider),
           const SizedBox(height: 10),
 
-          // Service Name
           _buildLabelValueRow('Service Name', serviceName),
           const SizedBox(height: 10),
 
-          // Date
           _buildLabelValueRow('Date', date),
           const SizedBox(height: 10),
 
-          // Time
           _buildLabelValueRow('Time', time),
           const SizedBox(height: 10),
 
-          // Estimated Total
           _buildLabelValueRow('Estimated Total', estimatedTotal),
           const SizedBox(height: 15),
 
-          // Cancel button (bottom right)
           Align(
             alignment: Alignment.bottomRight,
             child: ElevatedButton(
@@ -66,12 +58,9 @@ class UpcomingBookingCard extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF027335),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8), // 10% corners
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 8,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               ),
               child: const Text(
                 'Cancel',
@@ -93,7 +82,6 @@ class UpcomingBookingCard extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // label
         Expanded(
           flex: 4,
           child: Text(
@@ -106,7 +94,6 @@ class UpcomingBookingCard extends StatelessWidget {
             ),
           ),
         ),
-        // value
         Expanded(
           flex: 3,
           child: Text(
