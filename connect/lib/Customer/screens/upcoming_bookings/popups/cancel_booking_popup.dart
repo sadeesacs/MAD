@@ -6,22 +6,22 @@ class CancelBookingPopup extends StatelessWidget {
   final VoidCallback onCancel;
 
   const CancelBookingPopup({
-    super.key,
+    Key? key,
     required this.bookingInfo,
     required this.onConfirm,
     required this.onCancel,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.all(25), // 25 pixels margin from screen edges
+      insetPadding: const EdgeInsets.all(25),
       content: const Text(
         'Are you sure you want to cancel this booking?',
         textAlign: TextAlign.center,
         style: TextStyle(
           fontFamily: 'Roboto',
-          fontWeight: FontWeight.w500, // Medium
+          fontWeight: FontWeight.w500,
           fontSize: 18,
           color: Colors.black,
         ),
@@ -50,7 +50,7 @@ class CancelBookingPopup extends StatelessWidget {
         ElevatedButton(
           onPressed: onConfirm,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF027335),
+            backgroundColor: Color(0xFF027335),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
