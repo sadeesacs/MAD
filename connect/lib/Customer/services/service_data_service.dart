@@ -18,7 +18,8 @@ class ServiceDataService {
       final results = <Map<String, dynamic>>[];
       for (var doc in querySnapshot.docs) {
         final data = doc.data();
-        data['id'] = doc.id;
+        // Save the document ID under the key 'docId' so that downstream code finds it.
+        data['docId'] = doc.id;
         // Resolve local image path for coverImage
         data['coverImage'] = await _resolveLocalImagePath(data['coverImage']);
         results.add(data);
