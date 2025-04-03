@@ -21,7 +21,7 @@ class CancelBookingPopup extends StatelessWidget {
         textAlign: TextAlign.center,
         style: TextStyle(
           fontFamily: 'Roboto',
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w500, // Medium
           fontSize: 18,
           color: Colors.black,
         ),
