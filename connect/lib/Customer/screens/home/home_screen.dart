@@ -1,6 +1,9 @@
+// lib/Customer/screens/home/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+// Import your new HomeDataService
 
+import '../../services/home_data_service.dart';
 import '../../widgets/connect_app_bar.dart';
 import '../../widgets/connect_nav_bar.dart';
 import '../../widgets/hamburger_menu.dart';
@@ -10,7 +13,6 @@ import 'widgets/special_offers_widget.dart';
 import 'widgets/categories_widget.dart';
 import 'widgets/top_rated_widget.dart';
 import 'widgets/customer_reviews_widget.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,10 +26,30 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _hideNavBar = false;
   double _lastOffset = 0;
 
+  // Data from backend
+  List<Map<String, dynamic>> _topRatedServices = [];
+  List<Map<String, dynamic>> _latestFiveStarReviews = [];
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
+    _fetchHomeData();
+  }
+
+  Future<void> _fetchHomeData() async {
+    setState(() => _isLoading = true);
+
+    final homeDataService = HomeDataService();
+    final topRated = await homeDataService.fetchTopRatedServices(limit: 2);
+    final reviews = await homeDataService.fetchLatestFiveStarReviews(limit: 5);
+
+    setState(() {
+      _topRatedServices = topRated;
+      _latestFiveStarReviews = reviews;
+      _isLoading = false;
+    });
   }
 
   void _scrollListener() {
@@ -60,7 +82,9 @@ class _HomeScreenState extends State<HomeScreen> {
       endDrawer: const HamburgerMenu(),
       body: Stack(
         children: [
-          SingleChildScrollView(
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
             controller: _scrollController,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,37 +107,38 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 30),
 
-                /// Special Offers
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: const SpecialOffersWidget(),
+                /// Special Offers (static or not?)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  child: SpecialOffersWidget(),
                 ),
                 const SizedBox(height: 35),
 
-                /// Categories
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: const CategoriesWidget(),
+                /// Categories (static local)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  child: CategoriesWidget(),
                 ),
                 const SizedBox(height: 35),
 
                 /// Top Rated
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: const TopRatedWidget(),
+                  child: TopRatedWidget(services: _topRatedServices),
                 ),
                 const SizedBox(height: 35),
 
-                /// Customer Reviews
+                /// Customer Reviews (5-star)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: const CustomerReviewsWidget(),
+                  child: CustomerReviewsWidget(
+                    latestReviews: _latestFiveStarReviews,
+                  ),
                 ),
                 const SizedBox(height: 30),
               ],
             ),
           ),
-
           /// nav bar animation
           Positioned(
             left: 0,
