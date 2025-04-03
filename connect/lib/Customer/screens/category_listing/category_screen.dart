@@ -1,3 +1,4 @@
+// lib/Customer/category_listing/category_screen.dart
 import 'package:flutter/material.dart';
 import '../../widgets/connect_app_bar.dart';
 import '../../widgets/connect_nav_bar.dart';
@@ -6,32 +7,30 @@ import '../category_based_service_listing/category_service_listing_screen.dart';
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({Key? key}) : super(key: key);
 
+  // Local array of categories
+  final List<Map<String, String>> _categories = const [
+    {'name': 'Gardening', 'image': 'assets/images/categories/gardening.png'},
+    {'name': 'Cleaning', 'image': 'assets/images/categories/cleaning.png'},
+    {'name': 'Fitness', 'image': 'assets/images/categories/fitness.png'},
+    {'name': 'Cooking', 'image': 'assets/images/categories/cooking.png'},
+    {'name': 'Painting', 'image': 'assets/images/categories/painting.png'},
+    {'name': 'Car Wash', 'image': 'assets/images/categories/car_wash.png'},
+    {'name': 'Baby Sitting', 'image': 'assets/images/categories/baby_sitting.png'},
+    {'name': 'Laundry', 'image': 'assets/images/categories/laundry.png'},
+  ];
+
   @override
   Widget build(BuildContext context) {
-    // Example list of categories
-    final categories = [
-      {'name': 'Gardening', 'image': 'assets/images/categories/gardening.png'},
-      {'name': 'Cleaning', 'image': 'assets/images/categories/cleaning.png'},
-      {'name': 'Fitness', 'image': 'assets/images/categories/fitness.png'},
-      {'name': 'Cooking', 'image': 'assets/images/categories/cooking.png'},
-      {'name': 'Painting', 'image': 'assets/images/categories/painting.png'},
-      {'name': 'Car Wash', 'image': 'assets/images/categories/car_wash.png'},
-      {'name': 'Baby Sitting', 'image': 'assets/images/categories/baby_sitting.png'},
-      {'name': 'Laundry', 'image': 'assets/images/categories/laundry.png'},
-      // etc.
-    ];
-
     return Scaffold(
       appBar: const ConnectAppBar(),
       body: Stack(
         children: [
-          // Main content
           SingleChildScrollView(
             padding: const EdgeInsets.all(25),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Row: back arrow + "Categories"
+                // Back arrow and screen title row
                 Row(
                   children: [
                     GestureDetector(
@@ -40,7 +39,7 @@ class CategoriesScreen extends StatelessWidget {
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: const Color(0xFFDFE9E3),
-                          borderRadius: BorderRadius.circular(8), // 10% corners
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(
                           Icons.arrow_back_ios_new_rounded,
@@ -60,13 +59,12 @@ class CategoriesScreen extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    // Just a placeholder space
-                    const SizedBox(width: 8),
+                    // Invisible placeholder to balance the row
+                    const SizedBox(width: 28),
                   ],
                 ),
                 const SizedBox(height: 30),
-
-                // 3-column grid of categories
+                // 3-column grid of categories from the local array
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -76,12 +74,12 @@ class CategoriesScreen extends StatelessWidget {
                     mainAxisSpacing: 30,
                     childAspectRatio: 0.8,
                   ),
-                  itemCount: categories.length,
+                  itemCount: _categories.length,
                   itemBuilder: (context, index) {
-                    final category = categories[index];
+                    final category = _categories[index];
                     return InkWell(
                       onTap: () {
-                        // Navigate to CategoryServiceListingScreen
+                        // Navigate to the CategoryServiceListingScreen passing the category name
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -127,15 +125,12 @@ class CategoriesScreen extends StatelessWidget {
               ],
             ),
           ),
-
-          // Nav bar at bottom
-          Positioned(
+          // Navigation Bar at the bottom
+          const Positioned(
             left: 0,
             right: 0,
             bottom: 30,
-            child: const ConnectNavBar(
-              isDashboardSelected: true,
-            ),
+            child: ConnectNavBar(isDashboardSelected: true),
           ),
         ],
       ),
