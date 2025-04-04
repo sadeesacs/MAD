@@ -14,26 +14,26 @@ class OnboardingScreen3 extends StatelessWidget {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Top spacing
-            const SizedBox(height: 30),
+            const SizedBox(height: 60),
 
             // Title
             const Text(
               'Chat & Book with Confidence',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 23,
+                fontSize: 24,           // Increased for better visibility
                 color: titleColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
 
-            // Image
+            const SizedBox(height: 30),
+
+            // Center illustration
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: Image.asset(
                   'assets/onboarding/screen3.png',
                   fit: BoxFit.contain,
@@ -43,17 +43,19 @@ class OnboardingScreen3 extends StatelessWidget {
 
             // Description
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.0),
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
                 'Communicate with providers, confirm\nbookings, and track your services easily.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 19,
-                  height: 1,
+                  fontSize: 18,
+                  height: 1.3,
                   color: Colors.black87,
                 ),
               ),
             ),
+
+            const SizedBox(height: 25),
 
             // Dots
             Row(
@@ -67,15 +69,17 @@ class OnboardingScreen3 extends StatelessWidget {
               ],
             ),
 
-            // Get Started Button navigates to RoleSelectionScreen
+            const SizedBox(height: 25),
+
+            // "Get Started" Button
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              padding: const EdgeInsets.symmetric(horizontal: 25.0),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: titleColor,
-                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -100,7 +104,7 @@ class OnboardingScreen3 extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 5),
+            const SizedBox(height: 30),
           ],
         ),
       ),
