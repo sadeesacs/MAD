@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connect/auth/verification_code_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'verification_code_screen.dart';
 import 'success_password_change_screen.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
@@ -11,7 +11,6 @@ class ResetPasswordScreen extends StatefulWidget {
     Key? key,
     required this.email,
   }) : super(key: key);
-
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -27,9 +26,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // This ensures the screen resizes when the keyboard appears
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(25),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,6 +140,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 ),
               ),
               const SizedBox(height: 30),
+
               if (_errorMessage != null)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
@@ -201,7 +203,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         throw Exception("Password must be at least 6 characters");
       }
 
-      // Send a password reset email with the built-in Firebase feature
+      // Send a password reset email using Firebase
       await FirebaseAuth.instance.sendPasswordResetEmail(email: widget.email);
 
       setState(() {
@@ -215,8 +217,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         builder: (context) => AlertDialog(
           title: const Text('Password Reset Link Sent'),
           content: Text(
-              'A password reset link has been sent to ${widget.email}.\n\n'
-                  'Please check your email and click the link to complete the password reset process.'
+            'A password reset link has been sent to ${widget.email}.\n\n'
+                'Please check your email and click the link to complete the password reset process.',
           ),
           actions: [
             TextButton(
@@ -224,7 +226,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 // Navigate to success screen and clear history
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (_) => const SuccessPasswordChangeScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => const SuccessPasswordChangeScreen(),
+                  ),
                       (route) => false,
                 );
               },
@@ -233,7 +237,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           ],
         ),
       );
-
     } catch (e) {
       String errorMessage = 'Failed to reset password';
 

@@ -1,7 +1,9 @@
 // lib/Customer/screens/service-listing/service_listing.dart
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:connect/Customer/screens/home/home_screen.dart'; // Import HomeScreen
 import '../../services/service_data_service.dart';
 import '../../widgets/connect_app_bar.dart';
 import '../../widgets/connect_nav_bar.dart';
@@ -39,11 +41,12 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
 
   bool _isLoading = false;
   List<Map<String, dynamic>> _services = [];
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    // default to 'Plumbing'
+    // Default to 'Plumbing'
     _selectedCategory = _categories.first;
     _fetchServicesForCategory(_selectedCategory!);
   }
@@ -65,55 +68,78 @@ class _ServiceListingScreenState extends State<ServiceListingScreen> {
     _fetchServicesForCategory(category);
   }
 
+  /// This method is triggered when the user presses the device back button.
+  /// It redirects the user to the HomeScreen.
+  Future<bool> _onWillPop() async {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
+    return false;
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: white,
-      appBar: const ConnectAppBar(),
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: Column(
-              children: [
-                const Center(
-                  child: Text(
-                    'Services',
-                    style: TextStyle(color: darkGreen, fontSize: 30, fontWeight: FontWeight.bold),
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        backgroundColor: white,
+        appBar: const ConnectAppBar(),
+        body: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Column(
+                children: [
+                  const Center(
+                    child: Text(
+                      'Services',
+                      style: TextStyle(
+                        color: darkGreen,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                CategorySelector(
-                  categories: _categories,
-                  selectedCategory: _selectedCategory,
-                  onCategorySelected: _onCategorySelected,
-                ),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: _isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : ListView.builder(
-                    padding: const EdgeInsets.all(16.0),
-                    itemCount: _services.length,
-                    itemBuilder: (context, index) {
-                      final service = _services[index];
-                      return ServiceCard(service: service);
-                    },
+                  const SizedBox(height: 4),
+                  CategorySelector(
+                    categories: _categories,
+                    selectedCategory: _selectedCategory,
+                    onCategorySelected: _onCategorySelected,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: _isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : ListView.builder(
+                      padding: const EdgeInsets.all(16.0),
+                      itemCount: _services.length,
+                      itemBuilder: (context, index) {
+                        final service = _services[index];
+                        return ServiceCard(service: service);
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 30,
-            child: const ConnectNavBar(
-              isHomeSelected: false,
-              isConstructionSelected: true,
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 30,
+              child: const ConnectNavBar(
+                isHomeSelected: false,
+                isConstructionSelected: true,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

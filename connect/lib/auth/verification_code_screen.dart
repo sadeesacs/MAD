@@ -12,13 +12,14 @@ class VerificationCodeScreen extends StatefulWidget {
   final String email;
   final String verificationCode;
 
-  const VerificationCodeScreen(
-      {super.key,
-      required this.verificationId,
-      required this.userId,
-      required this.phoneNumber,
-      required this.verificationCode,
-      required this.email});
+  const VerificationCodeScreen({
+    Key? key,
+    required this.verificationId,
+    required this.userId,
+    required this.phoneNumber,
+    required this.verificationCode,
+    required this.email,
+  }) : super(key: key);
 
   @override
   State<VerificationCodeScreen> createState() => _VerificationCodeScreenState();
@@ -26,7 +27,7 @@ class VerificationCodeScreen extends StatefulWidget {
 
 class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
   final List<TextEditingController> _controllers =
-      List.generate(6, (_) => TextEditingController());
+  List.generate(6, (_) => TextEditingController());
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -60,9 +61,11 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Allows the screen to resize so fields and button remain visible
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(25),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,22 +177,22 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                   ),
                   child: _isLoading
                       ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
                       : const Text(
-                          'Verify',
-                          style: TextStyle(
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 25,
-                            color: Colors.white,
-                          ),
-                        ),
+                    'Verify',
+                    style: TextStyle(
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -254,8 +257,8 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
     if (_timeLeft > 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text('Please wait $_timeLeft seconds before requesting again')),
+          content: Text('Please wait $_timeLeft seconds before requesting again'),
+        ),
       );
       return;
     }
@@ -265,14 +268,11 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
     });
 
     try {
-      // Get the phone number from the widget params
       final phoneNumber = widget.phoneNumber;
 
       await _auth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
-        verificationCompleted: (PhoneAuthCredential credential) {
-          // Auto-verification completed (rare on most devices)
-        },
+        verificationCompleted: (PhoneAuthCredential credential) {},
         verificationFailed: (FirebaseAuthException e) {
           setState(() {
             _resendingCode = false;
@@ -286,9 +286,6 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
           setState(() {
             _resendingCode = false;
           });
-          // Update the verification ID
-          // Since this is a StatefulWidget, we can't directly modify widget properties
-          // Instead, recreate the screen with the new verification ID
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -301,18 +298,12 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
               ),
             ),
           );
-
-          // Reset timer
           _startTimer();
-
-          // Show confirmation
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Verification code resent')),
           );
         },
-        codeAutoRetrievalTimeout: (String verificationId) {
-          // Auto-retrieval timeout
-        },
+        codeAutoRetrievalTimeout: (String verificationId) {},
         timeout: const Duration(minutes: 2),
       );
     } catch (e) {
@@ -333,48 +324,36 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
     });
 
     try {
-      // Get the 6-digit code from input fields
-      final smsCode = _controllers.map((controller) => controller.text).join();
-
+      final smsCode = _controllers.map((c) => c.text).join();
       if (smsCode.length != 6) {
         throw Exception('Please enter all 6 digits');
       }
 
-      // Create credential with verification ID and SMS code
       final PhoneAuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: widget.verificationId, smsCode: smsCode);
-
+        verificationId: widget.verificationId,
+        smsCode: smsCode,
+      );
 
       User? user = _auth.currentUser;
-
       if (user == null) {
-        // If user isn't signed in (rare case), sign in with the user ID from widget
-        await _auth.signInWithEmailAndPassword(
-          email: (await _firestore.collection('users').doc(widget.userId).get())
-              .data()!['email'],
-          password: '', // This won't work without knowing the password
-        );
+        final doc = await _firestore.collection('users').doc(widget.userId).get();
+        final userEmail = doc['email'];
+        await _auth.signInWithEmailAndPassword(email: userEmail, password: '');
         user = _auth.currentUser;
       }
 
-      // Now link the phone credential to the existing user account
       await user?.linkWithCredential(credential);
-
-      // Update user's phone verification status
       await _firestore
           .collection('users')
           .doc(widget.userId)
           .update({'phoneVerified': true});
 
-      // Get user role from Firestore
       final userDoc =
-          await _firestore.collection('users').doc(widget.userId).get();
-
+      await _firestore.collection('users').doc(widget.userId).get();
       if (!userDoc.exists || userDoc.data() == null) {
         throw Exception('User data not found');
       }
 
-      // Get role and navigate accordingly
       final role = userDoc.data()!['role'];
 
       setState(() {
@@ -384,14 +363,13 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
       if (role == 'CUSTOMER') {
         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       } else if (role == 'SERVICE_PROVIDER') {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/dashboard', (route) => false);
+        Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
       } else {
-        // Invalid role - redirect to role selection
         Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
-            (route) => false);
+          context,
+          MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
+              (route) => false,
+        );
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -399,7 +377,6 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
         _errorMessage = e.message;
       });
 
-      // Special handling for specific Firebase Auth errors
       String errorMessage = 'Verification failed';
       if (e.code == 'credential-already-in-use') {
         errorMessage = 'Phone number is already linked to another account';

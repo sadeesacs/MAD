@@ -2,8 +2,6 @@
 import 'package:flutter/material.dart';
 
 class CustomerReviewsWidget extends StatelessWidget {
-  /// If the user wants the last 5 star reviews from Firestore
-  /// we pass them in here
   final List<Map<String, dynamic>> latestReviews;
 
   const CustomerReviewsWidget({super.key, required this.latestReviews});
@@ -35,8 +33,9 @@ class CustomerReviewsWidget extends StatelessWidget {
               final rv = latestReviews[index];
               final category = rv['category'] ?? 'Unknown';
               final reviewText = rv['comment'] ?? 'No comment';
-              // Possibly fetch author name if you want
-              final author = '~ Unnamed';
+              // If you want to store the author's name or doc reference:
+              final author = rv['authorName'] ?? '~ Unnamed';
+              // rating is in rv['rate'], if needed.
 
               return Container(
                 width: 220,
@@ -65,6 +64,8 @@ class CustomerReviewsWidget extends StatelessWidget {
                         fontSize: 12,
                         color: Colors.black,
                       ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const Spacer(),
                     Align(

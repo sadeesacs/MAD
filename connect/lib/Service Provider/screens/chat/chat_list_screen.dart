@@ -1,10 +1,12 @@
+// lib/Customer/screens/customer_chats/chat_list_screen.dart
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../widgets/connect_app_bar_sp.dart';
+import '../../../Customer/services/customer_chat_service.dart';
+import '../../../Customer/widgets/connect_app_bar.dart';
 import '../../widgets/sp_hamburger_menu.dart';
-import '../../services/chat_service.dart';
 import 'chat_screen.dart';
-import 'dart:io';
+import 'package:connect/Service Provider/screens/dashboard/dashboard_screen.dart'; // Import DashboardScreen
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({Key? key}) : super(key: key);
@@ -15,7 +17,7 @@ class ChatListScreen extends StatefulWidget {
 
 class _ChatListScreenState extends State<ChatListScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final ChatService _chatService = ChatService();
+  final CustomerChatService _chatService = CustomerChatService();
   String _searchQuery = '';
   // Cache for user data to avoid repeated Firestore lookups
   final Map<String, Map<String, dynamic>> _userDataCache = {};
@@ -30,7 +32,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     if (_userDataCache.containsKey(userId)) {
       return _userDataCache[userId]!;
     }
-    
+
     final userData = await _chatService.getUserData(userId);
     _userDataCache[userId] = userData;
     return userData;
@@ -43,37 +45,37 @@ class _ChatListScreenState extends State<ChatListScreen> {
     for (var chatDoc in chats) {
       final data = chatDoc.data() as Map<String, dynamic>;
       final List<dynamic> participants = data['participants'];
-      
+
       for (var userId in participants) {
         if (userId != _chatService.currentUserId && !_userDataCache.containsKey(userId)) {
           userIds.add(userId.toString());
         }
       }
     }
-    
+
     // Fetch user data in parallel
     await Future.wait(
-      userIds.map((userId) async {
-        final userData = await _chatService.getUserData(userId);
-        _userDataCache[userId] = userData;
-      })
+        userIds.map((userId) async {
+          final userData = await _chatService.getUserData(userId);
+          _userDataCache[userId] = userData;
+        })
     );
   }
-  
+
   // Search in chats using cached user data
   List<DocumentSnapshot> _filterChatsBySearchQuery(List<DocumentSnapshot> chats, String query) {
     if (query.isEmpty) return chats;
-    
+
     return chats.where((doc) {
       final data = doc.data() as Map<String, dynamic>;
       final List<dynamic> participants = data['participants'];
       final String lastMessage = (data['lastMessage'] ?? '').toString().toLowerCase();
-      
+
       // Check last message content
       if (lastMessage.contains(query)) {
         return true;
       }
-      
+
       // Check participant names
       for (var userId in participants) {
         if (userId != _chatService.currentUserId) {
@@ -91,93 +93,93 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const ConnectAppBarSP(),
-      endDrawer: const SPHamburgerMenu(),
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(25),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // "Chats" title
-              const Text(
-                'Chats',
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 32,
-                  color: Color(0xFF027335),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Search bar
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF3F5F7),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: const InputDecoration(
-                    hintText: 'Search',
-                    border: InputBorder.none,
-                    prefixIcon: Icon(Icons.search),
-                    contentPadding: EdgeInsets.symmetric(vertical: 14),
+    return WillPopScope(
+      onWillPop: () async {
+        // When the device back button is pressed, redirect to DashboardScreen.
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const DashboardScreen()),
+        );
+        return false;
+      },
+      child: Scaffold(
+        appBar: const ConnectAppBar(),
+        endDrawer: const SPHamburgerMenu(),
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(25),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // "Chats" title
+                const Text(
+                  'Chats',
+                  style: TextStyle(
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 32,
+                    color: Color(0xFF027335),
                   ),
-                  onChanged: (val) {
-                    setState(() {
-                      _searchQuery = val.toLowerCase();
-                    });
-                  },
                 ),
-              ),
-              const SizedBox(height: 20),
-
-              // List of chats
-              Expanded(
-                child: StreamBuilder<QuerySnapshot>(
-                  stream: _chatService.getChats(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    }
-
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return const Center(child: Text('No chats available'));
-                    }
-
-                    final allChats = snapshot.data!.docs;
-            
-                    // Preload user data for better search
-                    _preloadUserData(allChats);
-            
-                    // Filter chats based on search query
-                    final filteredChats = _filterChatsBySearchQuery(allChats, _searchQuery);
-            
-                    // Sort by latest message
-                    final sortedChats = _chatService.sortChatsByLatestMessage(filteredChats);
-            
-                    if (sortedChats.isEmpty && _searchQuery.isNotEmpty) {
-                      return Center(child: Text('No results for "$_searchQuery"'));
-                    }
-
-                    return ListView.builder(
-                      itemCount: sortedChats.length,
-                      itemBuilder: (context, index) {
-                        return _buildChatCard(sortedChats[index]);
-                      },
-                    );
-                  },
+                const SizedBox(height: 20),
+                // Search bar
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF3F5F7),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      hintText: 'Search',
+                      border: InputBorder.none,
+                      prefixIcon: Icon(Icons.search),
+                      contentPadding: EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onChanged: (val) {
+                      setState(() {
+                        _searchQuery = val.toLowerCase();
+                      });
+                    },
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+                // List of chats
+                Expanded(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: _chatService.getChats(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return const Center(child: Text('No chats available'));
+                      }
+                      final allChats = snapshot.data!.docs;
+                      // Preload user data for better search
+                      _preloadUserData(allChats);
+                      // Filter chats based on search query
+                      final filteredChats = _filterChatsBySearchQuery(allChats, _searchQuery);
+                      // Sort by latest message
+                      final sortedChats = _chatService.sortChatsByLatestMessage(filteredChats);
+                      if (sortedChats.isEmpty && _searchQuery.isNotEmpty) {
+                        return Center(child: Text('No results for "$_searchQuery"'));
+                      }
+                      return ListView.builder(
+                        itemCount: sortedChats.length,
+                        itemBuilder: (context, index) {
+                          return _buildChatCard(sortedChats[index]);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -186,9 +188,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   // Helper method to build profile image
   Widget _buildProfileImage(String imagePath, double width, double height) {
-    // Check if image path is a URL or local file path
     if (imagePath.startsWith('http')) {
-      // It's a network image
       return Image.network(
         imagePath,
         width: width,
@@ -197,7 +197,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
         errorBuilder: (context, error, stackTrace) => _buildDefaultProfileImage(width, height),
       );
     } else {
-      // It's a local file path
       final file = File(imagePath);
       return FutureBuilder<bool>(
         future: file.exists(),
@@ -216,7 +215,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
               ),
             );
           }
-          
           if (snapshot.hasData && snapshot.data == true) {
             return Image.file(
               file,
@@ -240,7 +238,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       height: height,
       decoration: BoxDecoration(
         color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(width / 2), // Make it circular
+        borderRadius: BorderRadius.circular(width / 2),
       ),
       child: Icon(
         Icons.person,
@@ -251,29 +249,26 @@ class _ChatListScreenState extends State<ChatListScreen> {
   }
 
   Widget _buildChatCard(DocumentSnapshot document) {
-    // Safely convert document data with null check
     final data = document.data() as Map<String, dynamic>? ?? {};
     final chatId = document.id;
     final List<dynamic> participants = data['participants'] as List<dynamic>? ?? [];
-    
-    // Find the other user's ID
+
     final String? otherUserId = participants.firstWhere(
-      (id) => id != _chatService.currentUserId, 
-      orElse: () => null
+            (id) => id != _chatService.currentUserId,
+        orElse: () => null
     ) as String?;
-    
+
     if (otherUserId == null) {
-      return const SizedBox.shrink(); // Skip if no other user found
+      return const SizedBox.shrink();
     }
 
     final lastMessage = data['lastMessage'] ?? '';
     final Timestamp? lastMessageTime = data['lastMessageTime'];
     final time = _formatTimestamp(lastMessageTime);
-    
-    // Get unread count for current user
+
     final Map<String, dynamic>? unreadCountMap = data['unreadCount'] as Map<String, dynamic>?;
     final int unreadCount = unreadCountMap?[_chatService.currentUserId.toString()] ?? 0;
-    
+
     return FutureBuilder<Map<String, dynamic>>(
       future: _getCachedUserData(otherUserId),
       builder: (context, snapshot) {
@@ -283,17 +278,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
             child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
           );
         }
-        
+
         final userData = snapshot.data!;
         final String name = userData['name'] ?? 'Unknown';
         final String profilePic = userData['profile_pic'] ?? 'https://via.placeholder.com/150';
 
         return InkWell(
           onTap: () async {
-            // Mark messages as read when chat is opened
             await _chatService.markMessagesAsRead(chatId);
-            
-            // Navigate to chat screen
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -310,12 +302,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Row(
               children: [
-                // Profile Picture - Handle both network and local files
                 ClipOval(
                   child: _buildProfileImage(profilePic, 50, 50),
                 ),
                 const SizedBox(width: 12),
-                // Name + last message
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,7 +331,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     ],
                   ),
                 ),
-                // Time + unread
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -382,26 +371,22 @@ class _ChatListScreenState extends State<ChatListScreen> {
       },
     );
   }
-  
+
   String _formatTimestamp(Timestamp? timestamp) {
     if (timestamp == null) return '';
-    
+
     final now = DateTime.now();
     final date = timestamp.toDate();
     final diff = now.difference(date);
-    
+
     if (diff.inDays == 0) {
-      // Today, show time
       return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
     } else if (diff.inDays == 1) {
-      // Yesterday
       return 'Yesterday';
     } else if (diff.inDays < 7) {
-      // Days of the week
       final weekday = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
       return weekday[date.weekday - 1];
     } else {
-      // Show date
       return '${date.day}/${date.month}/${date.year}';
     }
   }
