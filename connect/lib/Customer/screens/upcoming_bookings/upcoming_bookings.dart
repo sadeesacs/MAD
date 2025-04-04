@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
+// lib/Customer/screens/upcoming_bookings/upcoming_bookings.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
-// Import your custom widgets/screens
+import 'package:connect/Customer/screens/home/home_screen.dart'; // Import HomeScreen
 import '../../widgets/connect_app_bar.dart';
 import '../../widgets/connect_nav_bar.dart';
 import '../booking_history/booking_history.dart';
@@ -215,85 +216,114 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
     );
   }
 
+  String _formatTimestamp(Timestamp? timestamp) {
+    if (timestamp == null) return '';
+
+    final now = DateTime.now();
+    final date = timestamp.toDate();
+    final diff = now.difference(date);
+
+    if (diff.inDays == 0) {
+      return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    } else if (diff.inDays == 1) {
+      return 'Yesterday';
+    } else if (diff.inDays < 7) {
+      final weekday = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      return weekday[date.weekday - 1];
+    } else {
+      return '${date.day}/${date.month}/${date.year}';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: const ConnectAppBar(),
-      body: Stack(
-        children: [
-          StreamBuilder<QuerySnapshot>(
-            stream: _getUpcomingBookings(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return const Center(
-                  child: Text("Error loading bookings."),
-                );
-              }
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final docs = snapshot.data?.docs ?? [];
-              return SingleChildScrollView(
-                controller: _scrollController,
-                padding: const EdgeInsets.all(25),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Screen title
-                    const Text(
-                      'Bookings',
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 32,
-                        color: Color(0xFF027335),
+    return WillPopScope(
+      onWillPop: () async {
+        // Redirect back to HomeScreen when back button is pressed.
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: const ConnectAppBar(),
+        body: Stack(
+          children: [
+            StreamBuilder<QuerySnapshot>(
+              stream: _getUpcomingBookings(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Center(
+                    child: Text("Error loading bookings."),
+                  );
+                }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final docs = snapshot.data?.docs ?? [];
+                return SingleChildScrollView(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(25),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Screen title
+                      const Text(
+                        'Bookings',
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 32,
+                          color: Color(0xFF027335),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 25),
-                    // Toggle widget to switch between Upcoming Bookings and Booking History.
-                    UpcomingHistoryToggle(
-                      isUpcomingSelected: true,
-                      onUpcomingPressed: () {
-                        // Already on Upcoming Bookings screen.
-                      },
-                      onHistoryPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const BookingHistoryScreen(),
-                          ),
+                      const SizedBox(height: 25),
+                      // Toggle widget to switch between Upcoming and History
+                      UpcomingHistoryToggle(
+                        isUpcomingSelected: true,
+                        onUpcomingPressed: () {
+                          // Already on Upcoming Bookings screen.
+                        },
+                        onHistoryPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const BookingHistoryScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 25),
+                      // Render booking cards.
+                      ...docs.map((bookingDoc) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 5),
+                          child: _buildBookingCard(context, bookingDoc),
                         );
-                      },
-                    ),
-                    const SizedBox(height: 25),
-                    // Render booking cards.
-                    ...docs.map((bookingDoc) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 5),
-                        child: _buildBookingCard(context, bookingDoc),
-                      );
-                    }).toList(),
-                  ],
+                      }).toList(),
+                    ],
+                  ),
+                );
+              },
+            ),
+            // Floating navigation bar that hides on scroll.
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 30,
+              child: AnimatedSlide(
+                duration: const Duration(milliseconds: 500),
+                offset: _hideNavBar ? const Offset(0, 1.5) : const Offset(0, 0),
+                child: const ConnectNavBar(
+                  isHomeSelected: false,
+                  isUpcomingSelected: true,
                 ),
-              );
-            },
-          ),
-          // Floating navigation bar that hides on scroll.
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 30,
-            child: AnimatedSlide(
-              duration: const Duration(milliseconds: 500),
-              offset: _hideNavBar ? const Offset(0, 1.5) : const Offset(0, 0),
-              child: const ConnectNavBar(
-                isHomeSelected: false,
-                isUpcomingSelected: true,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

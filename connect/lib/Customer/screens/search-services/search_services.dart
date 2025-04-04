@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 // Local widget imports
+import '../home/home_screen.dart';
 import 'widgets/reset_button.dart';
 import 'widgets/select_button.dart';
 import 'widgets/select_location.dart';
@@ -50,7 +51,7 @@ class _SearchFunctionScreenState extends State<SearchFunctionScreen> {
   }
 
   /// Builds and executes a query for Firestore 'services' collection,
-  /// does local filter for rating & price, fetches provider name,
+  /// does local filtering for rating & price, fetches provider name,
   /// then navigates to SearchedServiceListingScreen.
   Future<void> _performSearch() async {
     try {
@@ -96,11 +97,11 @@ class _SearchFunctionScreenState extends State<SearchFunctionScreen> {
         final double docRating = (data['rating'] ?? 0).toDouble();
         final double docRate   = (data['hourlyRate'] ?? 0).toDouble();
 
-        // check rating
+        // Check rating
         if (_selectedRating != null && docRating < _selectedRating!) {
           continue;
         }
-        // check price
+        // Check price
         if (docRate < minPrice || docRate > maxPrice) {
           continue;
         }
@@ -124,7 +125,7 @@ class _SearchFunctionScreenState extends State<SearchFunctionScreen> {
             providerName = userData['name'] ?? 'Unknown Provider';
           }
         }
-        // store the provider name in the map
+        // Store the provider name in the map
         serviceMap['serviceProviderName'] = providerName;
         finalWithProvider.add(serviceMap);
       }
@@ -147,113 +148,130 @@ class _SearchFunctionScreenState extends State<SearchFunctionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: bodyBackgroundColor,
-      appBar: const ConnectAppBar(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(25.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top Row: Back & Title
-            Row(
-              children: [
-                // Back Button
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFDFE9E3),
+    // Wrap the entire screen in WillPopScope to override system back
+    return WillPopScope(
+      onWillPop: () async {
+        // Navigate to HomeScreen and prevent default back
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+        return false; // returning false means system back is disabled
+      },
+      child: Scaffold(
+        backgroundColor: bodyBackgroundColor,
+        appBar: const ConnectAppBar(),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(25.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top Row: Back & Title
+              Row(
+                children: [
+                  // Custom back button
+                  GestureDetector(
+                    onTap: () {
+                      // Instead of pop, go to HomeScreen
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const HomeScreen()),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFDFE9E3),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Color(0xFF027335),
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  const Text(
+                    'Search Services',
+                    style: TextStyle(
+                      color: darkGreen,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2),
+
+              // Reset Filters
+              ResetFiltersButton(onPressed: _resetFilters),
+              const SizedBox(height: 10),
+
+              // Select location
+              SelectLocation(
+                selectedDistrict: _selectedDistrict,
+                onChanged: (String? val) {
+                  setState(() {
+                    _selectedDistrict = val;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Select service category
+              SelectServiceCategory(
+                selectedServiceCategory: _selectedServiceCategory,
+                onChanged: (String? val) {
+                  setState(() {
+                    _selectedServiceCategory = val;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Price range
+              SelectPriceRange(
+                minPriceController: _minPriceController,
+                maxPriceController: _maxPriceController,
+              ),
+              const SizedBox(height: 16),
+
+              // Rating
+              SelectRating(
+                selectedRating: _selectedRating,
+                onChanged: (int? val) {
+                  setState(() {
+                    _selectedRating = val;
+                  });
+                },
+              ),
+              const SizedBox(height: 24),
+
+              // Search Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _performSearch,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF027335),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: Color(0xFF027335),
-                      size: 20,
+                  ),
+                  child: const Text(
+                    'Search',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold
                     ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                const Text(
-                  'Search Services',
-                  style: TextStyle(
-                    color: darkGreen,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 2),
-
-            // Reset Filters
-            ResetFiltersButton(onPressed: _resetFilters),
-            const SizedBox(height: 10),
-
-            // Select location
-            SelectLocation(
-              selectedDistrict: _selectedDistrict,
-              onChanged: (String? val) {
-                setState(() {
-                  _selectedDistrict = val;
-                });
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // Select service category
-            SelectServiceCategory(
-              selectedServiceCategory: _selectedServiceCategory,
-              onChanged: (String? val) {
-                setState(() {
-                  _selectedServiceCategory = val;
-                });
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // Price range
-            SelectPriceRange(
-              minPriceController: _minPriceController,
-              maxPriceController: _maxPriceController,
-            ),
-            const SizedBox(height: 16),
-
-            // Rating
-            SelectRating(
-              selectedRating: _selectedRating,
-              onChanged: (int? val) {
-                setState(() {
-                  _selectedRating = val;
-                });
-              },
-            ),
-            const SizedBox(height: 24),
-
-            // Search Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _performSearch,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF027335),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  'Search',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
