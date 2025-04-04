@@ -4,9 +4,9 @@ class RateReviewBottomSheet extends StatefulWidget {
   final Map<String, dynamic> bookingData;
 
   const RateReviewBottomSheet({
-    Key? key,
+    super.key,
     required this.bookingData,
-  }) : super(key: key);
+  });
 
   @override
   State<RateReviewBottomSheet> createState() => _RateReviewBottomSheetState();

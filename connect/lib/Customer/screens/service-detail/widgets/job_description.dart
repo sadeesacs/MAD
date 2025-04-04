@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class JobDescription extends StatelessWidget {
   final String description;
 
-  const JobDescription({Key? key, required this.description}) : super(key: key);
+  const JobDescription({super.key, required this.description});
 
   @override
   Widget build(BuildContext context) {

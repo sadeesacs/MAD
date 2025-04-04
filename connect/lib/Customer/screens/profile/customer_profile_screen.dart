@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:connect/auth/login_screen.dart';
 import 'package:connect/util/profile_screen_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,7 +11,7 @@ import '../../widgets/profile_screen/editable_text_field.dart';
 import '../../widgets/profile_screen/profile_label.dart';
 
 class CustomerProfileScreen extends StatefulWidget {
-  const CustomerProfileScreen({Key? key}) : super(key: key);
+  const CustomerProfileScreen({super.key});
 
   @override
   State<CustomerProfileScreen> createState() => _ProfileScreenState();
@@ -26,7 +25,7 @@ class _ProfileScreenState extends State<CustomerProfileScreen> {
   bool _isLoading = true;
   bool _isSaving = false;
   bool _nameEditable = false;
-  bool _emailEditable = false;
+  final bool _emailEditable = false;
   bool _phoneEditable = false;
   String? _profilePicUrl;
   String? _localProfileImagePath;

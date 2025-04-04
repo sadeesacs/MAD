@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import '../screens/chat/chat_list_screen.dart';
-import '../screens/completed_jobs/completed_jobs.dart';
 import '../screens/dashboard/dashboard_screen.dart';
 import '../screens/scheduled_jobs/scheduled_job.dart';
 import '../screens/service_listing/service_listing_screen.dart';
-import '../screens/pending_requests/pending_requests.dart';
 
 class ConnectNavBarSP extends StatelessWidget {
   final bool isHomeSelected;

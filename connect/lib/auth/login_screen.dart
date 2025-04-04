@@ -1,5 +1,4 @@
 // lib/Customer/screens/auth/login_screen.dart
-import 'package:connect/firebase_options.dart';
 import 'package:connect/role_selection/role_selection.dart';
 import 'package:connect/auth/register_screen.dart';
 import 'package:connect/auth/forgot_password_screen.dart';
@@ -15,9 +14,9 @@ class LoginScreen extends StatefulWidget {
   final bool isServiceProvider;
 
   const LoginScreen({
-    Key? key,
+    super.key,
     this.isServiceProvider = false,
-  }) : super(key: key);
+  });
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();

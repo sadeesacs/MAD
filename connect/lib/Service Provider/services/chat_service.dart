@@ -49,7 +49,7 @@ class ChatService {
       final batch = _firestore.batch();
       for (var doc in unreadMessages) {
         batch.update(doc.reference, {
-          'readBy.${currentUserId}': true,
+          'readBy.$currentUserId': true,
         });
       }
       
@@ -60,7 +60,7 @@ class ChatService {
       
       // Update the unread count in the chat document
       await _firestore.collection('chats').doc(chatId).update({
-        'unreadCount.${currentUserId}': 0,
+        'unreadCount.$currentUserId': 0,
       });
     } catch (e) {
       print('Error marking messages as read: $e');
@@ -123,7 +123,7 @@ class ChatService {
     // Increment unread count for all participants except the sender
     for (var userId in participants) {
       if (userId != currentUserId) {
-        updateData['unreadCount.${userId}'] = FieldValue.increment(1);
+        updateData['unreadCount.$userId'] = FieldValue.increment(1);
       }
     }
     

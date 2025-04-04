@@ -8,10 +8,10 @@ class BookingHistoryCard extends StatelessWidget {
   final Map<String, dynamic> bookingData;
 
   const BookingHistoryCard({
-    Key? key,
+    super.key,
     required this.bookingDocId,
     required this.bookingData,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

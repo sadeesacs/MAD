@@ -1,10 +1,7 @@
 // lib/Service Provider/screens/completed_jobs/completed_jobs.dart
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:intl/intl.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../services/booking_service.dart';
 import '../../widgets/connect_app_bar_sp.dart';
@@ -14,7 +11,7 @@ import 'widgets/completed_jobs_card.dart';
 import 'package:connect/Service Provider/screens/dashboard/dashboard_screen.dart';
 
 class CompletedJobsScreen extends StatefulWidget {
-  const CompletedJobsScreen({Key? key}) : super(key: key);
+  const CompletedJobsScreen({super.key});
 
   @override
   State<CompletedJobsScreen> createState() => _CompletedJobsScreenState();

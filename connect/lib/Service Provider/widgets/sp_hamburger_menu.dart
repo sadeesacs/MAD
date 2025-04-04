@@ -14,7 +14,7 @@ import '../screens/chat/chat_list_screen.dart';
 import '../../auth/login_screen.dart'; // Make sure this path is correct for your login screen
 
 class SPHamburgerMenu extends StatefulWidget {
-  const SPHamburgerMenu({Key? key}) : super(key: key);
+  const SPHamburgerMenu({super.key});
 
   @override
   State<SPHamburgerMenu> createState() => _SPHamburgerMenuState();

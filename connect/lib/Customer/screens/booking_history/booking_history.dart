@@ -12,7 +12,7 @@ import '../upcoming_bookings/widgets/upcoming_history_toggle.dart';
 import 'widgets/booking_history_card.dart';
 
 class BookingHistoryScreen extends StatefulWidget {
-  const BookingHistoryScreen({Key? key}) : super(key: key);
+  const BookingHistoryScreen({super.key});
 
   @override
   State<BookingHistoryScreen> createState() => _BookingHistoryScreenState();

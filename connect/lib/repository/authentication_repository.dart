@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:connect/role_selection/role_selection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';

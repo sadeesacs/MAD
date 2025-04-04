@@ -1,19 +1,14 @@
 // lib/Customer/screens/Service-detail/service_detail.dart
 
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/connect_app_bar.dart';
-import '../../widgets/connect_nav_bar.dart';
 import '../bookings/booking/booking_screen.dart';
 import '../bookings/booking_form_data.dart';
 import 'widgets/bottom_buttons.dart';
 import 'widgets/job_description.dart';
 import 'widgets/recent_jobs.dart';
 import 'widgets/reviews.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
-import '../../services/service_data_service.dart';
 import 'package:connect/util/image_provider_helper.dart';
 
 // -- ADDED IMPORTS for Chat functionality
@@ -30,7 +25,7 @@ class ServiceDetailScreen extends StatefulWidget {
   /// which is the Firestore document id for the service.
   final Map<String, dynamic> service;
 
-  const ServiceDetailScreen({Key? key, required this.service}) : super(key: key);
+  const ServiceDetailScreen({super.key, required this.service});
 
   @override
   State<ServiceDetailScreen> createState() => _ServiceDetailScreenState();

@@ -13,10 +13,10 @@ class BookingDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> bookingData;
 
   const BookingDetailsScreen({
-    Key? key,
+    super.key,
     required this.bookingId,
     required this.bookingData,
-  }) : super(key: key);
+  });
 
   @override
   State<BookingDetailsScreen> createState() => _BookingDetailsScreenState();

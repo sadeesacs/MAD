@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 // Adjust these imports to your actual screen files
 import '../../auth/login_screen.dart';
-import '../screens/booking_history/booking_history.dart';
 import '../screens/category_listing/category_screen.dart';
 import '../screens/customer_chats/customer_chat_list_screen.dart';
 import '../screens/home/home_screen.dart';
@@ -14,7 +13,7 @@ import '../screens/service-listing/service_listing.dart';
 import '../screens/upcoming_bookings/upcoming_bookings.dart'; // Make sure this path is correct for your login screen
 
 class HamburgerMenu extends StatefulWidget {
-  const HamburgerMenu({Key? key}) : super(key: key);
+  const HamburgerMenu({super.key});
 
   @override
   State<HamburgerMenu> createState() => _SPHamburgerMenuState();

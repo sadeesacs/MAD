@@ -1,7 +1,6 @@
 // lib/Customer/screens/bookings/booking/booking_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../../widgets/connect_app_bar.dart';
 import '../booking_form_data.dart';
 import 'widgets/date_input.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../role_selection/role_selection.dart';
 import 'onboarding_screen2.dart';
-import 'package:connect/auth/register_screen.dart'; // Import RegisterScreen
+// Import RegisterScreen
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});

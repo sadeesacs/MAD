@@ -1,8 +1,6 @@
 // lib/Customer/screens/service-listing/service_listing.dart
 
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:connect/Customer/screens/home/home_screen.dart'; // Import HomeScreen
 import '../../services/service_data_service.dart';
 import '../../widgets/connect_app_bar.dart';

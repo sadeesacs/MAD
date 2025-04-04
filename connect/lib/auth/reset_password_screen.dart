@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:connect/auth/verification_code_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'success_password_change_screen.dart';
@@ -8,9 +6,9 @@ class ResetPasswordScreen extends StatefulWidget {
   final String email;
 
   const ResetPasswordScreen({
-    Key? key,
+    super.key,
     required this.email,
-  }) : super(key: key);
+  });
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();

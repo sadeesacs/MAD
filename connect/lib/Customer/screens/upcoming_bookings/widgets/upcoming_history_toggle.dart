@@ -6,11 +6,11 @@ class UpcomingHistoryToggle extends StatelessWidget {
   final VoidCallback onHistoryPressed;
 
   const UpcomingHistoryToggle({
-    Key? key,
+    super.key,
     required this.isUpcomingSelected,
     required this.onUpcomingPressed,
     required this.onHistoryPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

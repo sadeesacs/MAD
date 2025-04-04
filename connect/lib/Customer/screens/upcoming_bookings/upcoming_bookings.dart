@@ -13,7 +13,7 @@ import 'widgets/upcoming_booking_card.dart';
 import 'popups/cancel_booking_popup.dart';
 
 class UpcomingBookingsScreen extends StatefulWidget {
-  const UpcomingBookingsScreen({Key? key}) : super(key: key);
+  const UpcomingBookingsScreen({super.key});
 
   @override
   State<UpcomingBookingsScreen> createState() => _UpcomingBookingsScreenState();
@@ -302,7 +302,7 @@ class _UpcomingBookingsScreenState extends State<UpcomingBookingsScreen> {
                           padding: const EdgeInsets.only(bottom: 5),
                           child: _buildBookingCard(context, bookingDoc),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                 );

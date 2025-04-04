@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../screens/category_listing/category_screen.dart';
 import '../screens/customer_chats/customer_chat_list_screen.dart';
 import '../screens/home/home_screen.dart';
-import '../screens/service-detail/service_detail.dart';
 import '../screens/service-listing/service_listing.dart';
 import '../screens/upcoming_bookings/upcoming_bookings.dart';
 

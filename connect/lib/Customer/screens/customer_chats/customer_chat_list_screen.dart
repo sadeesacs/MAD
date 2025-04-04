@@ -8,7 +8,7 @@ import '../../services/customer_chat_service.dart';
 import 'customer_chat_screen.dart';
 
 class CustomerChatListScreen extends StatefulWidget {
-  const CustomerChatListScreen({Key? key}) : super(key: key);
+  const CustomerChatListScreen({super.key});
 
   @override
   State<CustomerChatListScreen> createState() => _CustomerChatListScreenState();

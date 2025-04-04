@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     },
   ];
 
-  bool _isLoading = false; // For hard-coded data, we can set false
+  final bool _isLoading = false; // For hard-coded data, we can set false
 
   @override
   void initState() {

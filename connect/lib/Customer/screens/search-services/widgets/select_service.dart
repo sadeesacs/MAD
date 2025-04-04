@@ -6,10 +6,10 @@ class SelectServiceCategory extends StatelessWidget {
   final Function(String?) onChanged;
 
   SelectServiceCategory({
-    Key? key,
+    super.key,
     required this.selectedServiceCategory,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   final List<String> _serviceCategories = [
     'Plumbing',

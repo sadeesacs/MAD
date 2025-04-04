@@ -9,7 +9,7 @@ import '../service-detail/service_detail.dart';
 class SearchedServiceListingScreen extends StatelessWidget {
   final List<Map<String, dynamic>> services;
 
-  const SearchedServiceListingScreen({Key? key, required this.services}) : super(key: key);
+  const SearchedServiceListingScreen({super.key, required this.services});
 
   @override
   Widget build(BuildContext context) {

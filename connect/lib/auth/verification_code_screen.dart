@@ -13,13 +13,13 @@ class VerificationCodeScreen extends StatefulWidget {
   final String verificationCode;
 
   const VerificationCodeScreen({
-    Key? key,
+    super.key,
     required this.verificationId,
     required this.userId,
     required this.phoneNumber,
     required this.verificationCode,
     required this.email,
-  }) : super(key: key);
+  });
 
   @override
   State<VerificationCodeScreen> createState() => _VerificationCodeScreenState();

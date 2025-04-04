@@ -5,10 +5,10 @@ class PendingRequestsCard extends StatelessWidget {
   final VoidCallback onDetailsPressed;
 
   const PendingRequestsCard({
-    Key? key,
+    super.key,
     required this.bookingData,
     required this.onDetailsPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

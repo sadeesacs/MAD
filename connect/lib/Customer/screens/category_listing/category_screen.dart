@@ -6,7 +6,7 @@ import '../../widgets/connect_nav_bar.dart';
 import '../category_based_service_listing/category_service_listing_screen.dart';
 
 class CategoriesScreen extends StatelessWidget {
-  const CategoriesScreen({Key? key}) : super(key: key);
+  const CategoriesScreen({super.key});
 
   // Local array of categories
   final List<Map<String, String>> _categories = const [

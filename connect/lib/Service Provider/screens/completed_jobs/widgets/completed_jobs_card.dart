@@ -5,9 +5,9 @@ class CompletedJobsCard extends StatelessWidget {
   final Map<String, dynamic> bookingData;
 
   const CompletedJobsCard({
-    Key? key,
+    super.key,
     required this.bookingData,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

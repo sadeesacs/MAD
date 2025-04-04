@@ -6,10 +6,10 @@ class SelectLocation extends StatelessWidget {
   final Function(String?) onChanged;
 
   SelectLocation({
-    Key? key,
+    super.key,
     required this.selectedDistrict,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   final List<String> _districts = [
     'Colombo',

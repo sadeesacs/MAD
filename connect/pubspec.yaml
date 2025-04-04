@@ -54,6 +54,7 @@ dependencies:
   flutter_dotenv: ^5.2.1
 
 
+  path: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

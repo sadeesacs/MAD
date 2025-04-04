@@ -13,10 +13,10 @@ class DetailPendingRequestScreen extends StatefulWidget {
   final String bookingId;
 
   const DetailPendingRequestScreen({
-    Key? key,
+    super.key,
     required this.bookingData,
     required this.bookingId,
-  }) : super(key: key);
+  });
 
   @override
   State<DetailPendingRequestScreen> createState() => _DetailPendingRequestScreenState();
@@ -113,7 +113,7 @@ class _DetailPendingRequestScreenState extends State<DetailPendingRequestScreen>
     final String date            = widget.bookingData['date']            ?? '2025-03-03';
     final String time            = widget.bookingData['time']            ?? '3 PM To 6 PM';
     final String district        = widget.bookingData['district']        ?? 'Colombo';
-    final String additional_notes = widget.bookingData['additional_notes'] ?? 'Beware of dogs...';
+    final String additionalNotes = widget.bookingData['additional_notes'] ?? 'Beware of dogs...';
     final String total           = widget.bookingData['total']           ?? 'LKR 6000.00';
     final dynamic customerRef    = widget.bookingData['customerRef'];
     
@@ -221,7 +221,7 @@ class _DetailPendingRequestScreenState extends State<DetailPendingRequestScreen>
 
                 // Additional Notes
                 _buildLabel('Additional Notes'),
-                _buildInfo(additional_notes),
+                _buildInfo(additionalNotes),
                 const SizedBox(height: 16),
 
                 // Estimated Total

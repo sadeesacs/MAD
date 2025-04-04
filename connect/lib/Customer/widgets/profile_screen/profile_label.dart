@@ -4,9 +4,9 @@ class ProfileLabel extends StatelessWidget {
   final String label;
 
   const ProfileLabel({
-    Key? key,
+    super.key,
     required this.label,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

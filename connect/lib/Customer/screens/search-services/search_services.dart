@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 // Local widget imports
 import '../home/home_screen.dart';
 import 'widgets/reset_button.dart';
-import 'widgets/select_button.dart';
 import 'widgets/select_location.dart';
 import 'widgets/select_price.dart';
 import 'widgets/select_rating.dart';

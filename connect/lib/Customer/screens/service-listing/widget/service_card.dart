@@ -1,5 +1,4 @@
 // lib/Customer/screens/service-listing/widget/service_card.dart
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../../../util/image_provider_helper.dart';
@@ -9,7 +8,7 @@ const Color cardBackgroundColor = Color(0xFFF6FAF8);
 class ServiceCard extends StatelessWidget {
   final Map<String, dynamic> service;
 
-  const ServiceCard({Key? key, required this.service}) : super(key: key);
+  const ServiceCard({super.key, required this.service});
 
   /// Fetches the provider's name by using the 'serviceProvider' reference
   /// from the service document and then reading the 'name' field from the user document.

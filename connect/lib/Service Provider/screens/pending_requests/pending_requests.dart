@@ -1,5 +1,4 @@
 // lib/Service Provider/screens/pending_requests/pending_requests.dart
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connect/Service%20Provider/screens/dashboard/dashboard_screen.dart'; // Import DashboardScreen
 import 'package:flutter/material.dart';
@@ -30,7 +29,7 @@ class _PendingRequestsScreenState extends State<PendingRequestsScreen> {
   final BookingService _bookingService = BookingService();
   final Map<String, Map<String, dynamic>> _customerDataCache = {};
   final Map<String, Map<String, dynamic>> _serviceDataCache = {};
-  bool _isLoading = true;
+  final bool _isLoading = true;
 
   @override
   void initState() {

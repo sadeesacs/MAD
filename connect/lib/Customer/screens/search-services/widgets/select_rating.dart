@@ -6,10 +6,10 @@ class SelectRating extends StatelessWidget {
   final Function(int?) onChanged;
 
   SelectRating({
-    Key? key,
+    super.key,
     required this.selectedRating,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   final List<int> _ratings = [1, 2, 3, 4, 5];
 

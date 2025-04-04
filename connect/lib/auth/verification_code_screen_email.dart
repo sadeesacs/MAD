@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server/gmail.dart';
-import '../role_selection/role_selection.dart';
 
 class VerificationCodeScreenEmail extends StatefulWidget {
   final String email;
@@ -332,7 +331,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreenEmail> {
       for (var p in e.problems) {
         print('Problem: ${p.code}: ${p.msg}');
       }
-      throw e;
+      rethrow;
     }
   }
 

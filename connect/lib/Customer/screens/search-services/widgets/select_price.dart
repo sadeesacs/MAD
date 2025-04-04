@@ -6,10 +6,10 @@ class SelectPriceRange extends StatelessWidget {
   final TextEditingController maxPriceController;
 
   const SelectPriceRange({
-    Key? key,
+    super.key,
     required this.minPriceController,
     required this.maxPriceController,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

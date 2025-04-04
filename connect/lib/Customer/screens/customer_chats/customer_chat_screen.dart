@@ -11,12 +11,12 @@ class CustomerChatScreen extends StatefulWidget {
   final String otherUserId;
 
   const CustomerChatScreen({
-    Key? key,
+    super.key,
     required this.chatId,
     required this.profilePic,
     required this.userName,
     required this.otherUserId,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomerChatScreen> createState() => _CustomerChatScreenState();

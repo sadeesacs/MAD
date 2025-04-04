@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'login_screen.dart';
 
 class SuccessPasswordChangeScreen extends StatelessWidget {
-  const SuccessPasswordChangeScreen({Key? key}) : super(key: key);
+  const SuccessPasswordChangeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

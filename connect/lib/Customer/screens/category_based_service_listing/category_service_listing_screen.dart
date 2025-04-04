@@ -6,15 +6,13 @@ import '../../services/service_data_service.dart';
 import '../../widgets/connect_app_bar.dart';
 import '../../widgets/connect_nav_bar.dart';
 import '../home/widgets/search_bar_widget.dart';
-import '../home/widgets/top_rated_widget.dart';
 import '../service-detail/service_detail.dart';
 
 /// Widget to fetch and display the provider's name from Firestore.
 class ProviderNameWidget extends StatelessWidget {
   final dynamic serviceProvider; // Expected to be a DocumentReference
 
-  const ProviderNameWidget({Key? key, required this.serviceProvider})
-      : super(key: key);
+  const ProviderNameWidget({super.key, required this.serviceProvider});
 
   @override
   Widget build(BuildContext context) {
@@ -71,9 +69,9 @@ class CategoryServiceListingScreen extends StatefulWidget {
   final String categoryName;
 
   const CategoryServiceListingScreen({
-    Key? key,
+    super.key,
     required this.categoryName,
-  }) : super(key: key);
+  });
 
   @override
   State<CategoryServiceListingScreen> createState() =>

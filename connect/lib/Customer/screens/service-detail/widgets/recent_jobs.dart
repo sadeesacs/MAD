@@ -5,7 +5,7 @@ import '../../../../util/image_provider_helper.dart';
 class RecentJobs extends StatelessWidget {
   final List<Map<String, dynamic>> recentJobsList;
 
-  const RecentJobs({Key? key, required this.recentJobsList}) : super(key: key);
+  const RecentJobs({super.key, required this.recentJobsList});
 
   @override
   Widget build(BuildContext context) {

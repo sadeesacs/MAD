@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Reviews extends StatelessWidget {
   final List<Map<String, dynamic>> reviewsList;
 
-  const Reviews({Key? key, required this.reviewsList}) : super(key: key);
+  const Reviews({super.key, required this.reviewsList});
 
   @override
   Widget build(BuildContext context) {

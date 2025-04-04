@@ -14,7 +14,7 @@ import 'edit_widgets/available_dates_picker.dart';
 import 'edit_widgets/cover_image_picker.dart';
 
 class AddServiceDetailsScreen extends StatefulWidget {
-  const AddServiceDetailsScreen({Key? key}) : super(key: key);
+  const AddServiceDetailsScreen({super.key});
 
   @override
   State<AddServiceDetailsScreen> createState() =>
@@ -32,7 +32,7 @@ class _AddServiceDetailsScreenState extends State<AddServiceDetailsScreen> {
   List<String> _selectedLocations = [];
   String? _fromTime;
   String? _toTime;
-  Set<String> _selectedDays = {};
+  final Set<String> _selectedDays = {};
 
   bool _serviceNameError = false;
   bool _categoryError = false;

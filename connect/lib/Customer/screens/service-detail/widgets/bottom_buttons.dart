@@ -10,10 +10,10 @@ class BottomButtons extends StatelessWidget {
   final VoidCallback? onBookNowTap;
 
   const BottomButtons({
-    Key? key,
+    super.key,
     this.onMessageTap,
     this.onBookNowTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

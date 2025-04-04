@@ -1,11 +1,8 @@
 // lib/Service Provider/screens/scheduled_jobs/scheduled_jobs.dart
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connect/Service%20Provider/screens/dashboard/dashboard_screen.dart'; // Import DashboardScreen
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:intl/intl.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../services/booking_service.dart';
 import '../../widgets/connect_app_bar_sp.dart';

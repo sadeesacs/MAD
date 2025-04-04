@@ -7,12 +7,12 @@ class ViewRatingBottomSheet extends StatelessWidget {
   final String reviewDate;
 
   const ViewRatingBottomSheet({
-    Key? key,
+    super.key,
     required this.rating,
     required this.review,
     this.customerName = '',
     this.reviewDate = '',
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

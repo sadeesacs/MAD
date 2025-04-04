@@ -6,11 +6,11 @@ class CancelBookingPopup extends StatelessWidget {
   final VoidCallback onCancel;
 
   const CancelBookingPopup({
-    Key? key,
+    super.key,
     required this.bookingInfo,
     required this.onConfirm,
     required this.onCancel,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

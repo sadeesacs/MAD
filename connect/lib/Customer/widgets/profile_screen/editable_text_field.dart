@@ -7,12 +7,12 @@ class EditableTextField extends StatelessWidget {
   final VoidCallback onEditTap;
 
   const EditableTextField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.hintText,
     required this.isEditable,
     required this.onEditTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -9,7 +9,6 @@ import '../../widgets/sp_hamburger_menu.dart';
 import 'widgets/status_indicator.dart';
 import 'widgets/service_detail_card.dart';
 import 'widgets/job_description_card.dart';
-import 'widgets/recent_jobs_widget.dart';
 import 'popups/status_confirmation_popup.dart';
 import 'popups/edit_job_description_popup.dart';
 import 'edit_service_details_screen.dart';

@@ -118,7 +118,7 @@ class BookingService {
       });
     } catch (e) {
       print('Error updating booking status: $e');
-      throw e;
+      rethrow;
     }
   }
 
