@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:connect/role_selection/role_selection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,6 +8,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../auth/login_screen.dart';
+import '../onboarding_screens/onboarding_screen.dart';
 
 class AuthenticationRepository extends GetxController {
   static AuthenticationRepository get instance => Get.find();
@@ -29,11 +29,11 @@ class AuthenticationRepository extends GetxController {
   Future<void> screenRedirect() async {
     final user = _auth.currentUser;
 
-    if(user != null) {
+    if (user != null) {
       final userDoc = await _firestore.collection('users').doc(user.uid).get();
       final phoneNumber = userDoc.data()!['phoneNumber'];
 
-      if(userDoc.data()!['phoneVerified'] == true) {
+      if (userDoc.data()!['phoneVerified'] == true) {
         try {
           if (userDoc.exists && userDoc.data() != null) {
             final role = userDoc.data()!['role'];
@@ -52,23 +52,23 @@ class AuthenticationRepository extends GetxController {
         await checkPhoneVerification(user);
       }
     } else {
-      deviceStorage.writeIfNull('IsFirstTime', true);
-      if (deviceStorage.read('IsFirstTime') == true) {
-        Get.offAll(() => const RoleSelectionScreen());
-        // After first run, set to false
-        deviceStorage.write('IsFirstTime', false);
-      }else{
+      // Check if the user has seen the onboarding
+      bool hasSeenOnboarding = deviceStorage.read('hasSeenOnboarding') ?? false;
+      if (!hasSeenOnboarding) {
+        // Navigate to onboarding and set flag
+        Get.offAll(() => const OnboardingScreen());
+        deviceStorage.write('hasSeenOnboarding', true);
+      } else {
+        // If onboarding already seen, go to LoginScreen (or RoleSelectionScreen if that's desired)
         Get.offAll(() => const LoginScreen());
       }
     }
-
   }
 
   Future<void> signOut() async {
     await _auth.signOut();
     Get.offAll(() => const LoginScreen());
   }
-
 
   // Stream controller to emit verification requests
   final StreamController<Map<String, dynamic>> _verificationController =
@@ -81,10 +81,7 @@ class AuthenticationRepository extends GetxController {
   Future<void> checkPhoneVerification(User user) async {
     try {
       // Get user data from Firestore
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
+      final userDoc = await _firestore.collection('users').doc(user.uid).get();
 
       // If user exists and phone is not verified
       if (userDoc.exists &&
