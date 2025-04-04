@@ -11,66 +11,87 @@ class RoleSelectionScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Choose Your Role',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 32,
-                  color: Color(0xFF027335),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 40),
+            child: Column(
+              children: [
+                // Logo at the top center
+                Image.asset(
+                  'assets/images/logo/logo.png',
+                  width: 120,
+                  height: 120,
+                  fit: BoxFit.contain,
                 ),
-              ),
-              const SizedBox(height: 80),
+                const SizedBox(height: 30),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Customer Role
-                  _RoleCard(
-                    label: 'Customer',
-                    imagePath: 'assets/images/role_selection/customer.png',
-                    onTap: () {
-                      // Store role in GetStorage
-                      final storage = GetStorage();
-                      storage.write('userRole', 'CUSTOMER');
-                      print("Role set: CUSTOMER");
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const LoginScreen(isServiceProvider: false),
-                        ),
-                      );
-                    },
+                // Title: "Welcome to Connect"
+                const Text(
+                  'Welcome to Connect',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 35,
+                    color: Color(0xFF027335),
                   ),
+                ),
+                const SizedBox(height: 10),
 
-                  const SizedBox(width: 30),
-
-                  // Service Provider Role
-                  _RoleCard(
-                    label: 'Service Provider',
-                    imagePath: 'assets/images/role_selection/service_provider.png',
-                    onTap: () {
-                      // Store role in GetStorage
-                      final storage = GetStorage();
-                      storage.write('userRole', 'SERVICE_PROVIDER');
-                      print("Role set: SERVICE_PROVIDER");
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const LoginScreen(isServiceProvider: true),
-                        ),
-                      );
-                    },
+                // Subtitle: "Let’s get started by choosing your user role"
+                const Text(
+                  "Let's get started by choosing your user role",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.normal,
+                    fontSize: 20,
+                    color: Colors.black,
                   ),
-                ],
-              ),
-            ],
+                ),
+
+                const SizedBox(height: 50),
+
+                // Role Selection Row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Customer Role
+                    _RoleCard(
+                      label: 'Customer',
+                      imagePath: 'assets/images/role_selection/customer.png',
+                      onTap: () {
+                        final storage = GetStorage();
+                        storage.write('userRole', 'CUSTOMER');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const LoginScreen(isServiceProvider: false),
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(width: 40),
+
+                    // Service Provider Role
+                    _RoleCard(
+                      label: 'Service Provider',
+                      imagePath: 'assets/images/role_selection/service_provider.png',
+                      onTap: () {
+                        final storage = GetStorage();
+                        storage.write('userRole', 'SERVICE_PROVIDER');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const LoginScreen(isServiceProvider: true),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
