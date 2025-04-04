@@ -1,4 +1,4 @@
-// lib/Customer/screens/service-detail/service_detail.dart
+// lib/Customer/screens/Service-detail/service_detail.dart
 
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,7 +14,11 @@ import 'widgets/reviews.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import '../../services/service_data_service.dart';
-import 'package:connect/util/image_provider_helper.dart'; // Your helper for images
+import 'package:connect/util/image_provider_helper.dart';
+
+// -- ADDED IMPORTS for Chat functionality
+import 'package:connect/Customer/services/customer_chat_service.dart';
+import 'package:connect/Customer/screens/customer_chats/customer_chat_screen.dart';
 
 const Color darkGreen = Color(0xFF027335);
 const Color greyText  = Colors.grey;
@@ -39,6 +43,8 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   // Data fetched from Firestore:
   Map<String, dynamic> _serviceData = {};
   String _providerName = 'Unknown';
+  String _providerId   = ''; // We'll store the provider's user ID here
+  String _providerPic  = 'https://via.placeholder.com/150'; // Will fetch from user doc if possible
 
   // Computed average rating from reviews:
   double _computedRating = 0.0;
@@ -74,13 +80,18 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
       // Store the fetched service data and add the docId into it.
       _serviceData = {...data, 'docId': docId};
 
-      // 3. Fetch the service provider's name from the user doc.
+      // 3. Fetch the service provider's name & ID from the user doc.
       if (_serviceData['serviceProvider'] is DocumentReference) {
         final DocumentReference providerRef = _serviceData['serviceProvider'];
         final providerSnap = await providerRef.get();
         if (providerSnap.exists) {
           final userData = providerSnap.data() as Map<String, dynamic>;
           _providerName = userData['name'] ?? 'Unknown';
+          _providerId   = providerRef.id; // The actual user doc ID
+          // Optional: also store the provider's profile pic
+          if (userData['profile_pic'] is String) {
+            _providerPic = userData['profile_pic'];
+          }
         }
       }
 
@@ -103,6 +114,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           _computedRating = sum / _reviewsData.length;
         }
       } else {
+        // If there's a numeric rating directly on the service doc
         _computedRating = (_serviceData['rating']?.toDouble()) ?? 0.0;
       }
 
@@ -144,7 +156,6 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   }
 
   Widget _buildCoverImage(String path) {
-    // Use your helper to get the correct ImageProvider
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: Container(
@@ -152,7 +163,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
         height: 200,
         width: double.infinity,
         child: Image(
-          image: getImageProvider(path), // Uses a helper that checks local path
+          image: getImageProvider(path),
           fit: BoxFit.cover,
         ),
       ),
@@ -223,6 +234,40 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
         ],
       ),
     );
+  }
+
+  /// The key addition:
+  /// Called when the user taps the "Message" button.
+  /// 1) We get or create a chat with the provider ID.
+  /// 2) We fetch the provider's name & profile pic (already have them in memory).
+  /// 3) Navigate to the CustomerChatScreen.
+  Future<void> _onMessageTap() async {
+    try {
+      if (_providerId.isEmpty) {
+        throw Exception("No provider ID found. Cannot start chat.");
+      }
+      // Use your CustomerChatService
+      final chatService = CustomerChatService();
+      final chatId = await chatService.createOrGetChat(_providerId);
+
+      // We already stored _providerName, _providerPic, and _providerId in state
+      // So let's navigate to the chat screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => CustomerChatScreen(
+            chatId: chatId,
+            profilePic: _providerPic,
+            userName: _providerName,
+            otherUserId: _providerId,
+          ),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error starting chat: $e')),
+      );
+    }
   }
 
   @override
@@ -345,14 +390,15 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
             ),
           ),
 
-          // Bottom Buttons: Book Now button integration
+          // Bottom Buttons: Book Now and MESSAGE
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: BottomButtons(
               onMessageTap: () {
-                // Implement messaging functionality if needed
+                // --------------> We call our new method <--------------
+                _onMessageTap();
               },
               onBookNowTap: () {
                 // Create booking form data with required fields.
