@@ -18,6 +18,10 @@ class CategoriesScreen extends StatelessWidget {
     {'name': 'Car Wash', 'image': 'assets/images/categories/car_wash.png'},
     {'name': 'Baby Sitting', 'image': 'assets/images/categories/baby_sitting.png'},
     {'name': 'Laundry', 'image': 'assets/images/categories/laundry.png'},
+    {'name': 'Plumbing', 'image': 'assets/images/categories/Plumbing.png'},
+    {'name': 'Electrical', 'image': 'assets/images/categories/electrical.png'},
+    {'name': 'Massage', 'image': 'assets/images/categories/Massage.png'},
+    {'name': 'Eldercare', 'image': 'assets/images/categories/adultcare.png'},
   ];
 
   @override

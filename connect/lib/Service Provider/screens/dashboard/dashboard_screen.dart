@@ -1,3 +1,4 @@
+// lib/Service Provider/screens/dashboard/dashboard_screen.dart
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connect/Service%20Provider/screens/dashboard/widgets/manage_my_services.dart';
@@ -131,26 +132,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final bookingsSnapshot = await FirebaseFirestore.instance
           .collection('booking')
           .get();
-      
+
       int completed = 0;
       int upcoming = 0;
-      
+
       // Process each booking to check if the current user is the service provider
       for (var booking in bookingsSnapshot.docs) {
         final bookingData = booking.data();
-        
+
         // Get the service reference from booking
         if (bookingData['service'] != null) {
           final serviceRef = bookingData['service'] as DocumentReference;
           final serviceDoc = await serviceRef.get();
-          
+
           if (serviceDoc.exists) {
             final serviceData = serviceDoc.data() as Map<String, dynamic>;
-            
+
             // Check if serviceProvider field exists and points to current user
             if (serviceData['serviceProvider'] != null) {
               final serviceProviderRef = serviceData['serviceProvider'] as DocumentReference;
-              
+
               // If this booking's service provider is the current user
               if (serviceProviderRef.id == user!.uid) {
                 // Count based on status
@@ -218,7 +219,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             title,
             style: const TextStyle(
               fontFamily: 'Roboto',
-              fontWeight: FontWeight.w500, // Medium
+              fontWeight: FontWeight.w500,
               fontSize: 18,
               color: Colors.black,
             ),
@@ -231,7 +232,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 '$count',
                 style: const TextStyle(
                   fontFamily: 'Roboto',
-                  fontWeight: FontWeight.w600, // SemiBold
+                  fontWeight: FontWeight.w600,
                   fontSize: 22,
                   color: Colors.black,
                 ),
@@ -376,245 +377,227 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final customerDoc = await customerRef.get();
     return customerDoc.data() as Map<String, dynamic>;
   }
-  
+
   // Filter bookings to only show those belonging to current service provider
   Future<List<DocumentSnapshot>> _filterBookingsByServiceProvider(
       List<DocumentSnapshot> bookings) async {
     List<DocumentSnapshot> filteredBookings = [];
-    
-    for (var booking in bookings) {
-      final bookingData = booking.data() as Map<String, dynamic>;
-      
-      // Skip if booking doesn't have service reference
+
+    for (var doc in bookings) {
+      final bookingData = doc.data() as Map<String, dynamic>;
       if (bookingData['service'] == null) continue;
-      
+
       final serviceRef = bookingData['service'] as DocumentReference;
       final serviceDoc = await serviceRef.get();
-      
+
       if (serviceDoc.exists) {
         final serviceData = serviceDoc.data() as Map<String, dynamic>;
-        
-        // Check if serviceProvider field exists and points to current user
+
         if (serviceData['serviceProvider'] != null) {
           final serviceProviderRef = serviceData['serviceProvider'] as DocumentReference;
-          
-          // If this booking's service provider is the current user
           if (user != null && serviceProviderRef.id == user!.uid) {
-            // Only add pending requests
             if (bookingData['status'] == 'pending') {
-              filteredBookings.add(booking);
+              filteredBookings.add(doc);
             }
           }
         }
       }
     }
-    
+
     return filteredBookings;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: const ConnectAppBarSP(),
-      endDrawer: const SPHamburgerMenu(),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            controller: _scrollController,
-            padding: const EdgeInsets.all(25),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Welcome & Profile
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Welcome, $_userName',
-                        style: const TextStyle(
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 26,
-                          color: Color(0xFF027335),
-                          overflow: TextOverflow.ellipsis,
+    return WillPopScope(
+      onWillPop: () async {
+        // Prevent back navigation (stay on this screen)
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: const ConnectAppBarSP(),
+        endDrawer: const SPHamburgerMenu(),
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Welcome & Profile
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Welcome, $_userName',
+                          style: const TextStyle(
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 26,
+                            color: Color(0xFF027335),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
-                    ),
-                    _buildProfileImage(),
-                  ],
-                ),
-                const SizedBox(height: 30),
-
-                // Completed & Upcoming Services
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildStatsCard(
-                        title: 'Completed Services',
-                        count: completedServices,
-                        icon: Icons.check,
-                      ),
-                    ),
-                    const SizedBox(width: 18),
-                    Expanded(
-                      child: _buildStatsCard(
-                        title: 'Upcoming Services',
-                        count: upcomingServices,
-                        icon: Icons.priority_high,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-
-                // New Job Requests
-                const Text(
-                  'New Job Requests',
-                  style: TextStyle(
-                    fontFamily: 'Roboto',
-                    fontWeight: FontWeight.w600, // SemiBold
-                    fontSize: 22,
-                    color: Color(0xFF027335),
+                      _buildProfileImage(),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 30),
+                  const SizedBox(height: 30),
 
-                Container(
-                  height: 253,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF6FAF6),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.black12),
+                  // Completed & Upcoming Services
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatsCard(
+                          title: 'Completed Services',
+                          count: completedServices,
+                          icon: Icons.check,
+                        ),
+                      ),
+                      const SizedBox(width: 18),
+                      Expanded(
+                        child: _buildStatsCard(
+                          title: 'Upcoming Services',
+                          count: upcomingServices,
+                          icon: Icons.priority_high,
+                        ),
+                      ),
+                    ],
                   ),
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('booking')
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return const Text('Something went wrong');
-                      }
+                  const SizedBox(height: 30),
 
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                            child: CircularProgressIndicator());
-                      }
+                  // New Job Requests
+                  const Text(
+                    'New Job Requests',
+                    style: TextStyle(
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 22,
+                      color: Color(0xFF027335),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
 
-                      final bookings = snapshot.data!.docs;
-                      // Filter bookings after we fetch them
-                      return FutureBuilder<List<DocumentSnapshot>>(
-                        future: _filterBookingsByServiceProvider(bookings),
-                        builder: (context, filteredSnapshot) {
-                          if (filteredSnapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
-                          }
-                          
-                          if (filteredSnapshot.hasError) {
-                            return const Text('Error filtering bookings');
-                          }
-                          
-                          final filteredBookings = filteredSnapshot.data ?? [];
-                          
-                          if (filteredBookings.isEmpty) {
-                            return const Center(
-                              child: Text(
-                                'No job requests available',
-                                style: TextStyle(
-                                  fontFamily: 'Roboto',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 18,
-                                  color: Colors.black,
+                  Container(
+                    height: 253,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF6FAF6),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.black12),
+                    ),
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('booking')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return const Text('Something went wrong');
+                        }
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final docs = snapshot.data?.docs ?? [];
+                        return FutureBuilder<List<DocumentSnapshot>>(
+                          future: _filterBookingsByServiceProvider(docs),
+                          builder: (context, filteredSnapshot) {
+                            if (filteredSnapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                            if (filteredSnapshot.hasError) {
+                              return const Text('Error filtering bookings');
+                            }
+                            final filteredBookings = filteredSnapshot.data ?? [];
+                            if (filteredBookings.isEmpty) {
+                              return const Center(
+                                child: Text(
+                                  'No job requests available',
+                                  style: TextStyle(
+                                    fontFamily: 'Roboto',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                  ),
                                 ),
-                              ),
-                            );
-                          }
-
-                          return ListView.separated(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            itemCount: filteredBookings.length,
-                            separatorBuilder: (_, __) => const Divider(
-                              color: Colors.black,
-                              thickness: 1,
-                              height: 1,
-                            ),
-                            itemBuilder: (context, index) {
-                              final booking = filteredBookings[index];
-                              final bookingData =
-                                  booking.data() as Map<String, dynamic>;
-                              final serviceRef =
-                                  bookingData['service'] as DocumentReference;
-                              final customerRef =
-                                  bookingData['customer'] as DocumentReference;
-
-                              return FutureBuilder<Map<String, dynamic>>(
-                                future: Future.wait([
-                                  _fetchServiceData(serviceRef),
-                                  _fetchCustomerData(customerRef),
-                                ]).then((results) => {
-                                      'serviceTitle': results[0]['serviceName'],
-                                      'customerName': results[1]['name'],
-                                      'requestedDate': DateFormat('yyyy-MM-dd HH:mm')
-                                          .format((bookingData['date'] as Timestamp)
-                                              .toDate()),
-                                    }),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return const Center(
-                                        child: CircularProgressIndicator());
-                                  }
-
-                                  if (snapshot.hasError) {
-                                    return const Text('Error loading job request');
-                                  }
-
-                                  final job = snapshot.data!;
-                                  return _buildJobRequestCard(job);
-                                },
                               );
-                            },
-                          );
-                        },
-                      );
-                    },
+                            }
+                            return ListView.separated(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              itemCount: filteredBookings.length,
+                              separatorBuilder: (_, __) => const Divider(
+                                color: Colors.black,
+                                thickness: 1,
+                                height: 1,
+                              ),
+                              itemBuilder: (context, index) {
+                                final booking = filteredBookings[index];
+                                final bookingData =
+                                booking.data() as Map<String, dynamic>;
+                                final serviceRef =
+                                bookingData['service'] as DocumentReference;
+                                final customerRef =
+                                bookingData['customer'] as DocumentReference;
+
+                                return FutureBuilder<Map<String, dynamic>>(
+                                  future: Future.wait([
+                                    _fetchServiceData(serviceRef),
+                                    _fetchCustomerData(customerRef),
+                                  ]).then((results) => {
+                                    'serviceTitle': results[0]['serviceName'],
+                                    'customerName': results[1]['name'],
+                                    'requestedDate': DateFormat('yyyy-MM-dd HH:mm')
+                                        .format((bookingData['date'] as Timestamp)
+                                        .toDate()),
+                                  }),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                          child: CircularProgressIndicator());
+                                    }
+                                    if (snapshot.hasError) {
+                                      return const Text('Error loading job request');
+                                    }
+                                    final job = snapshot.data!;
+                                    return _buildJobRequestCard(job);
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(height: 30),
+                  const SizedBox(height: 30),
 
-                // Top Rated
-                const TopRatedSPWidget(),
-                const SizedBox(height: 30),
+                  // Top Rated
+                  const TopRatedSPWidget(),
+                  const SizedBox(height: 30),
 
-                // Customer Reviews
-                const CustomerReviewsSPWidget(),
-              ],
-            ),
-          ),
-
-          // Floating Nav Bar that hides on scroll
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 30,
-            child: AnimatedSlide(
-              duration: const Duration(milliseconds: 500),
-              offset: _hideNavBar ? const Offset(0, 1.5) : const Offset(0, 0),
-              child: ConnectNavBarSP(
-                // Home is highlighted here
-                isHomeSelected: true,
-                isToolsSelected: false,
+                  // Customer Reviews
+                  const CustomerReviewsSPWidget(),
+                ],
               ),
             ),
-          ),
-        ],
+            // Floating Nav Bar that hides on scroll
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 30,
+              child: AnimatedSlide(
+                duration: const Duration(milliseconds: 500),
+                offset: _hideNavBar ? const Offset(0, 1.5) : const Offset(0, 0),
+                child: ConnectNavBarSP(
+                  isHomeSelected: false,
+                  isToolsSelected: false,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
