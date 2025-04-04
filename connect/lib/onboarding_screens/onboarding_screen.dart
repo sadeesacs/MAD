@@ -134,7 +134,7 @@ class OnboardingScreen extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      width: isSelected ? 20 : 18,
+      width: isSelected ? 22 : 20,
       height: isSelected ? 20 : 18,
       decoration: BoxDecoration(
         shape: BoxShape.circle,

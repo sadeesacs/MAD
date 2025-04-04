@@ -1,13 +1,14 @@
+// lib/auth/forgot_password_screen.dart
 import 'dart:math';
 
 import 'package:connect/auth/verification_code_screen_email.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server/gmail.dart';
 import 'login_screen.dart';
 import 'verification_code_screen.dart';
-import 'package:mailer/smtp_server/gmail.dart';
-import 'package:mailer/mailer.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
@@ -18,8 +19,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
-  final gmailSmtp =
-      gmail(dotenv.env["GMAIL_MAIL"]!, dotenv.env["GMAIL_PASSWORD"]!);
+  final gmailSmtp = gmail(dotenv.env["GMAIL_MAIL"]!, dotenv.env["GMAIL_PASSWORD"]!);
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -27,9 +27,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Let the screen adjust when the keyboard is shown.
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(25),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,8 +71,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               // Subtext
               const Center(
                 child: Text(
-                  'Enter your registered email to receive\n'
-                  'a password reset link.',
+                  'Enter your registered email to receive\na password reset link.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'Roboto',
@@ -155,7 +156,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  sendMailFromGmail(String sender, sub, text) async {
+  // Function to send an email using Gmail SMTP
+  sendMailFromGmail(String sender, String sub, String text) async {
     final message = Message()
       ..from = Address(dotenv.env["GMAIL_MAIL"]!, 'Reset Password Request Code')
       ..recipients.add(sender)
@@ -189,7 +191,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
       // Send password reset code
       sendMailFromGmail(email, 'Reset Password Request', verificationCode);
-      // Don't navigate away - show success message but stay on screen
+
+      // Show a success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -200,7 +203,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ),
       );
 
-      // Clear loading state but stay on screen
       setState(() {
         _isLoading = false;
       });
@@ -215,11 +217,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
         ),
       );
-
     } catch (e) {
       String errorMessage = 'Failed to send password reset code';
 
-      // Handle specific Firebase auth errors
       if (e is FirebaseAuthException) {
         if (e.code == 'user-not-found') {
           errorMessage = 'No user found with this email address';
@@ -244,10 +244,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     }
   }
 
-// Generate a random 4-digit verification code
+  // Generate a random 6-digit verification code
   String _generateVerificationCode() {
     Random random = Random();
-    return (100000 + random.nextInt(900000))
-        .toString(); // 6-digit number between 1000-9999
+    return (100000 + random.nextInt(900000)).toString();
   }
 }

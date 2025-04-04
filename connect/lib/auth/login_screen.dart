@@ -45,9 +45,12 @@ class _LoginScreenState extends State<LoginScreen> {
         return false;
       },
       child: Scaffold(
+        // This ensures the screen resizes when the keyboard appears
+        resizeToAvoidBottomInset: true,
         backgroundColor: Colors.white,
         body: SafeArea(
-          child: Padding(
+          child: SingleChildScrollView(
+            // Padding is preserved to give space around the form
             padding: const EdgeInsets.all(25),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
